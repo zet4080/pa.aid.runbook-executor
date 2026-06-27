@@ -14,7 +14,11 @@
 
 ## Sibling Repositories
 
-None identified.
+| Repo | Path | Purpose |
+|------|------|---------|
+| `pa.aid.wsl-setup.sh` | `/repos/pa.aid.wsl-setup.sh` | WSL2 dev environment bootstrap — application code for the runbook executor lives here and is deployed alongside other OpenCode tooling |
+
+**Application code target:** All runbook executor application source code (server, UI, etc.) belongs in `pa.aid.wsl-setup.sh`, not in this planning repo.
 
 ## Workflow
 
