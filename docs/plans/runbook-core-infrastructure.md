@@ -25,16 +25,16 @@
 
 ### 🔴 HIGH — ARC-1285: Bootstrap web server
 
-- [ ] **ARC-1285** — Bootstrap web server and serve local UI
+- [x] **ARC-1285** — Bootstrap web server and serve local UI
   - [x] 🔒 Claimed: build / 2026-06-27 (session start)
-  - [ ] Read `issues/core-infrastructure/ARC-1285-bootstrap-web-server.md`
-  - [ ] Write `implementation_plans/core-infrastructure/ARC-1285-implementation-plan.md`
-  - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
-  - [ ] Execute plan
-  - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
-  - [ ] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1285-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(core-infrastructure): bootstrap web server and local UI serving`
+  - [x] Read `issues/core-infrastructure/ARC-1285-bootstrap-web-server.md`
+  - [x] Write `implementation_plans/core-infrastructure/ARC-1285-implementation-plan.md`
+  - [x] 🔴 INDIVIDUAL PLAN CHECKPOINT
+  - [x] Execute plan
+  - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
+  - [x] Lint / tests pass
+  - [x] Write `task-completions/ARC-1285-COMPLETION-SUMMARY.md`
+  - [x] Commit: `feat(core-infrastructure): bootstrap web server and local UI serving`
 
 ### 🔴 HIGH — ARC-1286: Parse runbook markdown
 
