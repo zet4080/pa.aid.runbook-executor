@@ -2,10 +2,11 @@
 |-------|-------|
 | Type | Story |
 | Priority | High |
-| Status | To Do |
+| Status | Completed |
 | Parent Epic | [ARC-1284](https://proalpha.atlassian.net/browse/ARC-1284) ARC: Core Infrastructure |
 | Jira | [ARC-1285](https://proalpha.atlassian.net/browse/ARC-1285) |
 | Created | 2026-06-27 |
+| Last Updated | 2026-06-27 |
 
 # ARC-1285: Bootstrap web server and serve local UI
 
