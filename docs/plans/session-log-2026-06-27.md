@@ -45,7 +45,11 @@
 | README.md | Rewritten |
 
 ### Commit Sequence
-_(filled after commits)_
+
+| # | Hash | Message |
+|---|------|---------|
+| 1 | 11aba9d | docs: generate lane runbooks from workorder |
+| 2 | 5c0e7aa | docs: add HOW-THIS-WORKS.md; update AGENTS.md and README.md; add session log |
 
 ## Design Decisions and Rationale
 
