@@ -5,20 +5,24 @@
 | Folder | Contents |
 |--------|----------|
 | `docs/requirements/` | Approved requirements doc |
-| `docs/plans/` | Proposed issues, create-epics log, workorder (when generated) |
+| `docs/plans/` | Workorder, runbooks, proposed issues, create-epics log, session logs |
 | `issues/` | One folder per epic; one markdown file per story |
 | `implementation_plans/` | Per-story implementation plans (created during execution) |
 | `task-completions/` | Completion summaries per story |
 | `done/` | Archived completed items |
 | `opencode-config/skills/` | Agent skills available in this repo |
 
+## Sibling Repositories
+
+None identified.
+
 ## Workflow
 
 | Step | Action | Artifact |
 |------|--------|----------|
 | 1. Issue | Define what to build | `issues/{epic}/{KEY}-{title}.md` |
-| 2. Plan | Write implementation plan | `implementation_plans/{KEY}-plan.md` |
-| 3. Execute | Implement, test, commit | feature branch named `{KEY}` |
+| 2. Plan | Write implementation plan | `implementation_plans/{lane}/{KEY}-implementation-plan.md` |
+| 3. Execute | Implement, test, commit | feature branch named exactly `{KEY}` |
 | 4. Complete | Write completion summary | `task-completions/{KEY}-COMPLETION-SUMMARY.md` |
 
 ## Epics
@@ -36,10 +40,12 @@
 ## Commit Message Format
 
 ```
-{KEY}: {short summary}
+{type}({lane}): {short summary}
 
 {detailed description of what changed and why}
 ```
+
+For planning artifacts: `docs({lane}): {short summary}`
 
 ## Issue Authoring
 
@@ -47,7 +53,16 @@ Issue files follow the template in `opencode-config/skills/create-issue/`. Each 
 
 ## Execution Planning
 
-Once workorder is generated, see `docs/plans/workorder.md` and `docs/plans/runbook-*.md` for lane-based execution instructions.
+Full operational reference: see `docs/plans/HOW-THIS-WORKS.md`.
+
+Lane runbooks (one per epic):
+- `docs/plans/runbook-core-infrastructure.md`
+- `docs/plans/runbook-session-setup.md`
+- `docs/plans/runbook-parallel-lane-execution.md`
+- `docs/plans/runbook-checkpoint-management.md`
+- `docs/plans/runbook-queue-scheduling-policy.md`
+- `docs/plans/runbook-failure-handling.md`
+- `docs/plans/runbook-session-history.md`
 
 ## MCP Endpoints
 
