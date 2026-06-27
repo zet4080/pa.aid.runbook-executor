@@ -26,7 +26,7 @@
 ### 🔴 HIGH — ARC-1285: Bootstrap web server
 
 - [ ] **ARC-1285** — Bootstrap web server and serve local UI
-  - [ ] 🔒 Claimed: _(fill in: agent / YYYY-MM-DD HH:MM before starting)_
+  - [x] 🔒 Claimed: build / 2026-06-27 (session start)
   - [ ] Read `issues/core-infrastructure/ARC-1285-bootstrap-web-server.md`
   - [ ] Write `implementation_plans/core-infrastructure/ARC-1285-implementation-plan.md`
   - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
