@@ -20,13 +20,33 @@
 
 **Application code target:** All runbook executor application source code (server, UI, etc.) belongs in `pa.aid.wsl-setup.sh`, not in this planning repo.
 
+**Application code location:** `runbook-executor/` top-level subdirectory in `pa.aid.wsl-setup.sh`.
+
+## Branching Strategy (pa.aid.wsl-setup.sh)
+
+All runbook executor feature work targets `pa.aid.wsl-setup.sh`. The `main` branch stays clean until the full feature set is complete.
+
+| Rule | Detail |
+|------|--------|
+| Long-lived integration branch | `runbook-executor` — all feature work merges here |
+| Feature branches | Branch off `runbook-executor`; named exactly `<KEY>` (e.g. `ARC-1285`) |
+| Merge target | Feature branches merge back into `runbook-executor`, never directly to `main` |
+| Final merge | `runbook-executor` → `main` only when all epics are complete |
+
+**Branch creation command:**
+```bash
+git -C /repos/pa.aid.wsl-setup.sh worktree add /repos/<KEY> -b <KEY> runbook-executor
+```
+
+**Runbook artifact commits** (runbook checkoffs, implementation plans, completion summaries) always go to `main` in `pa.aid.runbook-executor` — never into feature branches or `pa.aid.wsl-setup.sh`.
+
 ## Workflow
 
 | Step | Action | Artifact |
 |------|--------|----------|
 | 1. Issue | Define what to build | `issues/{epic}/{KEY}-{title}.md` |
 | 2. Plan | Write implementation plan | `implementation_plans/{lane}/{KEY}-implementation-plan.md` |
-| 3. Execute | Implement, test, commit | feature branch named exactly `{KEY}` |
+| 3. Execute | Implement, test, commit in `pa.aid.wsl-setup.sh` | feature branch named exactly `{KEY}`, branched off `runbook-executor` |
 | 4. Complete | Write completion summary | `task-completions/{KEY}-COMPLETION-SUMMARY.md` |
 
 ## Epics
