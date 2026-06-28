@@ -18,25 +18,35 @@ Acceptance criteria mapping:
 ## Assumptions & Dependencies
 
 - ARC-1285 is merged; the server package at `packages/server/` compiles cleanly with `tsc` and passes `vitest run`.
-- `unified`, `remark-parse`, and `remark-gfm` are available on npm and compatible with the server's TypeScript/CommonJS output target (`"module": "commonjs"` in `packages/server/tsconfig.json`).
+- The server package is switched to ESM output in Step 1 to support `unified` v11+. `unified`, `remark-parse`, and `remark-gfm` (all ESM-only at v11+) are used at their latest versions; no version pinning required.
 - Runbook files are located at `docs/plans/runbook-*.md` relative to the repository root of `pa.aid.runbook-executor`. The parser receives an absolute file path as input; callers are responsible for glob-resolving which files to pass.
 - Emoji markers (🔴🟡🟢) appear in H3 heading text as a prefix followed by a space and `HIGH`/`MEDIUM`/`LOW`. Their absence does not prevent parsing — the step is typed `manual` and checkpoint level is `null`.
 - Emoji markers in checkbox text (🔒🔔) are treated as decorative; the parser strips them when constructing step labels but does not assign semantic meaning.
 - The step graph contract defined in Step 1 (types file) is the single source of truth consumed by all downstream lanes (ARC-1313 session-setup, ARC-1291 parallel-lane-execution, etc.).
 - No streaming or incremental parsing is required; the parser is synchronous and reads the full file.
+- ESM output requires all internal imports use explicit `.js` file extensions (TypeScript resolves `.ts` source but emits `.js`); all new files in `src/runbook/` must follow this convention.
 
 ## Implementation Steps
 
 ---
 
-### Step 1: Install remark dependencies and define step graph types
+### Step 1: Configure ESM output, install remark dependencies, and define step graph types
 
 **Files:**
 - `packages/server/package.json`
+- `packages/server/tsconfig.json`
 - `packages/server/src/runbook/types.ts` *(new)*
 
 **Action:**
+Switch the server package to ESM output so that `unified` v11+ (ESM-only) can be imported without version pinning:
+- In `packages/server/tsconfig.json`: set `"module": "NodeNext"` and `"moduleResolution": "NodeNext"` (or `"Node16"`/`"Node16"` equivalently).
+- In `packages/server/package.json`: add `"type": "module"` to mark the package as ESM.
+- Update the `"build"` script if needed; `tsx` and `vitest` both support ESM natively.
+- Ensure existing files (`src/index.ts`, `src/routes/health.ts`) use `.js` extensions in their relative imports after the ESM switch (TypeScript NodeNext resolution requires explicit extensions).
+
 Add `unified`, `remark-parse`, and `remark-gfm` as runtime dependencies in `packages/server/package.json`. Add `@types/mdast` as a dev dependency for AST node types.
+
+Verify `npm run build` still passes after the ESM switch before proceeding to new source files.
 
 Create `packages/server/src/runbook/types.ts` exporting the following interfaces and union types:
 
@@ -48,7 +58,7 @@ Create `packages/server/src/runbook/types.ts` exporting the following interfaces
 - `RunbookMetadata`: object with fields `title` (string), `epic` (string | null), `lane` (string | null), `dependsOn` (string[])
 - `ParsedRunbook`: object with fields `metadata` (RunbookMetadata), `waves` (array of `RunbookWave`)
 
-**Verification:** `tsc --noEmit` passes with the new types file in place and no import errors.
+**Verification:** `npm run build` passes (including the ESM switch) with the new types file in place and no import errors. Existing `GET /api/health` test still passes.
 
 ---
 
@@ -184,7 +194,7 @@ All tests run via `npm run test --workspace=packages/server` (Vitest).
 
 ## Risks & Open Questions
 
-- **remark CommonJS compatibility:** `unified` v11+ ships as ESM-only. The server uses `"module": "commonjs"` in tsconfig. If ESM-only imports fail at runtime, the mitigation is to pin to `unified@10` and matching `remark-parse@10`/`remark-gfm@3` which ship dual CJS/ESM builds. This must be verified during Step 1 before any other steps proceed; if the pin is needed, update `package.json` accordingly. This is the highest-risk item in the plan.
+- **ESM vs CJS:** `unified` v11+ is ESM-only. Decision: switch the server package to ESM output — the project is fully owned so this is the simplest path and avoids version pinning. Step 1 updates `packages/server/tsconfig.json` (`module`/`moduleResolution` to `NodeNext`) and adds `"type": "module"` to `packages/server/package.json`. No version pinning required. All relative imports in `src/` must use `.js` extensions post-switch.
 - **Emoji normalization across platforms:** emoji bytes differ across editors (variation selector U+FE0F may or may not be present). The type derivation in Step 2 should also match the text strings `HIGH`, `MEDIUM`, `LOW` without emoji to be resilient. Already accounted for in Step 2 action.
 - **`docs/plans/` path resolution at runtime:** the server process must be started from the `pa.aid.runbook-executor` repo root for `process.cwd()` to resolve the glob correctly. This is a deployment constraint, not a code defect; document it in a comment in `routes/runbooks.ts`.
 - **Future emoji-to-structured-syntax migration:** the workorder notes that emoji markers may be replaced by parseable structured syntax in a later story. The type derivation function in `astWalker.ts` is intentionally isolated so that a future story can swap the derivation strategy without touching `parser.ts` or the API route.
