@@ -46,7 +46,7 @@
   - [x] Execute plan
   - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
   - [x] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1286-COMPLETION-SUMMARY.md`
+  - [x] Write `task-completions/ARC-1286-COMPLETION-SUMMARY.md`
   - [x] Commit: `feat(core-infrastructure): parse runbook markdown into typed step graph`
 
 ### 🟡 Batch — State & subprocess integration (ARC-1287, ARC-1288)
