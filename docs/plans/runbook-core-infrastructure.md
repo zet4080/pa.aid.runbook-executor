@@ -53,30 +53,30 @@
 
 > Note: ARC-1288 is 🔴 HIGH — individual plan checkpoint required before execution.
 
-- [ ] 🔒 Claimed: _(fill in: agent / YYYY-MM-DD HH:MM before starting)_
-- [ ] Read all issues: ARC-1287, ARC-1288
-- [ ] Write all implementation plans:
-  - [ ] `implementation_plans/core-infrastructure/ARC-1287-implementation-plan.md`
-  - [ ] `implementation_plans/core-infrastructure/ARC-1288-implementation-plan.md`
-- [ ] 🟡 BATCH PLAN CHECKPOINT (ARC-1287)
-- [ ] Execute ARC-1287
-  - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
-  - [ ] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1287-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(core-infrastructure): implement sidecar state file`
-- [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT (ARC-1288)
-- [ ] Execute ARC-1288
-  - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
-  - [ ] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1288-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(core-infrastructure): integrate opencode CLI subprocess with JSON event stream`
-- [ ] ☑ batch complete
+- [x] 🔒 Claimed: build / 2026-06-28 (session start)
+- [x] Read all issues: ARC-1287, ARC-1288
+- [x] Write all implementation plans:
+  - [x] `implementation_plans/core-infrastructure/ARC-1287-implementation-plan.md`
+  - [x] `implementation_plans/core-infrastructure/ARC-1288-implementation-plan.md`
+- [x] 🟡 BATCH PLAN CHECKPOINT (ARC-1287)
+- [x] Execute ARC-1287
+  - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
+  - [x] Lint / tests pass
+  - [x] Write `task-completions/ARC-1287-COMPLETION-SUMMARY.md`
+  - [x] Commit: `feat(core-infrastructure): implement sidecar state file`
+- [x] 🔴 INDIVIDUAL PLAN CHECKPOINT (ARC-1288)
+- [x] Execute ARC-1288
+  - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
+  - [x] Lint / tests pass
+  - [x] Write `task-completions/ARC-1288-COMPLETION-SUMMARY.md`
+  - [x] Commit: `feat(core-infrastructure): integrate opencode CLI subprocess with JSON event stream`
+- [x] ☑ batch complete
 
 ### Wave 1 gate
-- [ ] All Wave 1 stories checked off (ARC-1285, ARC-1286, ARC-1287, ARC-1288)
-- [ ] All PRs merged
-- [ ] All completion summaries written
-- [ ] 🟢 WAVE GATE — notify dependent lanes:
+- [x] All Wave 1 stories checked off (ARC-1285, ARC-1286, ARC-1287, ARC-1288)
+- [x] All PRs merged
+- [x] All completion summaries written
+- [x] 🟢 WAVE GATE — notify dependent lanes:
   - session-setup (unblocked by ARC-1286)
   - session-history (unblocked by ARC-1287)
   - parallel-lane-execution (unblocked by ARC-1288)
