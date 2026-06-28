@@ -38,16 +38,16 @@
 
 ### 🔴 HIGH — ARC-1286: Parse runbook markdown
 
-- [ ] **ARC-1286** — Parse runbook markdown into typed step graph
+- [x] **ARC-1286** — Parse runbook markdown into typed step graph
   - [x] 🔒 Claimed: build / 2026-06-28 (session start)
-  - [ ] Read `issues/core-infrastructure/ARC-1286-parse-runbook-markdown.md`
-  - [ ] Write `implementation_plans/core-infrastructure/ARC-1286-implementation-plan.md`
-  - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
-  - [ ] Execute plan
-  - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
-  - [ ] Lint / tests pass
+  - [x] Read `issues/core-infrastructure/ARC-1286-parse-runbook-markdown.md`
+  - [x] Write `implementation_plans/core-infrastructure/ARC-1286-implementation-plan.md`
+  - [x] 🔴 INDIVIDUAL PLAN CHECKPOINT
+  - [x] Execute plan
+  - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
+  - [x] Lint / tests pass
   - [ ] Write `task-completions/ARC-1286-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(core-infrastructure): parse runbook markdown into typed step graph`
+  - [x] Commit: `feat(core-infrastructure): parse runbook markdown into typed step graph`
 
 ### 🟡 Batch — State & subprocess integration (ARC-1287, ARC-1288)
 
