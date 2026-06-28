@@ -39,7 +39,7 @@
 ### 🔴 HIGH — ARC-1286: Parse runbook markdown
 
 - [ ] **ARC-1286** — Parse runbook markdown into typed step graph
-  - [ ] 🔒 Claimed: _(fill in: agent / YYYY-MM-DD HH:MM before starting)_
+  - [x] 🔒 Claimed: build / 2026-06-28 (session start)
   - [ ] Read `issues/core-infrastructure/ARC-1286-parse-runbook-markdown.md`
   - [ ] Write `implementation_plans/core-infrastructure/ARC-1286-implementation-plan.md`
   - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
