@@ -28,7 +28,7 @@
 ### HIGH stories
 
 - [ ] **ARC-1313** — Display runbook dashboard at startup
-  - [ ] 🔒 Claimed: _(fill in: agent / YYYY-MM-DD HH:MM before starting)_
+  - [x] 🔒 Claimed: build / 2026-06-28
   - [ ] Read `issues/session-setup/ARC-1313-display-runbook-dashboard.md`
   - [ ] Write `implementation_plans/session-setup/ARC-1313-implementation-plan.md`
   - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
