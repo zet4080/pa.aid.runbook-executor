@@ -64,9 +64,9 @@
 
 ### Wave 1 gate
 - [x] All Wave 1 stories checked off
-- [ ] All PRs merged
+- [x] All PRs merged
 - [x] All completion summaries written
-- [ ] 🟢 WAVE GATE — notify dependent lanes: none
+- [x] 🟢 WAVE GATE — notify dependent lanes: none
 
 ---
 
