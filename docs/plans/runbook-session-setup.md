@@ -63,9 +63,9 @@
 - [x] ☑ batch complete
 
 ### Wave 1 gate
-- [ ] All Wave 1 stories checked off
+- [x] All Wave 1 stories checked off
 - [ ] All PRs merged
-- [ ] All completion summaries written
+- [x] All completion summaries written
 - [ ] 🟢 WAVE GATE — notify dependent lanes: none
 
 ---
