@@ -49,7 +49,7 @@
 
 ## Wave 2 — Session Browse & Step History
 
-- [ ] 🔒 Claimed: _(fill in: agent / YYYY-MM-DD HH:MM before starting)_
+- [x] 🔒 Claimed: session-history / 2026-06-29 10:30
 - [ ] Read all issues: ARC-1311, ARC-1312
 - [ ] Write all implementation plans
 - [ ] 🟡 BATCH PLAN CHECKPOINT
