@@ -55,12 +55,12 @@
   - [x] Lint / tests pass
   - [x] Write `task-completions/ARC-1315-COMPLETION-SUMMARY.md`
   - [x] Commit: `feat(session-setup): select runbooks to include in session`
-- [ ] Execute ARC-1316
-  - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
-  - [ ] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1316-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(session-setup): configure session parameters before start`
-- [ ] ☑ batch complete
+- [x] Execute ARC-1316
+  - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
+  - [x] Lint / tests pass
+  - [x] Write `task-completions/ARC-1316-COMPLETION-SUMMARY.md`
+  - [x] Commit: `feat(session-setup): configure session parameters before start`
+- [x] ☑ batch complete
 
 ### Wave 1 gate
 - [ ] All Wave 1 stories checked off
