@@ -31,16 +31,16 @@
 
 ### ARC-1310 — Persist active session state across restarts
 
-- [ ] **ARC-1310** — Persist active session state across restarts
+- [x] **ARC-1310** — Persist active session state across restarts
   - [x] 🔒 Claimed: session-history / 2026-06-29 00:00
-  - [ ] Read `issues/session-history/ARC-1310-persist-session-state.md`
-  - [ ] Write `implementation_plans/session-history/ARC-1310-implementation-plan.md`
-  - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
-  - [ ] Execute plan
-  - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
-  - [ ] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1310-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(session-history): persist active session state across restarts`
+  - [x] Read `issues/session-history/ARC-1310-persist-session-state.md`
+  - [x] Write `implementation_plans/session-history/ARC-1310-implementation-plan.md`
+  - [x] 🔴 INDIVIDUAL PLAN CHECKPOINT
+  - [x] Execute plan
+  - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
+  - [x] Lint / tests pass
+  - [x] Write `task-completions/ARC-1310-COMPLETION-SUMMARY.md`
+  - [x] Commit: `feat(session-history): persist active session state across restarts`
 
 🟢 WAVE 1 GATE — ARC-1310 closed and merged before Wave 2 starts
 
