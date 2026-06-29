@@ -4,7 +4,7 @@
 > Stop at every checkpoint symbol (🔴 🟡 🟢).
 > Resume: find first unchecked box and continue.
 
-**Feature goal:** Supervisors can review, edit, approve, or reject execution checkpoints from the browser — with instant notifications and a live priority queue — so no lane proceeds past a gate without human sign-off.
+**Feature goal:** Supervisors can review checkpoint artifacts as Bitbucket PR inline comments and resume lanes via persistent [Resume] cards in the session UI — with a live priority queue — so no lane proceeds past a gate without human sign-off.
 **Epic:** ARC-1295
 **Lane:** checkpoint-management
 **Repos:** pa.aid.runbook-executor
@@ -48,7 +48,7 @@
 
 ---
 
-## Wave 2 — Notification, Queue Display, and Artifact Editing
+## Wave 2 — PR Creation, Resume Card, and Queue Display
 
 ### Batch 2-A: ARC-1302, ARC-1303
 
@@ -60,17 +60,17 @@
   - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
   - [ ] Lint / tests pass
   - [ ] Write `task-completions/ARC-1302-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(checkpoint-management): deliver browser notification within 5 seconds of checkpoint hit`
+  - [ ] Commit: `feat(checkpoint-management): create Bitbucket PR and display persistent Resume card on checkpoint hit`
 - [ ] Execute ARC-1303
   - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
   - [ ] Lint / tests pass
   - [ ] Write `task-completions/ARC-1303-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(checkpoint-management): display checkpoint queue with automatic priority scoring`
+  - [ ] Commit: `feat(checkpoint-management): display checkpoint queue with PR links and Resume buttons`
 - [ ] ☑ batch 2-A complete
 
-### ARC-1304 — Inline-edit checkpoint artifacts and persist handoff file to disk 🔴 HIGH
+### ARC-1304 — Read PR comment threads and address as required action items 🔴 HIGH
 
-- [ ] **ARC-1304** — Inline-edit checkpoint artifacts and persist handoff file to disk
+- [ ] **ARC-1304** — Read PR comment threads and address as required action items
   - [ ] 🔒 Claimed: _(fill in: agent / YYYY-MM-DD HH:MM before starting)_
   - [ ] Read `issues/checkpoint-management/ARC-1304-inline-edit-artifacts.md`
   - [ ] Write `implementation_plans/checkpoint-management/ARC-1304-implementation-plan.md`
@@ -79,7 +79,7 @@
   - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
   - [ ] Lint / tests pass
   - [ ] Write `task-completions/ARC-1304-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(checkpoint-management): inline-edit checkpoint artifacts and persist handoff file to disk`
+  - [ ] Commit: `feat(checkpoint-management): read PR comment threads on Resume and address each as required action item`
 
 ### 🟢 Wave 2 Gate
 
@@ -87,7 +87,7 @@
 
 ---
 
-## Wave 3 — Checkpoint Resolution
+## Wave 3 — Resume Card Persistence and Per-Lane Isolation
 
 ### Batch 3-A: ARC-1305
 
@@ -99,7 +99,7 @@
   - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
   - [ ] Lint / tests pass
   - [ ] Write `task-completions/ARC-1305-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(checkpoint-management): approve or reject checkpoint inline with feedback`
+  - [ ] Commit: `feat(checkpoint-management): display persistent Resume card and handle Resume click per lane`
 - [ ] ☑ batch 3-A complete
 
 ### 🟢 Wave 3 Gate

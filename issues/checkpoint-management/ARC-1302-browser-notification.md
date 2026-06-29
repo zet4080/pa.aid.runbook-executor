@@ -7,17 +7,22 @@
 | Jira | [ARC-1302](https://proalpha.atlassian.net/browse/ARC-1302) |
 | Created | 2026-06-27 |
 
-# ARC-1302: Deliver browser notification within 5 seconds of checkpoint hit
+# ARC-1302: Create Bitbucket PR and display persistent [Resume] card on checkpoint hit
 
 ## Goal
-When lane hits checkpoint, tool sends browser notification identifying runbook, lane, and checkpoint type. Delivered within 5 seconds.
+When a lane hits a checkpoint, the executor creates a git branch, pushes relevant artifacts, opens a Bitbucket Pull Request via the Bitbucket MCP endpoint, and displays a persistent [Resume] card in the session UI — all within 5 seconds of the checkpoint hit. The [Resume] card shows the PR link, checkpoint type, and runbook/lane context.
 
 ## Acceptance Criteria
-1. Given lane hits checkpoint, when 5 seconds elapse, then browser notification delivered with runbook name, lane, checkpoint type.
-2. Given browser tab not in focus, when checkpoint hit, then notification still appears via browser Notification API.
+1. Given lane hits checkpoint, within 5 seconds: git branch created, relevant artifacts pushed, and Bitbucket PR opened via Bitbucket MCP.
+2. Given PR created, then [Resume] card displayed in session UI with: PR URL, checkpoint type (🔴/🟡/🟢), runbook name, and lane identifier.
+3. Given [Resume] card displayed, then card remains visible in session UI until supervisor clicks [Resume] or lane is manually cancelled.
 
 ## In Scope
-- Browser Notification API integration, checkpoint metadata in notification
+- Bitbucket MCP PR creation, git branch creation, artifact push, [Resume] card display in session UI
 
 ## Out of Scope
-- Email, Slack, or other notification channels
+- Browser Notification API (separate story if needed), email notifications, Slack notifications
+
+## Dependencies
+- ARC-1301 (checkpoint detection and lane pause)
+- Bitbucket MCP endpoint available as `bitbucket`

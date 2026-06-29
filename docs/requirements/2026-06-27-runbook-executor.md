@@ -23,7 +23,7 @@ Executing runbooks today requires the supervisor to manually invoke agents step 
 
 | Persona | Role | Context |
 |---------|------|---------|
-| Supervisor | Developer / tech lead | Running automation sessions locally, reviewing and unblocking checkpoint gates, editing artifacts inline |
+| Supervisor | Developer / tech lead | Running automation sessions locally, reviewing checkpoint PRs in Bitbucket, and resuming lanes via [Resume] cards in the session UI |
 
 ---
 
@@ -62,12 +62,18 @@ Executing runbooks today requires the supervisor to manually invoke agents step 
 
 ### Checkpoints
 - 🔴, 🟡, and 🟢 markers in runbook markdown trigger a checkpoint pause in that lane
-- Supervisor receives a browser notification within 5 seconds of checkpoint hit
+- On checkpoint hit, executor creates a git branch, pushes relevant artifacts (planning repo artifacts or code artifacts depending on checkpoint type), and opens a Bitbucket Pull Request via the Bitbucket MCP endpoint
+- A persistent **[Resume]** card is displayed in the session UI within 5 seconds of the checkpoint hit, showing: checkpoint title, PR link, checkpoint type, and runbook/lane context
+- The suspended lane does not block other lanes — other lanes continue executing (non-blocking)
+- Each lane has its own checkpoints and PRs; per-lane isolation is maintained throughout
 - Checkpoint added to supervisor queue with automatic priority score (wait time + gate level)
-- Supervisor can inline-edit checkpoint artifacts (e.g. implementation plans) in the UI
-- Edited content persisted to disk immediately as ephemeral handoff file; agent consumes it during execution
-  - Supervisor approves or rejects checkpoint inline; rejection captures free-text feedback
-  - Rejected checkpoints halt the lane; supervisor must explicitly restart or requeue before execution resumes
+- Supervisor reviews the PR in Bitbucket using inline comments to indicate required changes; PR approval/rejection state is decorative — the executor does not act on it
+- Supervisor clicks **[Resume]** in the session UI to signal "I have finished reviewing"
+- On [Resume] click, executor reads all unresolved comment threads on the PR via Bitbucket MCP
+  - If unresolved comments exist: executor addresses each comment as a required action item, commits the result, replies on the PR thread ("Addressed in commit {sha}"), resolves the thread, then re-sends the [Resume] card with note "Agent addressed N comments — [view changes]" and waits for [Resume] again
+  - If no unresolved comments exist: lane proceeds to next step
+- This loop repeats until supervisor clicks [Resume] with zero unresolved threads
+- All unresolved inline comments on the PR — whether on planning artifacts or code — are treated as required action items
 
 ### Queue Management
 - Pending checkpoints visible as an ordered queue
@@ -102,9 +108,9 @@ Executing runbooks today requires the supervisor to manually invoke agents step 
 
 1. Supervisor can point tool at planning repo and see all runbooks with status within 3 seconds of startup
 2. Supervisor can select runbooks and start parallel execution in one action
-3. Every checkpoint pauses the lane and delivers browser notification within 5 seconds
-4. Supervisor can inline-edit checkpoint artifacts and approve/reject without leaving the browser
-5. Supervisor edits persisted to disk immediately — no data loss on restart or crash
+3. Every checkpoint pauses the lane, creates a Bitbucket PR, and delivers a persistent [Resume] card in the session UI within 5 seconds
+4. Supervisor can review checkpoint artifacts as PR inline comments in Bitbucket and resume the lane by clicking [Resume] in the session UI — no separate tool required
+5. Lane proceeds only when supervisor clicks [Resume] with zero unresolved PR comment threads — executor re-notifies after addressing comments rather than auto-proceeding
 6. When all lanes are blocked, tool stops consuming resources and waits
 7. Runbook checkbox state in markdown accurately reflects execution state at all times
 8. Failed steps retry up to configurable limit with escalating agent level before pausing for supervisor
@@ -122,7 +128,7 @@ Executing runbooks today requires the supervisor to manually invoke agents step 
 | 1 | Does `opencode` CLI support headless/non-interactive mode? | Architecture | 🔴 Blocker | **Resolved.** `opencode run [message]` is documented for scripting. `opencode serve` provides headless API. Known GitHub issues about permission prompts in CI — treat as requiring integration testing before relying on unattended execution. |
 | 2 | What is the output format of `opencode` CLI — how to detect completion vs failure? | Architecture | 🔴 Blocker | **Resolved.** Use `opencode run --format json` — outputs a JSON event stream. Detect completion/failure via process exit code + JSON event/error fields. Do not rely on raw text parsing. |
 | 3 | How does the tool detect that a runbook step requires agent invocation vs is a manual/human step? | Architecture | 🟡 Important | **Resolved.** Steps must be explicitly typed in runbook markdown (e.g. `type: agent` vs `type: manual`) or inferred from structured fields (`agent:`, `prompt:`, `command:`). Natural-language inference alone is insufficient. Runbook format must be extended to support this. |
-| 4 | Should rejected checkpoints re-queue the step or halt the lane? | Product | 🟡 Important | **Resolved.** Rejected checkpoints halt the lane until supervisor explicitly restarts or requeues. Auto-requeue risks repeated bad changes or approval bypass. |
+| 4 | How does the supervisor signal approval at a checkpoint? | Product | 🟡 Important | **Resolved.** PR approve/reject state is decorative. The executor reads unresolved comment threads on [Resume] click. If unresolved comments exist, executor addresses all of them and re-notifies. Lane proceeds only when [Resume] is clicked with zero unresolved threads. |
 
 ---
 

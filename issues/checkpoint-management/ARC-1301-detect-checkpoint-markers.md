@@ -10,11 +10,11 @@
 # ARC-1301: Detect checkpoint markers and pause lane execution
 
 ## Goal
-When executor reaches step with 🔴, 🟡, or 🟢 marker, lane immediately pauses and transitions to blocked state. All three types trigger pause.
+When executor reaches a step with 🔴, 🟡, or 🟢 marker, the lane immediately pauses and transitions to blocked state, awaiting PR review and supervisor [Resume]. All three marker types trigger pause.
 
 ## Acceptance Criteria
 1. Given step with 🔴, 🟡, or 🟢 marker, when executor reaches it, then lane pauses and transitions to blocked status.
-2. Given blocked lane, when supervisor views dashboard, then lane shows blocked with checkpoint type indicated.
+2. Given blocked lane, when supervisor views dashboard, then lane shows blocked with checkpoint type indicated and a [Resume] card is expected to follow from the PR creation step (ARC-1302).
 
 ## In Scope
 - Marker detection (all three types), lane pause, blocked status transition

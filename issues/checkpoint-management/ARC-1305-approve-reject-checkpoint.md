@@ -7,18 +7,23 @@
 | Jira | [ARC-1305](https://proalpha.atlassian.net/browse/ARC-1305) |
 | Created | 2026-06-27 |
 
-# ARC-1305: Approve or reject checkpoint inline with feedback
+# ARC-1305: Display persistent [Resume] card and handle Resume click per lane
 
 ## Goal
-Supervisor approves or rejects checkpoint in UI. Approval resumes lane. Rejection captures free-text feedback and halts lane — supervisor must explicitly restart or requeue.
+Session UI displays a persistent [Resume] card for each suspended checkpoint lane. Supervisor clicks [Resume] to signal "I have finished reviewing." This is not an approval — it triggers the executor to check for unresolved PR comment threads. Each lane's [Resume] card is independent; clicking one does not affect others.
 
 ## Acceptance Criteria
-1. Given pending checkpoint, when supervisor clicks Approve, then lane resumes from next step.
-2. Given pending checkpoint, when supervisor clicks Reject and enters feedback, then lane halts and feedback stored.
-3. Given rejected checkpoint, when supervisor has not restarted lane, then lane remains halted.
+1. Given checkpoint lane suspended, then [Resume] card visible in session UI showing PR link and checkpoint context.
+2. Given supervisor clicks [Resume], then executor wakes and reads all unresolved PR comment threads via Bitbucket MCP (triggering ARC-1304 flow).
+3. Given [Resume] card active, then card remains visible until either (a) supervisor clicks [Resume], or (b) lane is manually cancelled.
+4. Given multiple lanes suspended simultaneously, then each has its own independent [Resume] card; clicking one does not affect the others.
 
 ## In Scope
-- Approve/reject UI, free-text feedback, halt-on-rejection, explicit restart requirement
+- [Resume] card component, click handler, card persistence, per-lane isolation
 
 ## Out of Scope
-- Auto-requeue on rejection, partial approval
+- Approve/reject buttons, free-text rejection feedback (removed from model), auto-proceed without Re-notify
+
+## Dependencies
+- ARC-1302 (PR creation and initial [Resume] card display)
+- ARC-1304 (comment thread reading and re-notify loop)
