@@ -23,7 +23,7 @@
 
 ## Pre-check
 
-- [ ] Confirm core-infrastructure ARC-1287 merged
+- [x] Confirm core-infrastructure ARC-1287 merged
 
 ---
 
@@ -32,7 +32,7 @@
 ### ARC-1310 — Persist active session state across restarts
 
 - [ ] **ARC-1310** — Persist active session state across restarts
-  - [ ] 🔒 Claimed: _(fill in: agent / YYYY-MM-DD HH:MM before starting)_
+  - [x] 🔒 Claimed: session-history / 2026-06-29 00:00
   - [ ] Read `issues/session-history/ARC-1310-persist-session-state.md`
   - [ ] Write `implementation_plans/session-history/ARC-1310-implementation-plan.md`
   - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
