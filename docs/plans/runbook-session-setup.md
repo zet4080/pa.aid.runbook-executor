@@ -50,11 +50,11 @@
   - [x] Lint / tests pass
   - [x] Write `task-completions/ARC-1314-COMPLETION-SUMMARY.md`
   - [x] Commit: `feat(session-setup): expand runbook detail on demand`
-- [ ] Execute ARC-1315
-  - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
-  - [ ] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1315-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(session-setup): select runbooks to include in session`
+- [x] Execute ARC-1315
+  - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
+  - [x] Lint / tests pass
+  - [x] Write `task-completions/ARC-1315-COMPLETION-SUMMARY.md`
+  - [x] Commit: `feat(session-setup): select runbooks to include in session`
 - [ ] Execute ARC-1316
   - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
   - [ ] Lint / tests pass
