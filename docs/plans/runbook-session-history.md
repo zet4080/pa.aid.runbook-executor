@@ -50,20 +50,20 @@
 ## Wave 2 — Session Browse & Step History
 
 - [x] 🔒 Claimed: session-history / 2026-06-29 10:30
-- [ ] Read all issues: ARC-1311, ARC-1312
-- [ ] Write all implementation plans
-- [ ] 🟡 BATCH PLAN CHECKPOINT
-- [ ] Execute ARC-1311
-  - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
-  - [ ] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1311-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(session-history): browse past sessions list`
-- [ ] Execute ARC-1312
-  - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
-  - [ ] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1312-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(session-history): view full step output history for any past session`
-- [ ] ☑ batch complete
+- [x] Read all issues: ARC-1311, ARC-1312
+- [x] Write all implementation plans
+- [x] 🟡 BATCH PLAN CHECKPOINT
+- [x] Execute ARC-1311
+  - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
+  - [x] Lint / tests pass
+  - [x] Write `task-completions/ARC-1311-COMPLETION-SUMMARY.md`
+  - [x] Commit: `feat(session-history): browse past sessions list`
+- [x] Execute ARC-1312
+  - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
+  - [x] Lint / tests pass
+  - [x] Write `task-completions/ARC-1312-COMPLETION-SUMMARY.md`
+  - [x] Commit: `feat(session-history): view full step output history for any past session`
+- [x] ☑ batch complete
 
 🟢 WAVE 2 GATE — ARC-1311 and ARC-1312 closed and merged
 
