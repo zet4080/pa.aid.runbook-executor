@@ -41,7 +41,7 @@
 
 ### MEDIUM batch — Expand, Select, Configure
 
-- [ ] 🔒 Claimed: _(fill in: agent / YYYY-MM-DD HH:MM before starting)_
+- [x] 🔒 Claimed: session-setup / 2026-06-29 13:13
 - [ ] Read all issues: ARC-1314, ARC-1315, ARC-1316
 - [ ] Write all implementation plans
 - [ ] 🟡 BATCH PLAN CHECKPOINT
