@@ -2,7 +2,7 @@
 |-------|-------|
 | Type | Story |
 | Priority | Medium |
-| Status | To Do |
+| Status | Completed |\n| Last Updated | 2026-06-29 |
 | Parent Epic | [ARC-1289](https://proalpha.atlassian.net/browse/ARC-1289) ARC: Session Setup & Runbook Selection |
 | Jira | [ARC-1314](https://proalpha.atlassian.net/browse/ARC-1314) |
 | Created | 2026-06-27 |
