@@ -65,7 +65,7 @@
   - [x] Commit: `feat(session-history): view full step output history for any past session`
 - [x] ☑ batch complete
 
-🟢 WAVE 2 GATE — ARC-1311 and ARC-1312 closed and merged
+🟢 WAVE 2 GATE — ARC-1311 and ARC-1312 closed and merged ✅ (branch ARC-1311 → runbook-executor, afeba3f)
 
 ---
 
