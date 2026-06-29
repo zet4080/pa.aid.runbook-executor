@@ -41,8 +41,9 @@
   - [x] Lint / tests pass
   - [x] Write `task-completions/ARC-1310-COMPLETION-SUMMARY.md`
   - [x] Commit: `feat(session-history): persist active session state across restarts`
+  - [x] Branch `ARC-1310` merged into `runbook-executor` (b4ac5b8)
 
-🟢 WAVE 1 GATE — ARC-1310 closed and merged before Wave 2 starts
+🟢 WAVE 1 GATE — ARC-1310 closed and merged before Wave 2 starts ✅
 
 ---
 
