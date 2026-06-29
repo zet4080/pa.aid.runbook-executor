@@ -42,14 +42,14 @@
 ### MEDIUM batch — Expand, Select, Configure
 
 - [x] 🔒 Claimed: session-setup / 2026-06-29 13:13
-- [ ] Read all issues: ARC-1314, ARC-1315, ARC-1316
-- [ ] Write all implementation plans
-- [ ] 🟡 BATCH PLAN CHECKPOINT
-- [ ] Execute ARC-1314
-  - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
-  - [ ] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1314-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(session-setup): expand runbook detail on demand`
+- [x] Read all issues: ARC-1314, ARC-1315, ARC-1316
+- [x] Write all implementation plans
+- [x] 🟡 BATCH PLAN CHECKPOINT
+- [x] Execute ARC-1314
+  - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
+  - [x] Lint / tests pass
+  - [x] Write `task-completions/ARC-1314-COMPLETION-SUMMARY.md`
+  - [x] Commit: `feat(session-setup): expand runbook detail on demand`
 - [ ] Execute ARC-1315
   - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
   - [ ] Lint / tests pass
