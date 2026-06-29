@@ -23,7 +23,7 @@
 
 ## Wave 1 — Session Setup & Runbook Selection
 
-- [ ] Confirm core-infrastructure ARC-1286 merged
+- [x] Confirm core-infrastructure ARC-1286 merged
 
 ### HIGH stories
 
