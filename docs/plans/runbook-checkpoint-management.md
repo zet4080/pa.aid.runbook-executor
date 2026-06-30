@@ -44,7 +44,7 @@
 
 ### 🟢 Wave 1 Gate
 
-- [ ] 🟢 WAVE 1 GATE — ARC-1301 closed and merged
+- [x] 🟢 WAVE 1 GATE — ARC-1301 closed and merged
 
 ---
 
@@ -52,7 +52,7 @@
 
 ### Batch 2-A: ARC-1302, ARC-1303
 
-- [ ] 🔒 Claimed: _(fill in: agent / YYYY-MM-DD HH:MM before starting)_
+- [x] 🔒 Claimed: build-agent / 2026-06-30 00:00
 - [ ] Read all issues: ARC-1302, ARC-1303
 - [ ] Write all implementation plans
 - [ ] 🟡 BATCH PLAN CHECKPOINT
