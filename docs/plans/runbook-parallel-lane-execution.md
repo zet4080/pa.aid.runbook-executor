@@ -41,7 +41,7 @@
 ### ARC-1292 — Run multiple lanes concurrently up to concurrency limit 🔴 HIGH
 
 - [ ] **ARC-1292** — Run multiple lanes concurrently up to concurrency limit
-  - [ ] 🔒 Claimed: _(fill in: agent / YYYY-MM-DD HH:MM before starting)_
+  - [x] 🔒 Claimed: parallel-lane-execution / 2026-06-30 10:00
   - [ ] Read `issues/parallel-lane-execution/ARC-1292-concurrent-lanes.md`
   - [ ] Write `implementation_plans/parallel-lane-execution/ARC-1292-implementation-plan.md`
   - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
