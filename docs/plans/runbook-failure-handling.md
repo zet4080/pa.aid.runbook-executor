@@ -24,7 +24,7 @@
 ## Wave 1 — Retry Engine & Escalation
 
 **Start condition:**
-- [ ] Confirm ARC-1288 (opencode CLI subprocess) merged
+- [x] Confirm ARC-1288 (opencode CLI subprocess) merged
 
 ### ARC-1306 — Retry failed agent steps up to configurable limit 🔴 HIGH
 
