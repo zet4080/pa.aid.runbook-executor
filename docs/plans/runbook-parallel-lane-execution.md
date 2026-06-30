@@ -53,16 +53,16 @@
 
 ### ARC-1293 — Stream live agent output per lane in the UI 🔴 HIGH
 
-- [ ] **ARC-1293** — Stream live agent output per lane in the UI
-  - [ ] 🔒 Claimed: _(fill in: agent / YYYY-MM-DD HH:MM before starting)_
-  - [ ] Read `issues/parallel-lane-execution/ARC-1293-stream-agent-output.md`
-  - [ ] Write `implementation_plans/parallel-lane-execution/ARC-1293-implementation-plan.md`
-  - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
-  - [ ] Execute plan
-  - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
-  - [ ] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1293-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(parallel-lane-execution): stream live agent output per lane in UI`
+- [x] **ARC-1293** — Stream live agent output per lane in the UI
+  - [x] 🔒 Claimed: build-agent / 2026-06-30
+  - [x] Read `issues/parallel-lane-execution/ARC-1293-stream-agent-output.md`
+  - [x] Write `implementation_plans/parallel-lane-execution/ARC-1293-implementation-plan.md`
+  - [x] 🔴 INDIVIDUAL PLAN CHECKPOINT
+  - [x] Execute plan
+  - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
+  - [x] Lint / tests pass
+  - [x] Write `task-completions/ARC-1293-COMPLETION-SUMMARY.md`
+  - [x] Commit: `feat(parallel-lane-execution): stream live agent output per lane in UI`
 
 ### Batch: ARC-1294 🟡 MEDIUM
 
