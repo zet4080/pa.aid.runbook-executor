@@ -67,16 +67,16 @@
 
 ### Batch: ARC-1294 🟡 MEDIUM
 
-- [ ] 🔒 Claimed: _(fill in: agent / YYYY-MM-DD HH:MM before starting)_
+- [x] 🔒 Claimed: build-agent / 2026-06-30
 - [x] Read all issues: ARC-1294
-- [ ] Write all implementation plans
-- [ ] 🟡 BATCH PLAN CHECKPOINT
+- [x] Write all implementation plans
+- [x] 🟡 BATCH PLAN CHECKPOINT
 - [x] Execute ARC-1294
-  - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
-  - [ ] Lint / tests pass
+  - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
+  - [x] Lint / tests pass
   - [x] Write `task-completions/ARC-1294-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(parallel-lane-execution): real-time runbook checkbox state updates`
-- [ ] ☑ batch complete
+  - [x] Commit: `feat(parallel-lane-execution): real-time runbook checkbox state updates`
+- [x] ☑ batch complete
 
 ### 🟢 Wave 1 Gate
 
@@ -84,7 +84,7 @@
 - [x] ARC-1292 completion summary written and committed
 - [x] ARC-1293 completion summary written and committed
 - [x] ARC-1294 completion summary written and committed
-- [ ] 🟢 WAVE 1 GATE — all 4 stories closed; unblock checkpoint-management lane (ARC-1291 → ARC-1301)
+- [x] 🟢 WAVE 1 GATE — all 4 stories closed; unblock checkpoint-management lane (ARC-1291 → ARC-1301)
 
 ---
 
