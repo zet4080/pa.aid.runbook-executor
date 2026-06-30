@@ -53,9 +53,9 @@
 ### Batch 2-A: ARC-1302, ARC-1303
 
 - [x] 🔒 Claimed: build-agent / 2026-06-30 00:00
-- [ ] Read all issues: ARC-1302, ARC-1303
-- [ ] Write all implementation plans
-- [ ] 🟡 BATCH PLAN CHECKPOINT
+- [x] Read all issues: ARC-1302, ARC-1303
+- [x] Write all implementation plans
+- [x] 🟡 BATCH PLAN CHECKPOINT
 - [x] Execute ARC-1302
   - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
   - [x] Lint / tests pass
@@ -66,7 +66,7 @@
   - [x] Lint / tests pass
   - [x] Write `task-completions/ARC-1303-COMPLETION-SUMMARY.md`
   - [x] Commit: `feat(checkpoint-management): ARC-1303 checkpoint queue panel with priority scoring`
-- [ ] ☑ batch 2-A complete
+- [x] ☑ batch 2-A complete
 
 ### ARC-1304 — Read PR comment threads and address as required action items 🔴 HIGH
 
