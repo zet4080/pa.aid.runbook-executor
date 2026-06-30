@@ -29,14 +29,14 @@
 
 - [x] **ARC-1291** — Execute runbook steps sequentially within a lane
   - [x] 🔒 Claimed: parallel-lane-execution / 2026-06-30 00:00
-  - [ ] Read `issues/parallel-lane-execution/ARC-1291-sequential-step-execution.md`
-  - [ ] Write `implementation_plans/parallel-lane-execution/ARC-1291-implementation-plan.md`
-  - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
-  - [ ] Execute plan
-  - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
-  - [ ] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1291-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(parallel-lane-execution): sequential step execution within a lane`
+  - [x] Read `issues/parallel-lane-execution/ARC-1291-sequential-step-execution.md`
+  - [x] Write `implementation_plans/parallel-lane-execution/ARC-1291-implementation-plan.md`
+  - [x] 🔴 INDIVIDUAL PLAN CHECKPOINT
+  - [x] Execute plan
+  - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
+  - [x] Lint / tests pass
+  - [x] Write `task-completions/ARC-1291-COMPLETION-SUMMARY.md`
+  - [x] Commit: `feat(parallel-lane-execution): sequential step execution within a lane`
 
 ### ARC-1292 — Run multiple lanes concurrently up to concurrency limit 🔴 HIGH
 
@@ -79,7 +79,7 @@
 
 ### 🟢 Wave 1 Gate
 
-- [ ] ARC-1291 completion summary written and committed
+- [x] ARC-1291 completion summary written and committed
 - [ ] ARC-1292 completion summary written and committed
 - [ ] ARC-1293 completion summary written and committed
 - [ ] ARC-1294 completion summary written and committed
