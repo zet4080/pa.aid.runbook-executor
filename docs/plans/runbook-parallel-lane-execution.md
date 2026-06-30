@@ -49,7 +49,7 @@
   - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
   - [x] Lint / tests pass
   - [x] Write `task-completions/ARC-1292-COMPLETION-SUMMARY.md`
-  - [x] Commit: `feat(parallel-lane-execution): concurrent lane execution up to concurrency limit` (1f4c92a, 9e39728)
+  - [x] Commit: `feat(parallel-lane-execution): concurrent lane execution up to concurrency limit` (1f4c92a, 9e39728; merged a797700)
 
 ### ARC-1293 — Stream live agent output per lane in the UI 🔴 HIGH
 
