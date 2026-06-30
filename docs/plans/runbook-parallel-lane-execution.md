@@ -23,7 +23,7 @@
 
 ## Wave 1 — Foundation & Concurrency (ARC-1291, ARC-1292, ARC-1293, ARC-1294)
 
-- [ ] Confirm core-infrastructure ARC-1288 merged
+- [x] Confirm core-infrastructure ARC-1288 merged
 
 ### ARC-1291 — Execute runbook steps sequentially within a lane 🔴 HIGH
 
