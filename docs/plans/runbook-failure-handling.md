@@ -29,7 +29,7 @@
 ### ARC-1306 — Retry failed agent steps up to configurable limit 🔴 HIGH
 
 - [ ] **ARC-1306** — Retry failed agent steps up to configurable limit
-  - [ ] 🔒 Claimed: _(fill in: agent / YYYY-MM-DD HH:MM before starting)_
+  - [x] 🔒 Claimed: build / 2026-06-30 12:00
   - [ ] Read `issues/failure-handling/ARC-1306-retry-failed-steps.md`
   - [ ] Write `implementation_plans/failure-handling/ARC-1306-implementation-plan.md`
   - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
