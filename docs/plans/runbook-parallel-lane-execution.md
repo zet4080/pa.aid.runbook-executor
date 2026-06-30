@@ -63,6 +63,7 @@
   - [x] Lint / tests pass
   - [x] Write `task-completions/ARC-1293-COMPLETION-SUMMARY.md`
   - [x] Commit: `feat(parallel-lane-execution): stream live agent output per lane in UI`
+  - [x] Merge branch into `runbook-executor` (8704e03)
 
 ### Batch: ARC-1294 🟡 MEDIUM
 
