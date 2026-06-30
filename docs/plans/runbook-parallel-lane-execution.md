@@ -81,7 +81,7 @@
 
 - [x] ARC-1291 completion summary written and committed
 - [x] ARC-1292 completion summary written and committed
-- [ ] ARC-1293 completion summary written and committed
+- [x] ARC-1293 completion summary written and committed
 - [ ] ARC-1294 completion summary written and committed
 - [ ] 🟢 WAVE 1 GATE — all 4 stories closed; unblock checkpoint-management lane (ARC-1291 → ARC-1301)
 

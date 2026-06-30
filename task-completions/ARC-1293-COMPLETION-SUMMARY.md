@@ -1,59 +1,68 @@
----
-# ARC-1293 Completion Summary — Stream Live Agent Output Per Lane in the UI
+```markdown
+# ARC-1293 Stream Live Agent Output Per Lane in the UI — Completion Summary
 
-**Branch:** ARC-1293
-**Commit:** 98ed86e
-**Date:** 2026-06-30
-**Status:** Complete
+**Issue:** `issues/parallel-lane-execution/ARC-1293-stream-agent-output.md`
+**Implementation Plan:** `implementation_plans/parallel-lane-execution/ARC-1293-implementation-plan.md`
+**Completed:** 2026-06-30
+**Duration:** ~1 session
+**Commit:** `98ed86ee5fd167feb5031b7d546a2379311b2bd2` (branch `ARC-1293` in `pa.aid.wsl-setup.sh`)
 
----
+## Acceptance Criteria Verification
 
-## Acceptance Criteria Evidence
+| # | Criterion | Status | Evidence |
+|---|-----------|--------|----------|
+| 1 | Given executing agent step, when subprocess emits events, then each appears in lane panel within 1 second | Passed | SSE endpoint `GET /api/lanes/:encodedPath/stream` fans out `eventBus.publish` calls synchronously via `laneEventFanout.ts` → `res.write`. No polling or buffering; only network latency separates publish from client delivery. 8 server unit tests in `laneEventFanout.test.ts` verify the fan-out path; `useLaneStream` hook opens a live `EventSource` connection and appends events on receipt (9 hook tests pass). |
+| 2 | Given multiple lanes running, when each emits output, then output correctly isolated per lane panel | Passed | Server `laneListeners` map is keyed by `runbookPath` — events for lane A are never delivered to lane B's listener set (isolation scenario in `laneEventFanout.test.ts`). UI renders one `LaneOutputPanel` per entry in `selectedRunbooks`, each calling `useLaneStream` with its own `runbookPath` (4 new Dashboard tests assert two panels render for two selected runbooks; 6 `LaneOutputPanel` tests verify per-lane rendering). |
 
-| AC | Criterion | Evidence |
-|----|-----------|----------|
-| AC 1 | Each subprocess event appears in the lane panel within 1 second | Events flow synchronously: eventBus.publish → laneEventFanout.deliverToLane → subscribeLane listener → res.write (SSE). No polling or buffering. Network RTT is the only latency. Verified by laneEventFanout unit tests confirming synchronous delivery. |
-| AC 2 | Output correctly isolated per lane panel | laneListeners map is keyed by runbookPath. Events for lane A can never reach lane B's listener set. Each LaneOutputPanel opens its own EventSource to its own encoded path. Verified by isolation test in laneEventFanout.test.ts and separate panel instances in Dashboard.tsx. |
+## Implementation Summary
 
----
+Seven files added, six modified across server and UI packages:
 
-## Files Created / Modified
+**Server:**
+- `runner/laneRunner.ts` — added `laneActiveStep` registry (`Map<string, string>`) tracking the currently executing stepId per lane; exports `getActiveLaneStep`; calls `notifyLaneStep`/`endLaneStep` around each `executeStep` invocation; `_resetLaneStateForTesting` extended to clear this map.
+- `runner/laneEventFanout.ts` (new) — SSE bridge: maintains `laneListeners` (per-lane listener sets) and `stepUnsubscribes` (cleanup callbacks from `eventBus.subscribe`); exports `subscribeLane`, `notifyLaneStep`, `endLaneStep`, `_resetFanoutForTesting`.
+- `routes/steps.ts` — added `GET /api/lanes/:encodedPath/stream` SSE route: decodes path, sets SSE headers, calls `subscribeLane`, writes `data: JSON\n\n` per event, unsubscribes on client disconnect.
 
-### Server (`packages/server/`)
-| File | Change |
-|------|--------|
-| `src/runner/laneEventFanout.ts` | **New** — SSE bridge: subscribeLane, notifyLaneStep, endLaneStep, _resetFanoutForTesting |
-| `src/runner/laneRunner.ts` | **Modified** — added laneActiveStep registry (getActiveLaneStep), integrated notifyLaneStep/endLaneStep around executeStep, extended _resetLaneStateForTesting |
-| `src/routes/steps.ts` | **Modified** — added GET /api/lanes/:encodedPath/stream SSE endpoint |
-| `src/__tests__/laneEventFanout.test.ts` | **New** — 8 unit test scenarios |
+**UI:**
+- `lib/formatEvent.ts` (new) — extracted `extractEventText` helper from `SessionDetailPage.tsx`; imported by both `SessionDetailPage.tsx` and `LaneOutputPanel.tsx`.
+- `hooks/useLaneStream.ts` (new) — `EventSource`-backed hook returning ordered `LaneStreamEvent[]`; resets on `runbookPath` change or unmount; error-resilient (no throw on `onerror`).
+- `components/LaneOutputPanel.tsx` (new) — renders live event log with `stepId` prefix per line, auto-scroll on new events, "Waiting for agent output…" placeholder when empty.
+- `pages/Dashboard.tsx` — mounts one `LaneOutputPanel` per `selectedRunbooks` entry when `hasActiveSession` is true; derives `laneLabel` by stripping `runbook-` prefix and `.md` suffix.
 
-### UI (`packages/ui/`)
-| File | Change |
-|------|--------|
-| `src/lib/formatEvent.ts` | **New** — extractEventText extracted from SessionDetailPage.tsx |
-| `src/hooks/useLaneStream.ts` | **New** — EventSource-backed SSE hook |
-| `src/hooks/useLaneStream.test.ts` | **New** — 9 unit tests (mock EventSource) |
-| `src/components/LaneOutputPanel.tsx` | **New** — live lane output panel component |
-| `src/components/LaneOutputPanel.test.tsx` | **New** — 6 component unit tests |
-| `src/pages/Dashboard.tsx` | **Modified** — mounts LaneOutputPanel per selected runbook when session active |
-| `src/pages/Dashboard.test.tsx` | **Modified** — 4 new tests for lane panel lifecycle; mocked LaneOutputPanel |
-| `src/pages/SessionDetailPage.tsx` | **Modified** — imports extractEventText from @/lib/formatEvent |
+## Verification Steps
 
----
+```bash
+# From the ARC-1293 worktree:
+cd /repos/ARC-1293/runbook-executor
 
-## Test Results
+# Server tests (195 pass)
+cd packages/server && npx vitest run
 
-| Package | Test Files | Tests | Result |
-|---------|-----------|-------|--------|
-| server | 16 | 195 | ✅ All pass |
-| ui | 14 | 108 | ✅ All pass |
-| tsc --noEmit (server) | — | — | ✅ Clean |
-| tsc --noEmit (ui) | — | — | ✅ Clean |
+# UI tests (108 pass)
+cd../ui && npx vitest run
 
----
+# Type-check (both packages, no errors)
+cd /repos/ARC-1293/runbook-executor/packages/server && npx tsc --noEmit
+cd /repos/ARC-1293/runbook-executor/packages/ui && npx tsc --noEmit
+```
 
-## Deviations from Implementation Plan
+## Tests Added/Modified
 
-None. All 10 plan steps implemented as specified. The plan noted `extractEventText` extraction as Step 8 — this was implemented as specified, with SessionDetailPage.tsx updated to import from @/lib/formatEvent.
+**Server (`packages/server/src/__tests__/`):**
+- `laneEventFanout.test.ts` (new, 8 tests) — fan-out to single listener, fan-out to multiple listeners for same lane, isolation between lanes, unsubscribe stops delivery, `endLaneStep` stops eventBus subscription, multiple sequential steps in one lane
 
-The plan's risk note about URL encoding (`%2F` proxy normalisation) was not encountered in the dev/test environment. The path-parameter approach was used as specified.
+**UI (`packages/ui/src/`):**
+- `hooks/useLaneStream.test.ts` (new, 9 tests) — starts empty, appends events on SSE message, clears on cleanup, opens correct URL, no-throw on error, idle when `runbookPath` is null
+- `components/LaneOutputPanel.test.tsx` (new, 6 tests) — renders placeholder when empty, renders events with stepId prefix, renders formatted event text, auto-scroll ref present, multiple events in order
+- `pages/Dashboard.test.tsx` (modified, 4 new tests) — two lane panels render for two selected runbooks, panels absent when no active session, panels absent when no selected runbooks, correct `runbookPath` prop passed
+
+**Total:** 195 server tests, 108 UI tests — all passing.
+
+## Rollback Notes
+
+None. No database migrations or persistent state changes. Removing the feature is a revert of the commit.
+
+## Next Steps
+
+- None for this story. ARC-1293 completes the ARC-1290 parallel lane execution epic.
+```
