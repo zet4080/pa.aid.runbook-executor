@@ -57,10 +57,10 @@
 - [ ] Write all implementation plans
 - [ ] 🟡 BATCH PLAN CHECKPOINT
 - [ ] Execute ARC-1302
-  - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
-  - [ ] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1302-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(checkpoint-management): create Bitbucket PR and display persistent Resume card on checkpoint hit`
+  - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
+  - [x] Lint / tests pass
+  - [x] Write `task-completions/ARC-1302-COMPLETION-SUMMARY.md`
+  - [x] Commit: `feat(checkpoint-management): create Bitbucket PR and display persistent Resume card on checkpoint hit`
 - [ ] Execute ARC-1303
   - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
   - [ ] Lint / tests pass
