@@ -11,9 +11,9 @@ This plan delivers the sequential step execution engine — the foundation that 
 
 Acceptance criteria mapping:
 
-- **AC 1** (steps execute in order; N+1 does not start until N completes): covered by Steps 3 and 4 — `laneRunner` iterates steps sequentially using `await executeStep()`, and wiring to session start fires that runner.
+- **AC 1** (steps execute in order; N+1 does not start until N completes): covered by Steps 3 and 5 — `laneRunner` iterates steps sequentially using `await executeStep()`, and wiring to session start fires that runner.
 - **AC 2** (manual step → lane pauses, supervisor notified): covered by Steps 1 and 3 — `manual` is removed from the type system; what was `manual` is now correctly `checkpoint`. `laneRunner` pauses on any `checkpoint` step and pushes to `checkpointQueue`.
-- **AC 3** (agent step → opencode run invoked, output streams to UI): covered by Steps 2, 3, and 4 — `executeStep` already handles subprocess invocation and event-bus streaming; `laneRunner` calls it for `agent` steps.
+- **AC 3** (agent step → opencode run invoked, output streams to UI): covered by Steps 2, 3, 3a, 5 — buildPromptFromStep constructs the prompt from step metadata; executeStep handles subprocess invocation and event-bus streaming; laneRunner calls it; sessions route wires lane start.
 
 ## Assumptions & Dependencies
 
@@ -23,7 +23,7 @@ Acceptance criteria mapping:
 - `POST /api/sessions/start` in `packages/server/src/routes/sessions.ts` already has a comment: *"ARC-1291 will extend it to spawn actual lane executor processes."* This is the correct hook point.
 - `SidecarState.selectedRunbooks` holds the absolute paths of runbooks chosen for the session. The lane runner resolves parsed runbooks by path from the cache.
 - `SidecarState.checkpointQueue: CheckpointQueueEntry[]` is the existing supervisor notification channel. Checkpoint steps push to this queue and halt the lane.
-- A `prompt` field is not currently stored per step in `RunbookStep`. The `label` field is used as the prompt for `executeStep` in this story. ARC-1292+ may refine prompt construction.
+- The `label` and `subSteps` fields on `RunbookStep` are the available metadata for constructing an agent prompt. `buildPromptFromStep` (Step 3a) derives the prompt from these fields. A dedicated `prompt:` field in the runbook format is anticipated by the requirements but not yet present; when added, `buildPromptFromStep` should prefer it over the derived form.
 - `writeSidecar` is not yet serialized across concurrent lane writes — the existing `NOTE(ARC-1294)` comment in `sidecar.ts` documents this known limitation. Since ARC-1291 only runs one lane (no concurrency yet), this is acceptable. ARC-1294 will address concurrent writes.
 - Lane execution is fire-and-forget relative to the HTTP response. `POST /api/sessions/start` returns immediately after setting `sessionStartedAt`; lane execution runs asynchronously in the background.
 
@@ -100,11 +100,32 @@ The `CheckpointQueueEntry` pushed for a checkpoint step must include: `stepId: s
 
 **Exports:** `runLane`, `getLaneState`, `LaneStatus` type, `_resetLaneStateForTesting` (test isolation).
 
-**Verification:** Unit tests in `__tests__/laneRunner.test.ts` (Step 5). TypeScript compiles without error.
+**Verification:** Unit tests in `__tests__/laneRunner.test.ts` (Step 6). TypeScript compiles without error.
 
 ---
 
-### Step 4: Wire `laneRunner` to `POST /api/sessions/start`
+### Step 3a: Add `buildPromptFromStep` helper to `laneRunner.ts`
+
+**Files:** `packages/server/src/runner/laneRunner.ts`
+
+**Action:** Add an internal (non-exported) helper function with the signature:
+
+```ts
+function buildPromptFromStep(step: RunbookStep): string
+```
+
+The function constructs a prompt string from the step's existing fields:
+- Opens with the step identity line: `"You are executing step {step.id}: {step.label}."`
+- If `step.subSteps` is non-empty and at least one sub-step has `checked: false`, appends `"Complete the following tasks in order:"` followed by each unchecked sub-step label as a numbered list item (checked sub-steps are omitted from the list).
+- If `step.subSteps` is empty, or all sub-steps are already `checked: true`, appends `"The sub-steps are already completed — verify and confirm."` instead of the numbered list.
+
+In the agent step execution path of `runLane`, replace the direct use of `step.label` as the `executeStep` prompt with a call to `buildPromptFromStep(step)`.
+
+**Verification:** Unit test scenarios in `__tests__/laneRunner.test.ts` (added in Step 6): given a step with label and two unchecked sub-steps, assert the returned string contains the step id, the label, and both sub-step labels in numbered form; given a step with no sub-steps, assert the returned string contains the identity line and the "already completed" clause with no numbered list.
+
+---
+
+### Step 5: Wire `laneRunner` to `POST /api/sessions/start`
 
 **Files:** `packages/server/src/routes/sessions.ts`
 
@@ -123,7 +144,7 @@ Import `getRunbook` from `../runner/runbookCache.js` and `runLane` from `../runn
 
 ---
 
-### Step 5: Add tests for `laneRunner`
+### Step 6: Add tests for `laneRunner`
 
 **Files:** `packages/server/src/__tests__/laneRunner.test.ts` (new)
 
@@ -136,12 +157,14 @@ Scenarios:
 - **Failed agent step pauses lane:** given an agent step whose `executeStep` resolves with `outcome: 'failed'`, assert the lane status transitions to `'paused'` and the next step is not executed.
 - **All steps complete → done:** given two agent steps that both succeed, assert lane status transitions to `'done'` after the second step.
 - **Lane status tracking:** call `getLaneState` before, during (with a never-resolving mock), and after execution to verify `'idle'` → `'running'` → `'done'` transitions.
+- **`buildPromptFromStep` with sub-steps:** given a step with a label and two unchecked sub-steps, assert the returned string contains the step id, the label, and both sub-step labels in numbered form.
+- **`buildPromptFromStep` without sub-steps:** given a step with a label and an empty `subSteps` array, assert the returned string contains the identity line and no numbered list.
 
 **Verification:** `npm test` in `packages/server` passes all tests including the new suite.
 
 ---
 
-### Step 6: Tick the cross-lane dependency gate
+### Step 7: Tick the cross-lane dependency gate
 
 **Files:** `docs/plans/runbook-parallel-lane-execution.md` (planning repo)
 
@@ -160,7 +183,7 @@ Scenarios:
 **Unit test suite (`npm test --workspace=packages/server`):**
 - All pre-existing tests pass without modification except fixture updates for `type: 'manual'` → `'checkpoint'` or `'agent'`.
 - New `runbookCache.test.ts`-level scenarios pass (may be co-located in an existing test file).
-- New `laneRunner.test.ts` suite passes all six scenarios described in Step 5.
+- New `laneRunner.test.ts` suite passes all scenarios described in Step 6.
 - Sessions route test: `POST /api/sessions/start` fires `runLane` per selected runbook and returns immediately.
 
 **End-to-end smoke test (manual):**
@@ -173,7 +196,7 @@ Scenarios:
 
 ## Risks & Open Questions
 
-- **`RunbookStep` has no `prompt` field:** `executeStep` is called with `step.label` as the prompt. This is a reasonable placeholder — the label text is the step description. If the runbook format later defines an explicit `prompt:` field (per the requirements), `laneRunner` must be updated to use it. This is out of scope for ARC-1291 but should be noted as a follow-up for the runbook format spec.
+- **Prompt fidelity:** `buildPromptFromStep` uses `step.label` and `step.subSteps` to construct the agent instruction. If a runbook step's label is terse or its sub-steps are purely administrative (e.g. "🔒 Claimed:" entries), the generated prompt may be sparse. The requirements anticipate an explicit `prompt:` field in the runbook format; when that is added, `buildPromptFromStep` should check `step.prompt ?? buildFromLabel(step)` as a fallback chain. This is out of scope for ARC-1291.
 - **Lane resume after restart:** When the server restarts mid-session, `sessionStartedAt` is preserved in the sidecar but no lane is running. The supervisor must re-call `POST /api/sessions/start` to resume. This is acceptable for ARC-1291 scope. Full resume-from-checkpoint is a future concern (ARC-1301+).
 - **Concurrent writes:** `writeSidecar` in `laneRunner` (for checkpoint queue updates) is not yet serialized against concurrent lane writes. This is safe for ARC-1291 since only one lane runs at a time. ARC-1294 will introduce a write queue; `laneRunner` must be updated to use it at that point.
 - **`manual` in existing test fixtures:** Any test that asserts `type: 'manual'` will need updating. A grep for `'manual'` across `__tests__/` and `__fixtures__/` before starting implementation will scope the cleanup work.
