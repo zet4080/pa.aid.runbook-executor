@@ -68,7 +68,7 @@
 ### Batch: ARC-1294 🟡 MEDIUM
 
 - [ ] 🔒 Claimed: _(fill in: agent / YYYY-MM-DD HH:MM before starting)_
-- [ ] Read all issues: ARC-1294
+- [x] Read all issues: ARC-1294
 - [ ] Write all implementation plans
 - [ ] 🟡 BATCH PLAN CHECKPOINT
 - [ ] Execute ARC-1294
