@@ -56,7 +56,7 @@
 - [ ] Read all issues: ARC-1302, ARC-1303
 - [ ] Write all implementation plans
 - [ ] 🟡 BATCH PLAN CHECKPOINT
-- [ ] Execute ARC-1302
+- [x] Execute ARC-1302
   - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
   - [x] Lint / tests pass
   - [x] Write `task-completions/ARC-1302-COMPLETION-SUMMARY.md`
