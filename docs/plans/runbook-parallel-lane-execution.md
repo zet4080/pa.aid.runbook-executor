@@ -40,16 +40,16 @@
 
 ### ARC-1292 — Run multiple lanes concurrently up to concurrency limit 🔴 HIGH
 
-- [ ] **ARC-1292** — Run multiple lanes concurrently up to concurrency limit
+- [x] **ARC-1292** — Run multiple lanes concurrently up to concurrency limit
   - [x] 🔒 Claimed: parallel-lane-execution / 2026-06-30 10:00
-  - [ ] Read `issues/parallel-lane-execution/ARC-1292-concurrent-lanes.md`
-  - [ ] Write `implementation_plans/parallel-lane-execution/ARC-1292-implementation-plan.md`
-  - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
-  - [ ] Execute plan
-  - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
-  - [ ] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1292-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(parallel-lane-execution): concurrent lane execution up to concurrency limit`
+  - [x] Read `issues/parallel-lane-execution/ARC-1292-concurrent-lanes.md`
+  - [x] Write `implementation_plans/parallel-lane-execution/ARC-1292-implementation-plan.md`
+  - [x] 🔴 INDIVIDUAL PLAN CHECKPOINT
+  - [x] Execute plan
+  - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
+  - [x] Lint / tests pass
+  - [x] Write `task-completions/ARC-1292-COMPLETION-SUMMARY.md`
+  - [x] Commit: `feat(parallel-lane-execution): concurrent lane execution up to concurrency limit` (1f4c92a, 9e39728)
 
 ### ARC-1293 — Stream live agent output per lane in the UI 🔴 HIGH
 
@@ -80,7 +80,7 @@
 ### 🟢 Wave 1 Gate
 
 - [x] ARC-1291 completion summary written and committed
-- [ ] ARC-1292 completion summary written and committed
+- [x] ARC-1292 completion summary written and committed
 - [ ] ARC-1293 completion summary written and committed
 - [ ] ARC-1294 completion summary written and committed
 - [ ] 🟢 WAVE 1 GATE — all 4 stories closed; unblock checkpoint-management lane (ARC-1291 → ARC-1301)
