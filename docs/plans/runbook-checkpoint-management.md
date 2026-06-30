@@ -31,16 +31,16 @@
 
 ### ARC-1301 — Detect checkpoint markers and pause lane execution 🔴 HIGH
 
-- [ ] **ARC-1301** — Detect checkpoint markers and pause lane execution
-  - [ ] 🔒 Claimed: _(fill in: agent / YYYY-MM-DD HH:MM before starting)_
-  - [ ] Read `issues/checkpoint-management/ARC-1301-detect-checkpoint-markers.md`
-  - [ ] Write `implementation_plans/checkpoint-management/ARC-1301-implementation-plan.md`
-  - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
-  - [ ] Execute plan
-  - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
-  - [ ] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1301-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(checkpoint-management): detect checkpoint markers and pause lane execution`
+- [x] **ARC-1301** — Detect checkpoint markers and pause lane execution
+  - [x] 🔒 Claimed: build-agent / 2026-06-30 19:45
+  - [x] Read `issues/checkpoint-management/ARC-1301-detect-checkpoint-markers.md`
+  - [x] Write `implementation_plans/checkpoint-management/ARC-1301-implementation-plan.md`
+  - [x] 🔴 INDIVIDUAL PLAN CHECKPOINT
+  - [x] Execute plan
+  - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
+  - [x] Lint / tests pass
+  - [x] Write `task-completions/ARC-1301-COMPLETION-SUMMARY.md`
+  - [x] Commit: `feat(checkpoint-management): detect checkpoint markers and pause lane execution`
 
 ### 🟢 Wave 1 Gate
 
