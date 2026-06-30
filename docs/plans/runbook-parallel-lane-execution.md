@@ -28,7 +28,7 @@
 ### ARC-1291 — Execute runbook steps sequentially within a lane 🔴 HIGH
 
 - [ ] **ARC-1291** — Execute runbook steps sequentially within a lane
-  - [ ] 🔒 Claimed: _(fill in: agent / YYYY-MM-DD HH:MM before starting)_
+  - [x] 🔒 Claimed: parallel-lane-execution / 2026-06-30 00:00
   - [ ] Read `issues/parallel-lane-execution/ARC-1291-sequential-step-execution.md`
   - [ ] Write `implementation_plans/parallel-lane-execution/ARC-1291-implementation-plan.md`
   - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
