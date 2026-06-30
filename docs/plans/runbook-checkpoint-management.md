@@ -61,11 +61,11 @@
   - [x] Lint / tests pass
   - [x] Write `task-completions/ARC-1302-COMPLETION-SUMMARY.md`
   - [x] Commit: `feat(checkpoint-management): create Bitbucket PR and display persistent Resume card on checkpoint hit`
-- [ ] Execute ARC-1303
-  - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
-  - [ ] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1303-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(checkpoint-management): display checkpoint queue with PR links and Resume buttons`
+- [x] Execute ARC-1303
+  - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
+  - [x] Lint / tests pass
+  - [x] Write `task-completions/ARC-1303-COMPLETION-SUMMARY.md`
+  - [x] Commit: `feat(checkpoint-management): ARC-1303 checkpoint queue panel with priority scoring`
 - [ ] ☑ batch 2-A complete
 
 ### ARC-1304 — Read PR comment threads and address as required action items 🔴 HIGH
