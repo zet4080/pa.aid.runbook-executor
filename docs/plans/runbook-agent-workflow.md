@@ -41,7 +41,7 @@
 ### ARC-1346 — Introduce decision document pattern for async human decisions 🔴 HIGH
 
 - [ ] **ARC-1346** — Introduce decision document pattern for async human decisions
-  - [ ] 🔒 Claimed: _(fill in: agent / YYYY-MM-DD HH:MM before starting)_
+  - [x] 🔒 Claimed: agent-workflow / 2026-07-01 20:20
   - [ ] Read `issues/agent-workflow/ARC-1346-decision-document-pattern.md`
   - [ ] Write `implementation_plans/agent-workflow/ARC-1346-implementation-plan.md`
   - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
