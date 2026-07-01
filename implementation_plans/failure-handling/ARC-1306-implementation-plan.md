@@ -1,91 +1,125 @@
-# ARC-1306 Retry Failed Agent Steps Up to Configurable Limit - Implementation Plan
+# ARC-1306 Retry failed agent steps up to configurable limit — Implementation Plan
+
 **Issue:** `issues/failure-handling/ARC-1306-retry-failed-steps.md`
-**Completion Summary:** `task-completions/failure-handling/ARC-1306-retry-failed-steps-COMPLETION-SUMMARY.md` (TBD)
-**Approach:** retry loop in laneRunner with retryCount persisted on StepRecord
-**Owner:** build
-**Date:** 2026-06-30
+**Completion Summary:** `task-completions/ARC-1306-COMPLETION-SUMMARY.md` (TBD)
+**Approach:** In-loop retry within `runLane` — intercept the failure path before pausing, re-invoke `executeStep` up to `retryLimit` times, publish synthetic retry-announce events between attempts, then pause when retries exhausted
+**Owner:** build agent
+**Date:** 2026-07-01
 
 ## Scope & Alignment
 
-This plan implements automatic retry of failed runbook steps up to a configurable limit. It covers:
+This plan covers the automatic retry mechanism for failed agent steps inside the lane runner. It maps directly to the two acceptance criteria:
 
-- Extending `StepRecord` with a `retryCount` field
-- Adding a `RetryEvent` to the `OpenCodeEvent` union for UI visibility
-- Replacing the single-attempt step execution in `runLane()` with a retry loop that reads `retryLimit` from session config
-- Persisting `retryCount` to the sidecar after each retry increment
-- Unit tests covering retry success, retry exhaustion, event emission, and sidecar persistence
+| AC | Step(s) that satisfy it |
+|----|------------------------|
+| AC 1: Retry remaining → spawn new subprocess for same step | Steps 1, 2, 3 |
+| AC 2: Retry limit reached → no further auto-retries, escalation triggered | Steps 2, 4 |
 
-**AC mapping:**
-- AC 1 (step fails with retries remaining → new subprocess spawned): covered by Steps 3 and 4
-- AC 2 (retry limit reached → no further auto-retry, escalation triggered): covered by Steps 4 and 5
+Retry logging in lane output (goal statement) is addressed by Step 3 (synthetic event published to event bus).
 
-Out of scope: manual retry triggered by supervisor; escalation tier selection (ARC-1307).
+Out of scope: escalation action after retries exhausted (ARC-1307 handles agent-level escalation; ARC-1308 handles notification). This plan ends at "lane paused, escalation hook ready".
 
 ## Assumptions & Dependencies
 
-- `SessionConfig.retryLimit` already exists in `src/state/types.ts` with `DEFAULT_SESSION_CONFIG.retryLimit = 3`; no config schema changes needed.
-- `getState().config.retryLimit` is accessible inside `runLane()` via the existing `getState()` import in `src/runner/laneRunner.ts`.
-- `runStep()` in `src/runner/subprocessManager.ts` returns `RunResult { outcome: success | failed, exitCode, events }` — value-based, no thrown exceptions.
-- `publish(stepId, event)` in `src/runner/eventBus.ts` accepts any member of the `OpenCodeEvent` union and is already imported in `laneRunner.ts`.
-- `writeSidecar()` in `src/state/sidecar.ts` accepts the full session state and is available in the runner layer.
-- The `ErrorEvent.data.isRetryable` optional field exists but is not used to gate retries in this story — all failures are retryable up to `retryLimit`.
-- TypeScript strict mode is enabled; all new fields require initialization at construction sites.
+- ARC-1288 is merged. `runStep` in `subprocessManager.ts` is the subprocess entry point; `executeStep` in `stepRunner.ts` is the unit-of-work wrapper called by `runLane`.
+- `SessionConfig.retryLimit` already exists in `state/types.ts` (default `3`). No new config field required.
+- `retryLimit === 0` means no retries — one attempt only. A step that fails on the first attempt with `retryLimit === 0` pauses the lane immediately (consistent with current behaviour).
+- The retry counter is per-step-invocation, not per-session. It resets for each step the lane runner processes.
+- The `StepRecord` in `state/types.ts` needs a `retryCount` field so retry attempts are visible in session history (ARC-1312 consumers).
+- ARC-1307 will read `retryCount` from the step record to drive agent-level escalation on each retry. This plan must expose `retryCount` in the record so ARC-1307 has a signal to act on.
+- The event bus (`runner/eventBus.ts`) is the correct channel for emitting retry-announce messages to SSE subscribers; synthetic events with `type: 'retry'` are already handled as `UnknownEvent` by all consumers.
 
 ## Implementation Steps
 
-### Step 1: Add `retryCount` to `StepRecord`
-**Files:** `src/state/types.ts`
-**Action:** Add the field `retryCount: number` to the `StepRecord` interface. This field records how many retry attempts have been made for a given step execution, starting at zero.
-**Verification:** `npx tsc --noEmit` in `packages/server` completes without errors. Any existing code constructing a `StepRecord` literal will produce a type error if the field is missing, which drives the fix in Step 3.
+### Step 1: Add `retryCount` field to `StepRecord`
 
-### Step 2: Add `RetryEvent` to `OpenCodeEvent`
-**Files:** `src/runner/types.ts`
-**Action:** Define a new event variant `RetryEvent` with shape `{ type: retry; stepId: string; attempt: number; maxAttempts: number }` and add it to the `OpenCodeEvent` discriminated union. The `attempt` field is the 1-based retry attempt number; `maxAttempts` equals `retryLimit`.
-**Verification:** Any exhaustive `switch` over `OpenCodeEvent.type` in the codebase produces a TypeScript compile error for the unhandled `retry` case, confirming union membership. Add a `default` or explicit `retry` arm to each such consumer. `npx tsc --noEmit` passes after.
+**File:** `packages/server/src/state/types.ts`
 
-### Step 3: Initialize `retryCount` in `executeStep`
-**Files:** `src/runner/stepRunner.ts`
-**Action:** At every site where a `StepRecord` is created or reset at the start of a step execution, set `retryCount: 0`. This ensures the field is always defined before the retry loop in `laneRunner.ts` reads or increments it.
-**Verification:** `npx tsc --noEmit` passes (satisfying the type error surfaced in Step 1). Confirm via test that a freshly started step has `retryCount === 0`.
+**Action:** Add `retryCount: number` to the `StepRecord` interface, defaulting to `0` for new records. Update the initial record construction in `stepRunner.ts` (`executeStep`) to set `retryCount: 0`.
 
-### Step 4: Implement retry loop in `runLane`
-**Files:** `src/runner/laneRunner.ts`
-**Action:** Replace the single `executeStep()` call for each step with a loop. The loop:
-1. Reads `retryLimit` from `getState().config.retryLimit` once before the step begins.
-2. Calls `executeStep()` (which internally calls `runStep()`).
-3. On `result.outcome === success`: breaks out of the retry loop and continues to the next step.
-4. On `result.outcome === failed` and `stepRecord.retryCount < retryLimit`: increments `stepRecord.retryCount`, emits a `RetryEvent` via `publish(stepId, { type: retry, stepId, attempt: stepRecord.retryCount, maxAttempts: retryLimit })`, persists the updated record via `writeSidecar()`, then iterates.
-5. On `result.outcome === failed` and retries exhausted (`stepRecord.retryCount >= retryLimit`): sets lane status to `paused` in `laneStatusMap`, logs a structured message describing retry exhaustion (step ID, final retry count, outcome), and returns — leaving the door open for ARC-1307 escalation logic to read the paused state.
+**Verification:** TypeScript compiler accepts the change with no errors; existing sidecar read/write round-trips `retryCount` correctly (tests in `sidecar.test.ts` or `state.test.ts` cover the round-trip).
 
-The loop must be bounded: maximum iterations equal `retryLimit + 1` (initial attempt plus retries).
-**Verification:** Unit tests (Step 6) pass. Manual inspection confirms the loop cannot execute more than `retryLimit + 1` times.
+### Step 2: Introduce `retryStep` helper in `laneRunner.ts`
 
-### Step 5: Persist `retryCount` in sidecar after each retry increment
-**Files:** `src/runner/laneRunner.ts`, `src/state/sidecar.ts`
-**Action:** Confirm that the `writeSidecar()` call inside the retry branch (Step 4, iteration 4) writes the full session state including the updated `StepRecord.retryCount`. No changes to `writeSidecar()` itself are expected — verify it already serializes the full state graph that includes `StepRecord`.
-**Verification:** In the integration/unit test for "step fails once, succeeds on retry", assert that the sidecar written after the first failure contains `retryCount: 1`.
+**File:** `packages/server/src/runner/laneRunner.ts`
 
-### Step 6: Write tests
-**Files:** `src/__tests__/laneRunner.test.ts`
-**Action:** Add or extend test scenarios covering:
-- **Retry-then-success:** Mock `runStep` to fail on the first call and succeed on the second. Assert lane continues past the step, final `retryCount === 1`, and a `RetryEvent` with `attempt: 1` was published.
-- **Retry exhaustion:** Mock `runStep` to fail `retryLimit + 1` times. Assert lane is paused, `retryCount === retryLimit`, and no additional calls to `runStep` occur after exhaustion.
-- **RetryEvent emission:** Assert that one `RetryEvent` is published per retry attempt, with correct `attempt` and `maxAttempts` values.
-- **Sidecar persistence:** Assert that `writeSidecar` is called with a state containing the incremented `retryCount` after each retry.
-**Verification:** `npm test` in `packages/server` passes with all new scenarios green.
+**Action:** Add a private async function `retryStep(stepId, prompt, retryLimit)` that:
+- Accepts the step id, the already-constructed prompt string, and the retry limit from `SessionConfig`.
+- Runs the attempt loop: calls `executeStep(stepId, prompt)` for attempt 0 (the initial call made by the caller), then for attempts 1..retryLimit on failure.
+- Between each retry (before invoking `executeStep` again), publishes a synthetic `{ type: 'retry', attempt: N, stepId }` event via `publish(stepId, syntheticEvent)` so SSE subscribers see "Retry N of retryLimit" in the lane output.
+- Returns `{ result: RunResult, retryCount: number }` — the final `RunResult` and the number of retries attempted (0 if the first attempt succeeded).
+
+The caller (`runLane` agent-step block) replaces the current direct `executeStep` call with `retryStep`. On failure after exhausting retries, `runLane` pauses the lane as before.
+
+**Verification:** Unit tests (Step 5) cover: success on first attempt (retryCount 0), success on Nth retry, exhaustion of retries.
+
+### Step 3: Publish retry-announce synthetic events
+
+**File:** `packages/server/src/runner/laneRunner.ts` (inside `retryStep`)
+
+**Action:** Before each retry invocation (attempt ≥ 1), call `publish(stepId, retryEvent)` where `retryEvent` is an `UnknownEvent`-compatible object:
+```ts
+{ type: 'retry', timestamp: Date.now(), stepId, attempt: N, retryLimit }
+```
+This forwards through the event bus to all registered SSE subscribers for `stepId`, making the retry visible in the live lane output stream without changing the SSE transport layer.
+
+**Verification:** Test asserts `publish` is called with `type: 'retry'` exactly `N-1` times when a step fails and succeeds on attempt N.
+
+### Step 4: Persist `retryCount` in `StepRecord` after step resolution
+
+**File:** `packages/server/src/runner/stepRunner.ts`
+
+**Action:** The `executeStep` function currently builds the completed `StepRecord` after the subprocess resolves. Extend the function signature to accept an optional `retryCount: number` parameter (default `0`). Include `retryCount` in the `completedRecord` written to `stepLog`.
+
+Alternatively — and preferably — `retryStep` in `laneRunner.ts` can update the `stepLog` entry directly after `retryStep` returns, by reading the current state, finding the existing record keyed by `stepId`, and setting `retryCount` on it before calling `writeSidecar`. This avoids touching `executeStep`'s signature (which ARC-1307 also reads).
+
+**Chosen sub-approach:** `laneRunner.ts` updates the stepLog entry after `retryStep` returns. The update is a single synchronous `getState/setState/writeSidecar` triple, consistent with existing pattern in the file.
+
+**Verification:** After a step that required 2 retries, `getState().stepLog[stepId].retryCount === 2`.
+
+### Step 5: Update `runLane` call site
+
+**File:** `packages/server/src/runner/laneRunner.ts`
+
+**Action:** In the `runLane` agent-step block, replace:
+```ts
+result = await executeStep(step.id, prompt);
+```
+with:
+```ts
+const { result, retryCount } = await retryStep(step.id, prompt, getState().config.retryLimit);
+```
+Then, after `retryStep` returns, update `stepLog` with `retryCount` (per Step 4). The failure branch (`result.outcome === 'failed'`) already pauses the lane — no change needed there.
+
+**Verification:** Existing `laneRunner.test.ts` test "transitions to paused and does not execute subsequent steps" continues to pass. New tests added in Step 6 cover retry-specific behaviour.
+
+### Step 6: Add tests for retry behaviour
+
+**File:** `packages/server/src/__tests__/laneRunner.test.ts`
+
+**Action:** Add a new describe block `runLane — retry on failure (ARC-1306)` with test scenarios:
+- `retryLimit: 0` — step fails once, lane pauses, `executeStep` called exactly once.
+- `retryLimit: 2`, step fails twice then succeeds — `executeStep` called 3 times, lane continues (not paused), next step executes.
+- `retryLimit: 2`, step fails all 3 attempts — `executeStep` called 3 times, lane paused.
+- Retry announce event published: `publish` called `N-1` times with `type: 'retry'` when step succeeds on attempt N.
+- `retryCount` reflected in `stepLog` after a step that required retries.
+
+**Verification:** All new and existing tests pass under `pnpm test` in the server package.
 
 ## Testing & Validation
 
-Run `npm test` in `packages/server` after implementing all steps. All pre-existing tests must continue to pass.
+Run from `packages/server`:
+```
+pnpm test
+```
+All existing tests must remain green. The new describe block must pass all scenarios listed in Step 6.
 
-End-to-end validation: start a local runbook session with a step whose prompt is designed to fail (e.g., references a non-existent tool). Confirm via sidecar inspection that `retryCount` increments on each attempt, `RetryEvent` entries appear in the steps event log, and the lane transitions to `paused` after `retryLimit` failures.
-
-Type-safety validation: run `npx tsc --noEmit` in `packages/server` and confirm zero errors.
+End-to-end smoke: configure a session with `retryLimit: 2`, mock the subprocess to fail twice then succeed; assert lane status is `running` (not `paused`) after the step and that the SSE stream received two `retry` events.
 
 ## Risks & Open Questions
 
-- **`executeStep` reset behavior:** If `executeStep` resets the `StepRecord` on each invocation (re-initializing `retryCount: 0`), the retry counter will never accumulate. The retry loop in `laneRunner.ts` must own the `retryCount` increment and pass the existing record through, or `executeStep` must receive a flag to skip re-initialization on retry. Confirm the call signature during implementation.
-- **Concurrency:** `runLane` is sequential within a lane. No concurrent retry concerns within a single lane. Cross-lane state access via `getState()` is read-only for `retryLimit`, so no race condition is introduced.
-- **`retryLimit = 0`:** When `retryLimit` is zero, the loop executes once (initial attempt), fails, and immediately pauses the lane. This is the correct behavior and should be covered by a test assertion.
+- **ARC-1307 coordination:** ARC-1307 will read `retryCount` from `StepRecord` to escalate agent level on each retry. The `retryCount` field added in Step 1/4 is the shared signal. ARC-1307's implementation plan must read this field — no additional change needed here.
+- **`executeStep` signature change:** Step 4 deliberately avoids changing `executeStep`'s public signature to keep ARC-1307 unblocked. If ARC-1307 requires per-attempt agent-level injection into `executeStep`, that is ARC-1307's scope.
+- **`retryLimit` from state vs. parameter:** `retryStep` reads `retryLimit` from `getState().config.retryLimit` at call time (not captured before the loop). This means a mid-session config change would be reflected on the next retry. This is acceptable — config mutation mid-session is not in scope for this story.
+- **Concurrent retry events:** Each lane is sequential (ARC-1291). Two concurrent lanes retrying different steps publish to different stepId channels on the event bus, so no cross-lane event bleed.
 
----
