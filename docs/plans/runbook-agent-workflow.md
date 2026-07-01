@@ -40,16 +40,16 @@
 
 ### ARC-1346 — Introduce decision document pattern for async human decisions 🔴 HIGH
 
-- [ ] **ARC-1346** — Introduce decision document pattern for async human decisions
+- [x] **ARC-1346** — Introduce decision document pattern for async human decisions
   - [x] 🔒 Claimed: agent-workflow / 2026-07-01 20:20
-  - [ ] Read `issues/agent-workflow/ARC-1346-decision-document-pattern.md`
-  - [ ] Write `implementation_plans/agent-workflow/ARC-1346-implementation-plan.md`
-  - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
-  - [ ] Execute plan
-  - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
-  - [ ] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1346-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(agent-workflow): introduce decision document pattern for async human decisions`
+  - [x] Read `issues/agent-workflow/ARC-1346-decision-document-pattern.md`
+  - [x] Write `implementation_plans/agent-workflow/ARC-1346-implementation-plan.md`
+  - [x] 🔴 INDIVIDUAL PLAN CHECKPOINT
+  - [x] Execute plan
+  - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
+  - [x] Lint / tests pass
+  - [x] Write `task-completions/ARC-1346-COMPLETION-SUMMARY.md`
+  - [x] Commit: `feat(agent-workflow): introduce decision document pattern for async human decisions`
 
 ### ARC-1347 — Update planning skills for non-interactive checkpoint model 🔴 HIGH
 
