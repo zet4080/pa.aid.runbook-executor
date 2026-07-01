@@ -53,17 +53,17 @@
 
 ### ARC-1347 — Update planning skills for non-interactive checkpoint model 🔴 HIGH
 
-- [ ] Confirm ARC-1346 complete
-- [ ] **ARC-1347** — Update planning skills for non-interactive checkpoint model
+- [x] Confirm ARC-1346 complete
+- [x] **ARC-1347** — Update planning skills for non-interactive checkpoint model
   - [x] 🔒 Claimed: agent-workflow / 2026-07-01 21:00
-  - [ ] Read `issues/agent-workflow/ARC-1347-update-skills-noninteractive.md`
-  - [ ] Write `implementation_plans/agent-workflow/ARC-1347-implementation-plan.md`
-  - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
-  - [ ] Execute plan
-  - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
-  - [ ] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1347-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(agent-workflow): update planning skills for non-interactive checkpoint model`
+  - [x] Read `issues/agent-workflow/ARC-1347-update-skills-noninteractive.md`
+  - [x] Write `implementation_plans/agent-workflow/ARC-1347-implementation-plan.md`
+  - [x] 🔴 INDIVIDUAL PLAN CHECKPOINT
+  - [x] Execute plan
+  - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
+  - [x] Lint / tests pass
+  - [x] Write `task-completions/ARC-1347-COMPLETION-SUMMARY.md`
+  - [x] Commit: `feat(agent-workflow): update planning skills for non-interactive checkpoint model`
 
 🟢 **WAVE 1 GATE** — ARC-1345, ARC-1346, and ARC-1347 closed; agent-workflow lane complete
 
