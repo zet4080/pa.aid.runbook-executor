@@ -165,8 +165,8 @@ Comment `STOP` in the relevant runbook with reason and timestamp. All agents wor
 | Wave gate passes in lane X | Agent completing last story | Human supervisor | Check gate checklist; signal any dependent lane agents |
 | Dependent lane unblocked | Human supervisor | Coding agent for that lane | Start lane — confirm pre-check and proceed |
 | Story blocked (cross-lane dep missing) | Coding agent | Human supervisor | Add to On-Hold Register; supervisor tracks unblock |
-| Scope change discovered | Coding agent | Human supervisor | Stop; open new issue or defer; do not implement out-of-scope |
-| Security-sensitive change found | Coding agent | Human supervisor | Stop immediately; human sign-off required before proceeding |
+| Scope change discovered | Coding agent | Human supervisor | Write `decisions/{KEY}-scope-change.md`; commit+push; stop at 🔴 checkpoint. Do not implement out-of-scope. |
+| Security-sensitive change found | Coding agent | Human supervisor | Write `decisions/{KEY}-security-review.md`; commit+push; stop at 🔴 checkpoint. Human sign-off required before proceeding. |
 
 ---
 
@@ -236,4 +236,56 @@ Skills are located in `opencode-config/skills/`:
 
 ---
 
-*Last updated: 2026-06-27*
+## 16. Decision Document Protocol
+
+All planning skills use the decision document pattern instead of inline "STOP — ask human" question patterns. This enables async, non-interactive checkpoint resolution.
+
+### When to write a decision document
+
+Any time a coding agent hits a decision point it cannot resolve autonomously — scope ambiguity, architectural trade-off, security concern, or unspecified approach — it writes a decision document, commits and pushes it, and stops at a 🔴 checkpoint. The human reviews and answers the document asynchronously, then re-triggers the session.
+
+### Path A — Agent writes a pending document
+
+1. Agent writes `decisions/{KEY}-{type}.md` using `decisions/_template.md` as the schema.
+   - Set `status: pending`; leave `selected_approach`, `decided_by`, `decided_at` blank.
+   - Populate `## Decision Context`, `## Options` (with trade-offs), and `## Recommendation` in the body.
+2. Agent commits and pushes:
+   ```bash
+   git add decisions/{KEY}-{type}.md
+   git commit -m "docs({lane}): add {KEY} {type} decision"
+   git push
+   ```
+3. Agent stops at 🔴 checkpoint and surfaces the file path:
+   > "Decision document written and pushed. Review and answer: `decisions/{KEY}-{type}.md`. Set `status: answered` and `selected_approach: Option N`, then re-trigger the session."
+
+### Path B — Agent resumes after human answers
+
+1. Agent finds `decisions/{KEY}-{type}.md` exists with `status: answered`.
+2. Agent reads the document, extracts `selected_approach`.
+3. Agent proceeds with the selected approach — no interactive question emitted.
+
+### Archival
+
+After the implementation plan for a story is written and pushed, the `write-implementation-plan` skill archives the decision document:
+```bash
+git mv decisions/{KEY}-{type}.md done/decisions/{KEY}-{type}.md
+git commit -m "docs({lane}): archive {KEY} decision"
+git push
+```
+
+### Decision document types
+
+| Type suffix | Used when |
+|-------------|-----------|
+| `approach-decision` | Multiple valid architectural approaches (used by `write-implementation-plan`) |
+| `scope-change` | Out-of-scope change discovered during implementation |
+| `architecture-decision` | Architectural trade-off requiring human input |
+| `security-review` | Security-sensitive change requiring sign-off |
+| `behavior-change` | Unplanned observable product behavior change |
+| `implementation-gap` | Critical gap or ambiguity in an implementation plan step |
+| `verification-failure` | Repeated verification failures with no clear path forward |
+| `lane-selection` | Lane not specified at session invocation |
+
+---
+
+*Last updated: 2026-07-01*
