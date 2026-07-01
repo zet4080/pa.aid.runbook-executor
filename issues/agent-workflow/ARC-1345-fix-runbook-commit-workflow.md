@@ -1,7 +1,7 @@
 | Field | Value |
 |-------|-------|
 | Type | Story |
-| Priority | Low |
+| Priority | High |
 | Status | To Do |
 | Assignee | — |
 | Reporter | — |
@@ -9,37 +9,77 @@
 | Parent Epic | [ARC-1344](https://proalpha.atlassian.net/browse/ARC-1344) ARC: Agent Workflow Improvements |
 | Jira | [ARC-1345](https://proalpha.atlassian.net/browse/ARC-1345) |
 
-# ARC-1345: Clarify checkpoint-branch/PR scope vs. runbook artifact commit flow
+# ARC-1345: Fix checkpoint workflow — runbook file changes must not appear in checkpoint PR
 
-## Description
+## Goal
 
-The original issue assumed that skills were incorrectly implying PRs for runbook artifacts (claim, checkoff, wave-gate commits). Investigation showed this assumption was wrong: no skill ever implied PRs for runbook artifacts. The agent always commits runbook artifacts directly to `main` in `pa.aid.runbook-executor` — no PR, no branch.
+Fix `createCheckpointBranchAndPR` in `packages/server/src/git/checkpointGit.ts` (`pa.aid.conductor.ts`) so that runbook file changes in the planning repo are committed directly to the base branch **before** the checkpoint branch is created, ensuring they never appear in the checkpoint PR.
 
-The real behavior at checkpoint is different: when `pa.aid.conductor.ts` reaches a CHECKPOINT/GATE step, `laneRunner.ts` calls `createCheckpointBranchAndPR` in `packages/server/src/git/checkpointGit.ts`. This function creates a branch named `checkpoint/{lane}/{stepId}` in the **application repo** (`pa.aid.conductor.ts`), pushes it to remote, and non-blockingly attempts to open a Bitbucket PR for that branch. This checkpoint branch captures all application-code changes in `pa.aid.conductor.ts` up to that point in the lane. It has no connection to `pa.aid.runbook-executor` or its artifacts.
+## Problem
 
-The two flows are entirely independent:
+The planning repo (configured via `REPO_ROOT`) contains two categories of files the agent modifies:
 
-- **Runbook artifacts** (claim, checkoff, wave-gate, completion summary) → committed directly to `main` in `pa.aid.runbook-executor`; no branch, no PR
-- **Application code changes** at checkpoint → `checkpoint/{lane}/{stepId}` branch + PR created by the conductor system in `pa.aid.conductor.ts`
+| Category | Examples | Should end up in checkpoint PR? |
+|----------|----------|----------------------------------|
+| Planning artifacts | implementation plans, decision docs, design specs | ✅ YES |
+| Runbook files | `docs/plans/runbook-*.md` checkoffs, wave-gate marks, claim marks | ❌ NO — must go directly to `main` |
 
-The issue is to document this distinction clearly in `docs/plans/HOW-THIS-WORKS.md` so that agents and developers have an accurate mental model of both flows.
+**What currently happens at a checkpoint:**
+
+1. The agent has been working — it has modified runbook files (checkoffs, wave-gate marks, etc.) AND created planning artifacts (implementation plans, etc.); both are uncommitted in the planning repo working tree.
+2. `createCheckpointBranchAndPR` fires in `checkpointGit.ts`.
+3. `git checkout -b checkpoint/{lane}/{stepId}` runs — because git carries uncommitted working-tree changes to the new branch, **both** the runbook changes and the planning artifacts land on the checkpoint branch.
+4. The branch is pushed and a PR is opened.
+5. **Result:** runbook checkoffs and wave-gate marks appear in the checkpoint PR — **wrong**.
+
+**What should happen:**
+
+1. Before `git checkout -b`, the checkpoint logic detects any modified files matching `docs/plans/runbook-*.md` in the planning repo.
+2. Those changes are staged and committed directly to the base branch (e.g. `main`).
+3. Then `git checkout -b` runs — only the planning artifacts follow to the checkpoint branch.
+4. The branch is pushed and a PR is opened containing only planning artifacts.
+5. Runbook changes are already safely committed to `main`.
 
 ## In Scope
 
-- `docs/plans/HOW-THIS-WORKS.md` — add or update a section that explains: (a) runbook artifacts commit directly to `main` in `pa.aid.runbook-executor`, no PR; (b) at checkpoint, the conductor system creates a `checkpoint/{lane}/{stepId}` branch + PR in `pa.aid.conductor.ts` for application code changes; (c) these two flows are independent and do not interfere with each other
-- Optionally: add a brief note to `start-execution-session` or `execute-implementation-plan` skills if either currently lacks any mention of the checkpoint branch mechanism
+- `createCheckpointBranchAndPR` in `pa.aid.conductor.ts` — `packages/server/src/git/checkpointGit.ts`:
+  - Before branching, detect uncommitted changes to files matching `docs/plans/runbook-*.md` in the planning repo (`REPO_ROOT`)
+  - Stage and commit those changes directly to the current base branch
+  - Proceed with `git checkout -b` as usual — only non-runbook changes (planning artifacts) will follow
 
 ## Out of Scope
 
-- Changes to `checkpointGit.ts` or any conductor application logic
-- Changes to how application code PRs are created or merged
-- Any Jira workflow changes
+- Changing how planning artifacts flow into the checkpoint branch and PR
+- Changing the PR creation logic or Bitbucket integration
+- Changing agent skill instructions or runbook authoring conventions
 
 ## Acceptance Criteria
 
-1. Given `docs/plans/HOW-THIS-WORKS.md`, when it describes runbook artifact commits, then it states explicitly that claim, checkoff, wave-gate, and completion summary artifacts commit directly to `main` in `pa.aid.runbook-executor` with no PR or branch.
-2. Given `docs/plans/HOW-THIS-WORKS.md`, when it describes the checkpoint mechanism, then it explains that at a CHECKPOINT/GATE step the conductor system creates a `checkpoint/{lane}/{stepId}` branch and opens a Bitbucket PR in `pa.aid.conductor.ts` for all application-code changes up to that point.
-3. Given both descriptions exist in `HOW-THIS-WORKS.md`, when read together, then it is unambiguous that the two flows (runbook artifact commits vs. conductor checkpoint branches) are independent and never interleave.
+**Given** the agent has modified runbook files AND created planning artifacts (both uncommitted in the planning repo),
+**When** a checkpoint step is reached,
+**Then** runbook file changes (`docs/plans/runbook-*.md`) are committed directly to the base branch and do NOT appear in the checkpoint PR.
+
+---
+
+**Given** the agent has created planning artifacts (uncommitted) in the planning repo,
+**When** a checkpoint step is reached,
+**Then** those planning artifacts appear in the checkpoint branch and PR as expected.
+
+---
+
+**Given** the checkpoint branch has been created and pushed,
+**When** the PR is opened,
+**Then** the diff contains only planning artifacts — no runbook file changes.
+
+## Constraints
+
+- Runbook files are identifiable by path pattern `docs/plans/runbook-*.md` within the planning repo root (`REPO_ROOT`).
+- The commit of runbook changes to the base branch must happen atomically before the `git checkout -b` so that no runbook changes are present in the working tree when the branch is created.
+- If there are no runbook changes, the pre-branch commit step is a no-op.
+
+## Dependencies
+
+- `pa.aid.conductor.ts` — `packages/server/src/git/checkpointGit.ts`
 
 ## Completion Tracking
 
