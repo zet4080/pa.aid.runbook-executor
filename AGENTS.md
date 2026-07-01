@@ -7,9 +7,10 @@
 | `docs/requirements/` | Approved requirements doc |
 | `docs/plans/` | Workorder, runbooks, proposed issues, create-epics log, session logs |
 | `issues/` | One folder per epic; one markdown file per story |
+| `decisions/` | Pending and answered decision documents |
 | `implementation_plans/` | Per-story implementation plans (created during execution) |
 | `task-completions/` | Completion summaries per story |
-| `done/` | Archived completed items |
+| `done/` | Archived completed items (issues, plans, completions, decisions) |
 | `opencode-config/skills/` | Agent skills available in this repo |
 
 ## Sibling Repositories
