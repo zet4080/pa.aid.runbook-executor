@@ -24,7 +24,7 @@ Do NOT write the requirements doc until the dialogue is complete and the user ha
 </HARD-GATE>
 
 <SOURCE-OF-TRUTH>
-The planning repo must exist before writing the requirements doc. Do not write requirements into `pa.aid.wsl-setup.sh`, a product repo, or a temporary local folder and copy them later. Repo first, then durable docs.
+The planning repo must exist before writing the requirements doc. Do not write requirements into `pa.aid.conductor.ts`, a product repo, or a temporary local folder and copy them later. Repo first, then durable docs.
 </SOURCE-OF-TRUTH>
 
 ---
@@ -159,7 +159,7 @@ After the user approves the requirements summary, create or confirm the planning
 
 ```
 opencode-config/
-  skills/           ← copy from pa.aid.wsl-setup.sh/opencode-config/pa.aid.config.md/skills/
+  skills/           ← copy from pa.aid.conductor.ts/opencode-config/pa.aid.config.md/skills/
 docs/
   requirements/
   plans/

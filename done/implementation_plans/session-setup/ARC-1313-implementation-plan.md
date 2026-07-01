@@ -39,7 +39,7 @@ This plan implements the collapsed runbook dashboard shown on tool startup. It c
 - The `packages/ui` Vite dev server already proxies `/api` to `localhost:4000` via `vite.config.ts`. No proxy changes needed.
 - shadcn/ui requires a `paths` alias (`@/*`) in tsconfig and vite config. Both will be added in Step 1.
 - No client-side routing library is needed — the dashboard is the only view (ARC-1314 expand-on-demand will be in-page).
-- The worktree is at `/repos/ARC-1313`. All file paths below are relative to `/repos/ARC-1313/runbook-executor/`.
+- The worktree is at `/repos/ARC-1313`. All file paths below are relative to `/repos/ARC-1313/`.
 
 ---
 

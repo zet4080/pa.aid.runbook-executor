@@ -3,7 +3,7 @@
 **Issue:** `issues/core-infrastructure/ARC-1286-parse-runbook-markdown.md`
 **Implementation Plan:** `implementation_plans/core-infrastructure/ARC-1286-implementation-plan.md`
 **Completed:** 2026-06-28
-**Branch:** `ARC-1286` in `pa.aid.wsl-setup.sh`
+**Branch:** `ARC-1286` in `pa.aid.conductor.ts`
 **Commit:** `4f495cd`
 
 ## Acceptance Criteria Verification
@@ -51,7 +51,7 @@ npm run build --workspace=packages/server
 
 # API endpoint (start server from pa.aid.runbook-executor repo root)
 cd /repos/pa.aid.runbook-executor
-node /repos/ARC-1286/runbook-executor/packages/server/dist/index.js &
+node /repos/ARC-1286/packages/server/dist/index.js &
 curl -s http://localhost:4000/api/runbooks | node -e "
   const d = JSON.parse(require('fs').readFileSync('/dev/stdin','utf8'));
   console.log('count:', d.length);

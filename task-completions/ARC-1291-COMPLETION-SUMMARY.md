@@ -2,7 +2,7 @@
 
 **Issue:** `issues/parallel-lane-execution/ARC-1291-sequential-step-execution.md`
 **Plan:** `implementation_plans/parallel-lane-execution/ARC-1291-implementation-plan.md`
-**Commit:** `4f044ef` on branch `ARC-1291` in `pa.aid.wsl-setup.sh`
+**Commit:** `4f044ef` on branch `ARC-1291` in `pa.aid.conductor.ts`
 **Completed:** 2026-06-30
 
 ## Acceptance Criteria Verification
@@ -31,11 +31,11 @@
 
 ```bash
 # Confirm StepType has no 'manual'
-grep -n "StepType" /repos/ARC-1291/runbook-executor/packages/server/src/runbook/types.ts
+grep -n "StepType" /repos/ARC-1291/packages/server/src/runbook/types.ts
 # Expected: StepType = 'agent' | 'checkpoint'
 
 # Confirm laneRunner exports
-grep -n "^export" /repos/ARC-1291/runbook-executor/packages/server/src/runner/laneRunner.ts
+grep -n "^export" /repos/ARC-1291/packages/server/src/runner/laneRunner.ts
 
 # Run tests
 cd /repos/ARC-1291/runbook-executor && npm test --workspace=packages/server

@@ -7,7 +7,7 @@
 ✅ Complete
 
 ## Commit
-- Branch: `ARC-1303` in `/repos/pa.aid.wsl-setup.sh`
+- Branch: `ARC-1303` in `/repos/pa.aid.conductor.ts`
 - Commit: `d0eabd4`
 - Message: `feat(checkpoint-management): ARC-1303 checkpoint queue panel with priority scoring`
 

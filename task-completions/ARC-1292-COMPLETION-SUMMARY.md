@@ -87,7 +87,7 @@ Additionally, `runLane` now detects an unchecked CHECKPOINT/GATE sub-step after 
 
 ```bash
 # From the merged runbook-executor branch
-cd /repos/pa.aid.wsl-setup.sh/runbook-executor/packages/server
+cd /repos/pa.aid.conductor.ts/packages/server
 npm test
 npx tsc --noEmit
 ```

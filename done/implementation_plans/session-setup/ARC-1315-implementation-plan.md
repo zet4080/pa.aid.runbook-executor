@@ -29,7 +29,7 @@ This plan adds runbook selection to the dashboard: supervisors tick checkboxes o
 - The existing `PATCH /api/state` endpoint in `packages/server/src/routes/state.ts` already accepts and persists `selectedRunbooks`. No server changes are required for basic selection persistence.
 - The UI must initialise selection state from `GET /api/state` (or from `useRunbookSummary` polling) so that a page refresh retains the previous selection.
 - The worktree for this batch is `/repos/ARC-1314` (shared worktree for the batch; all three stories execute there).
-- All file paths below are relative to `runbook-executor/`.
+- All file paths below are relative to the repo root of `pa.aid.conductor.ts`.
 
 ---
 

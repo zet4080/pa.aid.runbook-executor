@@ -120,7 +120,7 @@ digraph write_design_spec {
 - Write the validated design (spec) to `docs/specs/YYYY-MM-DD-<topic>-design.md`
 - Commit the design document to git
 
-Before writing, ensure the current working directory is the planning repo for this initiative. If no planning repo exists, create/confirm one first using the same naming convention as `capture-requirements`: `pa.aid.<topic>`. Do not write specs into `pa.aid.wsl-setup.sh` or a product repo unless that repo is explicitly the planning repo.
+Before writing, ensure the current working directory is the planning repo for this initiative. If no planning repo exists, create/confirm one first using the same naming convention as `capture-requirements`: `pa.aid.<topic>`. Do not write specs into `pa.aid.conductor.ts` or a product repo unless that repo is explicitly the planning repo.
 
 **Spec Self-Review:**
 After writing the spec document:

@@ -26,7 +26,7 @@ Turn approved requirements doc into feature-driven Jira epics and stories, then 
 3. Jira project key — provided at invocation or ask:
    > "Which Jira project should epics and issues be created in? (e.g. AS, PA, ARC)"
 
-If no planning repo exists, stop and run `capture-requirements` to create it. Do not write planning artifacts into `pa.aid.wsl-setup.sh` or a product repo.
+If no planning repo exists, stop and run `capture-requirements` to create it. Do not write planning artifacts into `pa.aid.conductor.ts` or a product repo.
 
 ---
 

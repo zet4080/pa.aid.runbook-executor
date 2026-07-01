@@ -2,7 +2,7 @@
 
 **Story:** ARC-1310
 **Epic:** ARC-1309 — Session History
-**Branch:** `ARC-1310` in `/repos/pa.aid.wsl-setup.sh`
+**Branch:** `ARC-1310` in `/repos/pa.aid.conductor.ts`
 **Plan:** `implementation_plans/session-history/ARC-1310-implementation-plan.md`
 **Completed:** 2026-06-29
 
@@ -43,7 +43,7 @@
 
 4. **API flag:** `packages/server/src/state/types.ts` — `conflictingSession?: boolean` added to `SidecarState`. `packages/server/src/routes/state.ts` — `conflictingSession` added to `READ_ONLY_FIELDS` (cannot be PATCHed).
 
-5. **Lock file in `.gitignore`:** `runbook-executor/.gitignore` — `.runbook-executor-lock` pattern added.
+5. **Lock file in `.gitignore`:** `.gitignore` at the repo root of `pa.aid.conductor.ts` — `.runbook-executor-lock` pattern added.
 
 6. **Test coverage:** 
    - `packages/server/src/__tests__/sidecar.test.ts` — 8 new tests cover `getLockPath`, `acquireLock` (first call returns true, second returns false, PID written, idempotent), `releaseLock` (deletes file, idempotent, re-acquirable after release).
@@ -86,7 +86,7 @@ TypeScript type-check: `npx tsc --noEmit` — no errors.
 | `packages/server/src/state/sidecar.ts` | Added `getLockPath`, `acquireLock`, `releaseLock` |
 | `packages/server/src/index.ts` | Lock acquire/release at startup/shutdown; `conflictingSession` flag |
 | `packages/server/src/routes/state.ts` | `conflictingSession` in `READ_ONLY_FIELDS` |
-| `runbook-executor/.gitignore` | Added `.runbook-executor-lock` pattern |
+| `.gitignore` | Added `.runbook-executor-lock` pattern |
 | `packages/server/src/__tests__/sidecar.test.ts` | Lock helper tests |
 | `packages/server/src/__tests__/runbooks.summary.test.ts` | Write-back persistence test |
 | `packages/server/src/__tests__/state.test.ts` | New: `conflictingSession` API tests |

@@ -28,8 +28,8 @@ This plan adds expand/collapse behaviour to RunbookCard so the supervisor can re
 - A new `GET /api/runbooks/detail` endpoint will be added that accepts a `path` query parameter and returns the `ParsedRunbook` for that file plus the current `stepState` slice — this is the server-side requirement for AC-1 (step checkbox state).
 - The `stepState` is already stored in `SidecarState` (keyed by step id). The detail endpoint reads it from `getState()`.
 - No client-side routing is needed — expand/collapse is in-page. The expanded detail view replaces the card body content while the card header/title remain visible.
-- The worktree for this batch is at `/repos/ARC-1314` (to be created from `runbook-executor` branch).
-- All file paths below are relative to the `runbook-executor/` monorepo root unless otherwise noted.
+- The worktree for this batch is at `/repos/ARC-1314` (to be created from `main` branch).
+- All file paths below are relative to the repo root of `pa.aid.conductor.ts` unless otherwise noted.
 
 ---
 

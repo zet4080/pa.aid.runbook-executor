@@ -16,15 +16,15 @@
 
 | Repo | Path | Purpose |
 |------|------|---------|
-| `pa.aid.wsl-setup.sh` | `/repos/pa.aid.wsl-setup.sh` | WSL2 dev environment bootstrap — application code for the runbook executor lives here and is deployed alongside other OpenCode tooling |
+| `pa.aid.conductor.ts` | `/repos/pa.aid.conductor.ts` | Standalone runbook executor application — server, UI, and all application code live here |
 
-**Application code target:** All runbook executor application source code (server, UI, etc.) belongs in `pa.aid.wsl-setup.sh`, not in this planning repo.
+**Application code target:** All runbook executor application source code (server, UI, etc.) belongs in `pa.aid.conductor.ts`, not in this planning repo.
 
-**Application code location:** `runbook-executor/` top-level subdirectory in `pa.aid.wsl-setup.sh`.
+**Application code location:** Root of `pa.aid.conductor.ts` (code is not in a subdirectory).
 
-## Branching Strategy (pa.aid.wsl-setup.sh)
+## Branching Strategy (pa.aid.conductor.ts)
 
-All runbook executor feature work targets `pa.aid.wsl-setup.sh`. The `main` branch stays clean until the full feature set is complete.
+All runbook executor feature work targets `pa.aid.conductor.ts`. The `main` branch stays clean until the full feature set is complete.
 
 | Rule | Detail |
 |------|--------|
@@ -35,10 +35,10 @@ All runbook executor feature work targets `pa.aid.wsl-setup.sh`. The `main` bran
 
 **Branch creation command:**
 ```bash
-git -C /repos/pa.aid.wsl-setup.sh worktree add /repos/<KEY> -b <KEY> runbook-executor
+git -C /repos/pa.aid.conductor.ts worktree add /repos/<KEY> -b <KEY> main
 ```
 
-**Runbook artifact commits** (runbook checkoffs, implementation plans, completion summaries) always go to `main` in `pa.aid.runbook-executor` — never into feature branches or `pa.aid.wsl-setup.sh`.
+**Runbook artifact commits** (runbook checkoffs, implementation plans, completion summaries) always go to `main` in `pa.aid.runbook-executor` — never into feature branches or `pa.aid.conductor.ts`.
 
 ## Workflow
 
@@ -46,7 +46,7 @@ git -C /repos/pa.aid.wsl-setup.sh worktree add /repos/<KEY> -b <KEY> runbook-exe
 |------|--------|----------|
 | 1. Issue | Define what to build | `issues/{epic}/{KEY}-{title}.md` |
 | 2. Plan | Write implementation plan | `implementation_plans/{lane}/{KEY}-implementation-plan.md` |
-| 3. Execute | Implement, test, commit in `pa.aid.wsl-setup.sh` | feature branch named exactly `{KEY}`, branched off `runbook-executor` |
+| 3. Execute | Implement, test, commit in `pa.aid.conductor.ts` | feature branch named exactly `{KEY}`, branched off `main` |
 | 4. Complete | Write completion summary | `task-completions/{KEY}-COMPLETION-SUMMARY.md` |
 
 ## Epics

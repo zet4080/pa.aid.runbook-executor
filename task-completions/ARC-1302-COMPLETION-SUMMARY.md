@@ -4,7 +4,7 @@
 | --- | --- |
 | Story | ARC-1302 |
 | Status | Completed |
-| Branch | ARC-1302 in /repos/pa.aid.wsl-setup.sh |
+| Branch | ARC-1302 in /repos/pa.aid.conductor.ts |
 | Commit | ba4da5a
 
 ## Acceptance Criteria Evidence

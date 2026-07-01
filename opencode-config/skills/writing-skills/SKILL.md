@@ -21,7 +21,7 @@ Core rule: if no agent failure or pressure scenario was observed, you do not kno
 
 ## Inputs / Preconditions
 
-- Canonical skills live in `/repos/pa.aid.wsl-setup.sh/opencode-config/pa.aid.config.md/skills/`.
+- Canonical skills live in `/repos/pa.aid.conductor.ts/opencode-config/pa.aid.config.md/skills/`.
 - Runtime copies live in `~/.config/opencode/skills/` and may include external/plugin skills.
 - Each skill lives in `skills/<skill-name>/SKILL.md`.
 - Load `test-driven-development` before changing executable validation code.

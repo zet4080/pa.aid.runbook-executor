@@ -187,7 +187,7 @@ Scenarios:
 - Sessions route test: `POST /api/sessions/start` fires `runLane` per selected runbook and returns immediately.
 
 **End-to-end smoke test (manual):**
-1. Start the server (`npm run dev` in `runbook-executor/`).
+1. Start the server (`npm run dev` in `/repos/pa.aid.conductor.ts`).
 2. Confirm a runbook is selected via `PATCH /api/state` (set `selectedRunbooks`).
 3. Call `POST /api/sessions/start`.
 4. Verify the response returns `{ ok: true, sessionStartedAt: <ISO> }` immediately.

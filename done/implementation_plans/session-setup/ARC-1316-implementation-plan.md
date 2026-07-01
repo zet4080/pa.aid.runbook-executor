@@ -30,7 +30,7 @@ This plan adds a session configuration panel on the Dashboard where the supervis
 - `PATCH /api/state` already accepts `{ config: Partial<SessionConfig> }` and merges it shallowly.
 - The issue mentions "escalation sequence" as a configurable parameter. In the current `SidecarState`, there is no `escalationSequence` field — only `retryLimit`. The escalation sequence (junior → senior → human) is defined in ARC-1307. For this story, the configurable value is `retryLimit` (number of retries before escalation). If a dedicated `escalationSequence` field is needed, it must be added to `SessionConfig` and `SidecarState` as part of this story.
 - The worktree for this batch is `/repos/ARC-1314`.
-- All file paths below are relative to `runbook-executor/`.
+- All file paths below are relative to the repo root of `pa.aid.conductor.ts`.
 
 ---
 

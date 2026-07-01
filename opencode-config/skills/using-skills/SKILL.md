@@ -36,7 +36,7 @@ Not negotiable. Not optional. Cannot rationalize out of this.
 
 ## How to Access Skills
 
-Use the `skill` tool (OpenCode) or `Skill` tool (Claude Code). Canonical repo skills live in `/repos/pa.aid.wsl-setup.sh/opencode-config/pa.aid.config.md/skills/`; runtime deployment copies them into `~/.config/opencode/skills/`.
+Use the `skill` tool (OpenCode) or `Skill` tool (Claude Code). Canonical repo skills live in `/repos/pa.aid.conductor.ts/opencode-config/pa.aid.config.md/skills/`; runtime deployment copies them into `~/.config/opencode/skills/`.
 
 ## The Rule
 

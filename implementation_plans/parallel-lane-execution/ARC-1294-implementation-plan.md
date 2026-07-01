@@ -10,7 +10,7 @@
 
 ## Scope & Alignment
 
-The core checkbox write-back feature was implemented as part of the ARC-1293 fix commit (`d7ff6e2`). The following is already in production on the `runbook-executor` integration branch:
+The core checkbox write-back feature was implemented as part of the ARC-1293 fix commit (`d7ff6e2`). The following is already in production on the `main` integration branch:
 
 - `packages/server/src/runbook/markdownWriter.ts` — `markStepCheckedInMarkdown` and `markSubStepsCheckedInMarkdown`, both using atomic write (`.tmp` → rename).
 - `packages/server/src/runner/laneRunner.ts` calls both write-back functions at the correct points: step success with no pending gate → `markStepCheckedInMarkdown`; step success with pending checkpoint gate → `markSubStepsCheckedInMarkdown` for pre-gate sub-steps.
@@ -37,11 +37,11 @@ The core checkbox write-back feature was implemented as part of the ARC-1293 fix
 
 ## Assumptions & Dependencies
 
-- ARC-1291, ARC-1292, and ARC-1293 are merged to the `runbook-executor` integration branch. All existing `markdownWriter.ts` and `laneRunner.ts` write-back code is in production.
+- ARC-1291, ARC-1292, and ARC-1293 are merged to the `main` integration branch. All existing `markdownWriter.ts` and `laneRunner.ts` write-back code is in production.
 - Node.js single-threaded event loop: synchronous calls between `await` boundaries cannot interleave. The `getState()` → `setState()` → `writeSidecar()` block in `laneRunner.ts` is synchronous throughout — no `await` between these calls — so concurrent lanes cannot observe a torn state write.
 - Similarly, `markStepCheckedInMarkdown` and `markSubStepsCheckedInMarkdown` use synchronous `readFileSync`/`writeFileSync`/`renameSync`. They cannot interleave with each other within a single Node.js process.
 - The markdown file is the crash-recovery ground truth as stated in the issue. `SidecarState.stepState` is a secondary index; the authoritative skip-guard in `runLane` is `step.checked === true`, which comes from the parsed runbook (i.e., from the markdown file). The runbook cache is re-populated from disk at server startup, so a fresh parse reflects all checkboxes written before the crash.
-- The worktree for ARC-1294 is branched off `runbook-executor`: `git -C /repos/pa.aid.wsl-setup.sh worktree add /repos/ARC-1294 -b ARC-1294 runbook-executor`.
+- The worktree for ARC-1294 is branched off `main`: `git -C /repos/pa.aid.conductor.ts worktree add /repos/ARC-1294 -b ARC-1294 main`.
 
 ---
 
@@ -126,7 +126,7 @@ All automated verification is via `vitest run` and `tsc --noEmit` in `packages/s
 - **Atomic markdown write:** Existing tests in `markdownWriter.test.ts` confirm `.tmp` file is absent after write and content is correct.
 
 **End-to-end smoke test (manual):**
-1. Start the server (`npm run dev` in `runbook-executor/`) with `REPO_ROOT` pointing to a planning repo.
+1. Start the server (`npm run dev` in `/repos/pa.aid.conductor.ts`) with `REPO_ROOT` pointing to a planning repo.
 2. Select two runbooks; click "Start Session".
 3. As each lane's agent steps complete, confirm the corresponding top-level checkboxes flip from `[ ]` to `[x]` in the markdown file within ~1 second.
 4. When a checkpoint is hit, confirm the lane's in-progress step checkbox is NOT checked (lane paused).

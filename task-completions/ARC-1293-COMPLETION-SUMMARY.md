@@ -5,7 +5,7 @@
 **Implementation Plan:** `implementation_plans/parallel-lane-execution/ARC-1293-implementation-plan.md`
 **Completed:** 2026-06-30
 **Duration:** ~1 session
-**Commit:** `98ed86ee5fd167feb5031b7d546a2379311b2bd2` (branch `ARC-1293` in `pa.aid.wsl-setup.sh`)
+**Commit:** `98ed86ee5fd167feb5031b7d546a2379311b2bd2` (branch `ARC-1293` in `pa.aid.conductor.ts`)
 
 ## Acceptance Criteria Verification
 
@@ -42,8 +42,8 @@ cd packages/server && npx vitest run
 cd../ui && npx vitest run
 
 # Type-check (both packages, no errors)
-cd /repos/ARC-1293/runbook-executor/packages/server && npx tsc --noEmit
-cd /repos/ARC-1293/runbook-executor/packages/ui && npx tsc --noEmit
+cd /repos/ARC-1293/packages/server && npx tsc --noEmit
+cd /repos/ARC-1293/packages/ui && npx tsc --noEmit
 ```
 
 ## Tests Added/Modified

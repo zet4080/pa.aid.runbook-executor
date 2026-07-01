@@ -121,5 +121,5 @@ Lock file content: `String(process.pid)` — aids human diagnosis of stale locks
 ## Risks & Open Questions
 
 - **Stale lock on crash:** If the server crashes without running the SIGINT/SIGTERM handler (e.g. SIGKILL), the lock file persists. The warning message advises manual deletion. This is an accepted known limitation — no auto-stale-detection in scope for ARC-1310.
-- **Lock file in `.gitignore`:** `.runbook-executor-lock` should be added to `.gitignore` in `runbook-executor/` to prevent accidental commits. Verify the existing `.gitignore` or add the entry.
+- **Lock file in `.gitignore`:** `.runbook-executor-lock` should be added to the root `.gitignore` of `pa.aid.conductor.ts` to prevent accidental commits. Verify the existing `.gitignore` or add the entry.
 - **`conflictingSession` in UI:** This plan adds the server-side flag only. A UI warning banner consuming `conflictingSession` is out of scope for ARC-1310 (no UI AC in the issue). The field is available in `GET /api/state` for any future UI story to consume.

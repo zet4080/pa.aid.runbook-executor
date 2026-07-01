@@ -105,7 +105,7 @@ After feature clustering is complete and before writing any proposal document, c
 
 ```
 opencode-config/
-  skills/           ← copy from pa.aid.wsl-setup.sh
+  skills/           ← copy from pa.aid.conductor.ts
 docs/
   plans/
   specs/
@@ -117,7 +117,7 @@ done/
 
 Commit: `chore: initialize planning repo`
 
-Do not write proposal docs in `pa.aid.wsl-setup.sh`, a product repo, or a temporary folder.
+Do not write proposal docs in `pa.aid.conductor.ts`, a product repo, or a temporary folder.
 
 ---
 
@@ -252,7 +252,7 @@ Commit: `docs: add restructure log after Jira epic and issue restructure`
 The planning repo already exists from Phase 3. Ensure directories:
 ```
 opencode-config/
-  skills/           ← copy from pa.aid.wsl-setup.sh
+  skills/           ← copy from pa.aid.conductor.ts
 docs/
   plans/
   specs/

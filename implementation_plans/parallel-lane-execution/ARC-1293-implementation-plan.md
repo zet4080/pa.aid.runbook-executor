@@ -269,7 +269,7 @@ All automated verification is via `vitest run` and `tsc --noEmit` in both packag
 - **UI hook and component tests:** `useLaneStream` and `LaneOutputPanel` unit tests pass with mocked event sources.
 
 **End-to-end smoke test (manual):**
-1. Start the server (`npm run dev` in `runbook-executor/`).
+1. Start the server (`npm run dev` in `/repos/pa.aid.conductor.ts`).
 2. Select two runbooks; click "Start Session".
 3. Confirm two lane output panels appear below the session controls.
 4. As each lane executes agent steps, confirm events appear in the correct panel within ~1 second.
