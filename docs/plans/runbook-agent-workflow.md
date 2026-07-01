@@ -28,7 +28,7 @@
 ### ARC-1345 — Fix runbook-commit workflow — no PR for runbook artifacts 🟢 LOW
 
 - [ ] **ARC-1345** — Fix runbook-commit workflow — no PR for runbook artifacts
-  - [ ] 🔒 Claimed: _(fill in: agent / YYYY-MM-DD HH:MM before starting)_
+  - [x] 🔒 Claimed: agent-workflow / 2026-07-01 20:03
   - [ ] Read `issues/agent-workflow/ARC-1345-fix-runbook-commit-workflow.md`
   - [ ] Write `implementation_plans/agent-workflow/ARC-1345-implementation-plan.md`
   - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
