@@ -1,9 +1,8 @@
-# ARC-1345 Fix checkpoint workflow — runbook file changes must not appear in checkpoint PR - Implementation Plan
-
+# ARC-1345 Fix runbook-commit workflow: no PR for runbook artifacts — Implementation Plan
 **Issue:** `issues/agent-workflow/ARC-1345-fix-runbook-commit-workflow.md`
 **Completion Summary:** `task-completions/ARC-1345-COMPLETION-SUMMARY.md` (TBD)
-**Approach:** Pre-branch runbook flush — detect and commit runbook-matching files to base branch before `git checkout -b`
-**Owner:** agent
+**Approach:** Pre-branch commit of runbook files — single approach, pattern established
+**Owner:** build agent
 **Date:** 2026-07-01
 
 ---
@@ -13,134 +12,110 @@
 This plan covers a single surgical change to `createCheckpointBranchAndPR` in
 `packages/server/src/git/checkpointGit.ts` (`pa.aid.conductor.ts`).
 
-Before the function creates the checkpoint branch it must:
-1. Detect any uncommitted working-tree changes to files matching `docs/plans/runbook-*.md`
-2. Stage and commit those files directly to the current base branch
-3. Then proceed with branch creation as today
+| AC | Covered by step |
+|----|----------------|
+| Runbook files (`docs/plans/runbook-*.md`) are committed to base branch before `git checkout -b` | Step 1 |
+| If no runbook changes are present, the pre-branch commit step is a no-op | Step 1 |
+| Planning artifacts still appear in the checkpoint branch and PR | Step 1 (unchanged branching path) |
+| Checkpoint PR diff contains only planning artifacts — no runbook files | Steps 1 + 2 |
 
-If no runbook files are modified, the new step is a no-op and existing behaviour is unchanged.
-
-AC mapping:
-
-| AC | Covered by |
-|----|-----------|
-| Runbook changes go to base branch, not PR | Step 1 (flush helper) + Step 2 (call site) |
-| Planning artifacts still reach checkpoint PR | Step 2 (no change to post-flush branch logic) |
-| PR diff contains only planning artifacts | Step 1 + Step 2 — runbook files committed before branch creation |
-| No-op when no runbook files changed | Conditional in `flushRunbookChangesToBaseBranch` |
+Out of scope: PR creation logic, Bitbucket integration, agent skill instructions, planning artifact routing.
 
 ---
 
 ## Assumptions & Dependencies
 
-- `execSync` is already imported and used with a consistent `execOpts` object — the new helper uses the same pattern.
-- The planning repo path (`repoRoot`) is the git working tree root — `docs/plans/runbook-*.md` paths are relative to it.
-- Git's short-status format (`git status --porcelain`) is available in all environments where the server runs.
-- The current branch at call time is always the base branch (e.g. `main`) — no prior checkout has occurred.
-- Runbook commit message format: `chore(runbook): flush runbook checkoffs before checkpoint branch` — plain, no Jira key, consistent with planning-repo commit conventions.
-- Test framework: Vitest; `execSync` is already fully mocked in `checkpointGit.test.ts`.
+- `REPO_ROOT` (passed as `opts.repoRoot`) is the absolute path to the planning repo on disk.
+- The function is called while the planning repo is checked out on its base branch (e.g. `main`). Runbook files are present in the working tree with uncommitted changes.
+- `execSync` (already imported from `child_process`) is the correct primitive to use — no new dependencies.
+- `git add -- <pathspec>` with a glob pattern is safe to use inside `execSync`; if nothing matches the pattern, the command exits 0 with no changes staged.
+- A `git commit` with nothing staged (when there are no runbook changes) exits with code 1. The pre-branch commit must therefore check for staged runbook changes before invoking `git commit`, to keep the no-op path clean.
+- The existing tests count the exact number of `execSync` calls. Adding the pre-branch commit steps will change the call count; the test suite must be updated accordingly.
 
 ---
 
 ## Implementation Steps
 
-### Step 1 — Extract `flushRunbookChangesToBaseBranch` helper
+### Step 1 — Insert pre-branch runbook commit in `createCheckpointBranchAndPR`
 
 **File:** `packages/server/src/git/checkpointGit.ts`
 
 **Action:**
-Add a new private function `flushRunbookChangesToBaseBranch(repoRoot: string, execOpts: object): void` immediately before `createCheckpointBranchAndPR`.
 
-Logic:
-1. Run `git status --porcelain` in `repoRoot` with the shared `execOpts`.
-2. Parse each output line. Extract the file path (column 4 onward after stripping the two-character status prefix and optional rename arrow).
-3. Filter paths matching the glob `docs/plans/runbook-*.md` (use a simple `String.includes('docs/plans/runbook-')` prefix + `.md` suffix check — no external glob dependency).
-4. If the filtered list is empty, return immediately (no-op).
-5. Stage each matched file: `git add -- <path>` for each path in the list.
-6. Commit: `git commit -m "chore(runbook): flush runbook checkoffs before checkpoint branch"`.
+Immediately before the `branchExistsLocally` check (the block that calls `git rev-parse --verify` and then `git checkout -b`), insert a pre-branch runbook commit block:
 
-The function throws synchronously on any `execSync` error — do not swallow git failures.
+1. Run `git status --porcelain -- docs/plans/runbook-*.md` to detect whether any runbook files are modified (staged or unstaged).
+2. If the output is non-empty (i.e. at least one matching file has changes):
+   a. Run `git add -- docs/plans/runbook-*.md` to stage all modified runbook files.
+   b. Run `git commit -m "docs(runbook): auto-commit runbook checkoffs before checkpoint branch"` to commit them directly to the current base branch.
+3. If the output is empty, skip the add+commit — no-op.
 
-**Verification:** Unit tests for the helper (added in Step 3) pass.
+The surrounding branch-creation and push logic is unchanged.
 
----
-
-### Step 2 — Call the helper in `createCheckpointBranchAndPR`
-
-**File:** `packages/server/src/git/checkpointGit.ts`
-
-**Action:**
-In `createCheckpointBranchAndPR`, move `execOpts` to be declared before the `branchExistsLocally` block (it already is — confirm it is in scope). Insert a single call:
-
-```
-flushRunbookChangesToBaseBranch(repoRoot, execOpts);
-```
-
-immediately before the `try { execSync('git rev-parse ...' }` block (i.e., before any branch-existence check or checkout). No other changes to the existing function body.
-
-**Verification:** Existing tests that count `execSync` call counts will need to be updated (Step 4) to account for the two new calls (`git status --porcelain` + `git add` + `git commit` when runbook files are present, or just `git status --porcelain` when they are absent).
+**Verification:** Read the modified function and confirm:
+- The `git status --porcelain` call precedes `git rev-parse --verify`.
+- The `git add` and `git commit` calls are inside an `if` guard.
+- The `git checkout -b` / `git checkout` block is unchanged.
 
 ---
 
-### Step 3 — Add unit tests for `flushRunbookChangesToBaseBranch`
+### Step 2 — Update tests in `checkpointGit.test.ts`
 
 **File:** `packages/server/src/git/checkpointGit.test.ts`
 
 **Action:**
-Add a new `describe` block: `'flushRunbookChangesToBaseBranch'`. Because the helper is private, test it indirectly through `createCheckpointBranchAndPR` by controlling what `execSyncMock` returns for the `git status --porcelain` call.
 
-Test scenarios:
+The existing success-path test `'calls execSync for git checkout -b, git push, and git checkout -'` asserts `execSyncMock` is called exactly 3 times. After Step 1 the pre-branch path adds one `execSync` call (`git status --porcelain`), changing the minimum call count.
 
-1. **No runbook changes** — `git status --porcelain` returns empty string. Assert `git add` and `git commit` are NOT called. Assert subsequent checkout/push calls proceed as normal.
+Update the test suite:
 
-2. **One runbook file changed** — `git status --porcelain` returns ` M docs/plans/runbook-session-setup.md`. Assert `git add -- docs/plans/runbook-session-setup.md` is called, then `git commit -m "chore(runbook): flush runbook checkoffs before checkpoint branch"` is called, before the `git checkout -b` call.
+1. **Existing `'calls execSync for git checkout -b, git push, and git checkout -'` test:**
+   - Change the `toHaveBeenCalledTimes(3)` assertion to `toHaveBeenCalledTimes(4)` (adding the `git status --porcelain` call).
+   - Retain the existing `toHaveBeenNthCalledWith` assertions but shift their indices: `git status --porcelain` is now call 1; `git checkout -b` is call 2; `git push` is call 3; `git checkout -` is call 4.
 
-3. **Multiple runbook files changed** — `git status --porcelain` returns two matching lines. Assert both `git add` calls are issued (one per file) before the commit.
+2. **Add a new test: `'commits runbook files to base branch before creating checkpoint branch'`:**
+   - Scenario: `execSyncMock` returns non-empty output (e.g. `'M docs/plans/runbook-core.md'`) for the `git status --porcelain` call and `''` for all others.
+   - Verify that `execSyncMock` was called with `git add -- docs/plans/runbook-*.md` and then with the auto-commit message, both before the `git checkout -b` call.
 
-4. **Non-runbook files only** — `git status --porcelain` returns `M  src/something.ts`. Assert no `git add` or `git commit` flush call is made.
+3. **Add a new test: `'skips runbook commit when no runbook files are modified'`:**
+   - Scenario: `execSyncMock` returns `''` for the `git status --porcelain` call (no runbook changes).
+   - Verify that `git add` and `git commit` are NOT called for runbook files.
+   - Verify that `git checkout -b` is still called (normal path proceeds).
 
-5. **Mixed: runbook + non-runbook files** — `git status --porcelain` returns one runbook line and one non-runbook line. Assert only the runbook file is staged; the non-runbook file is not touched.
-
-**Verification:** `pnpm test` in `packages/server` — all five new tests pass alongside all existing tests.
-
----
-
-### Step 4 — Update existing execSync call-count assertions
-
-**File:** `packages/server/src/git/checkpointGit.test.ts`
-
-**Action:**
-The existing `'calls execSync for git checkout -b, git push, and git checkout -'` test asserts `execSyncMock` was called exactly 3 times. After the change, there is a minimum of 1 additional call (`git status --porcelain`). Update affected assertions:
-
-- For tests where `git status --porcelain` returns `''` (empty — no runbook changes): add 1 to the expected call count (the status check call).
-- Update `toHaveBeenCalledTimes(3)` → `toHaveBeenCalledTimes(4)` and update the `toHaveBeenNthCalledWith` positions accordingly (status check is now call 1; existing calls shift by 1).
-- The `branchExistsLocally` check (`git rev-parse --verify`) also exists in the flow — trace the exact call sequence and set counts accordingly.
-
-Verify the existing `'throws synchronously when execSync throws (git failure is not swallowed)'` test still passes — the first execSync call is now `git status --porcelain`, so the mock should throw on that call and the function should still reject.
-
-**Verification:** `pnpm test` — all tests pass, no regressions in the existing PR-creation and failure-path suites.
+**Verification:** Run `pnpm --filter server test` (or the equivalent test command for the project) and confirm all tests pass with no failures.
 
 ---
 
 ## Testing & Validation
 
-Run from `packages/server`:
+### Unit tests (Step 2)
 
+Run the server package tests:
 ```
-pnpm test
+pnpm --filter server test
 ```
+Expected: all existing tests plus two new tests pass.
 
-Expected: all tests in `checkpointGit.test.ts` pass (new + updated). No failures in `checkpoints.test.ts` or other suites.
+### Manual smoke scenario (conceptual)
 
-Manual integration check (optional, no CI required for this story):
-- In a local planning repo with a dirty `docs/plans/runbook-*.md` file and an unstaged implementation plan, invoke `createCheckpointBranchAndPR` and verify:
-  - The runbook file is committed to `main` before the branch is created.
-  - The checkpoint branch contains only the implementation plan diff.
+Scenario: planning repo has `docs/plans/runbook-core-infrastructure.md` with an uncommitted change AND an uncommitted `implementation_plans/agent-workflow/ARC-1345-implementation-plan.md`.
+
+On `createCheckpointBranchAndPR` call:
+- `git log --oneline -1` on the base branch should show the auto-commit of the runbook file.
+- `git diff main...checkpoint/{lane}/{stepId} --name-only` should list only `implementation_plans/agent-workflow/ARC-1345-implementation-plan.md` — not any `docs/plans/runbook-*.md` file.
+
+### Edge case: no runbook changes
+
+Scenario: only a planning artifact is uncommitted, no runbook files modified.
+- The `git status --porcelain` returns empty output.
+- No `git add` or `git commit` for runbook files occurs.
+- Checkpoint branch and PR are created normally.
 
 ---
 
 ## Risks & Open Questions
 
-- **`execSync` call-count drift in existing tests** — the existing tests count exact call numbers. The step-by-step ordering in Step 4 mitigates this; the plan explicitly requires updating those counts.
-- **Renamed files in `git status --porcelain`** — rename lines have format `R  old -> new`. The helper must correctly extract the destination path. Scenario: `R  docs/plans/runbook-old.md -> docs/plans/runbook-new.md`. The parsing logic should split on ` -> ` and take the second segment when present.
-- **No new runtime dependencies required** — the implementation uses only `execSync` (already present) and standard string operations.
+- **`execSync` call-count coupling in tests:** Existing tests assert exact call counts. The test updates in Step 2 are load-bearing — if Step 2 is incomplete the test suite will fail on call-count assertions. Steps must be executed together.
+- **Shell glob expansion in `execSync`:** The glob `docs/plans/runbook-*.md` is passed as a shell argument string inside `execSync`. Verify the shell expands the glob correctly in the test environment. If `execSync` is invoked with `shell: false`, the glob will not be expanded by the OS shell — the existing `execSync` calls in the file use the two-argument form (command string, options), which invokes the shell by default on POSIX, so glob expansion should work.
+- **Commit identity:** `git commit` requires `user.name` and `user.email` to be configured in the repo or globally. In CI/agent environments this is typically configured. No change needed here; if it fails, the error will surface through the existing un-caught `execSync` path (git failures are not swallowed — consistent with existing behavior).
+- **Concurrent checkpoint calls:** Not addressed here. The issue is scoped to the single-call sequential flow.
