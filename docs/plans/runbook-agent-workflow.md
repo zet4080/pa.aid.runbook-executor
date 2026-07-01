@@ -55,7 +55,7 @@
 
 - [ ] Confirm ARC-1346 complete
 - [ ] **ARC-1347** — Update planning skills for non-interactive checkpoint model
-  - [ ] 🔒 Claimed: _(fill in: agent / YYYY-MM-DD HH:MM before starting)_
+  - [x] 🔒 Claimed: agent-workflow / 2026-07-01 21:00
   - [ ] Read `issues/agent-workflow/ARC-1347-update-skills-noninteractive.md`
   - [ ] Write `implementation_plans/agent-workflow/ARC-1347-implementation-plan.md`
   - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
