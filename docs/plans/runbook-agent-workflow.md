@@ -27,16 +27,16 @@
 
 ### ARC-1345 — Fix runbook-commit workflow — no PR for runbook artifacts 🟢 LOW
 
-- [ ] **ARC-1345** — Fix runbook-commit workflow — no PR for runbook artifacts
+- [x] **ARC-1345** — Fix runbook-commit workflow — no PR for runbook artifacts
   - [x] 🔒 Claimed: agent-workflow / 2026-07-01 20:03
-  - [ ] Read `issues/agent-workflow/ARC-1345-fix-runbook-commit-workflow.md`
-  - [ ] Write `implementation_plans/agent-workflow/ARC-1345-implementation-plan.md`
-  - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
-  - [ ] Execute plan
-  - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
-  - [ ] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1345-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(agent-workflow): fix runbook-commit workflow no PR for runbook artifacts`
+  - [x] Read `issues/agent-workflow/ARC-1345-fix-runbook-commit-workflow.md`
+  - [x] Write `implementation_plans/agent-workflow/ARC-1345-implementation-plan.md`
+  - [x] 🔴 INDIVIDUAL PLAN CHECKPOINT
+  - [x] Execute plan
+  - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
+  - [x] Lint / tests pass
+  - [x] Write `task-completions/ARC-1345-COMPLETION-SUMMARY.md`
+  - [x] Commit: `feat(agent-workflow): fix runbook-commit workflow no PR for runbook artifacts`
 
 ### ARC-1346 — Introduce decision document pattern for async human decisions 🔴 HIGH
 
