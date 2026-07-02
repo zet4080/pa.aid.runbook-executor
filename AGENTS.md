@@ -12,6 +12,7 @@
 | `task-completions/` | Completion summaries per story |
 | `done/` | Archived completed items (issues, plans, completions, decisions) |
 | `opencode-config/skills/` | Agent skills available in this repo |
+| `docs/plans/agent-tools-technical-context.md` | Standing technical decisions and patterns for the agent-tools lane — load at start of every agent-tools session |
 
 ## Sibling Repositories
 
@@ -97,3 +98,15 @@ Lane runbooks (one per epic):
 | bitbucket | PR management (BITBUCKET_PASSWORD) |
 | sonarqube | Code quality gates (SONARQUBE_TOKEN) |
 | aws-mcp / eks-mcp | AWS infrastructure (AWS credentials) |
+
+## Lane-Specific Technical Context
+
+When starting or resuming work on the **agent-tools** lane, load the technical context document before planning or implementing:
+
+**File:** `docs/plans/agent-tools-technical-context.md`
+
+This document contains:
+- Standing architectural decisions (parser copy strategy, tool registration, WSL integration)
+- TypeScript interfaces for the parser output
+- Standard tool implementation pattern
+- Key assumptions and their verification status
