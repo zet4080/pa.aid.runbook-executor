@@ -1,8 +1,8 @@
 # ARC-1349 Implement `runbook_claim_story` OpenCode tool — Implementation Plan
 
 **Issue:** `issues/agent-tools/ARC-1349-tool-runbook-claim-story.md`
-**Completion Summary:** `task-completions/ARC-1349-COMPLETION-SUMMARY.md` (TBD)
-**Approach:** Single standalone TypeScript tool file — pattern established (ARC-1348)
+**Completion Summary:** `task-completions/ARC-1349-COMPLETION-SUMMARY.md` (to be created)
+**Approach:** AST-locate + raw line patch (hybrid)
 **Owner:** agent
 **Date:** 2026-07-02
 
@@ -10,124 +10,146 @@
 
 ## Scope & Alignment
 
-This plan delivers a single TypeScript file at `~/.config/opencode/tools/runbook_claim_story.ts` that is auto-discovered by OpenCode and exposes one tool named `runbook_claim_story`. The tool patches the `🔒 Claimed:` sub-item in the runbook markdown in-place, then stages, commits, and pushes the change via Bun shell.
+This plan delivers a single TypeScript file at `~/.config/opencode/tools/runbook_claim_story.ts` that is auto-discovered by OpenCode and exposes one tool named `runbook_claim_story`. The tool uses `parseRunbook()` from `./lib/parser.ts` to structurally validate story presence and sub-item state, then patches the `🔒 Claimed:` sub-item in-place using a story-key-anchored raw text replacement. It then stages, commits, and pushes the change via Bun shell.
 
 AC mapping:
 
 | AC | Covered by |
 |----|-----------|
-| Unchecked `🔒 Claimed:` sub-item → patched to `[x]` with UTC timestamp, committed, pushed | Steps 3–4: regex patch + `Bun.$` git commands |
-| Already-claimed sub-item → return `"Story {KEY} is already claimed"`, no changes | Step 3: pre-flight guard on checked state |
-| No `🔒 Claimed:` sub-item found → return `"No Claimed sub-item found for story {KEY}"`, no changes | Step 3: pre-flight guard on presence |
+| Unchecked `🔒 Claimed:` sub-item → patched to `[x]` with UTC timestamp, committed, pushed | Steps 3–4: AST guards + story-anchored raw patch + `Bun.$` git commands |
+| Already-claimed sub-item → return `"Story {KEY} is already claimed"`, no changes | Step 3: AST pre-flight guard on `subStep.checked` state |
+| No `🔒 Claimed:` sub-item found → return `"No Claimed sub-item found for story {KEY}"` | Step 3: AST pre-flight guard on sub-item presence |
 | Push failure → preserve local commit, return error with retry instructions | Step 3: separate try/catch around push, distinct return message |
-| Tool registered in allowlist for `build` and `senior-coder` agents | Step 5: already present in `opencode-sync-config.sh`; confirm and sync to `opencode.json` |
+| Tool registered in allowlist for `build` and `senior-coder` agents | Step 5: confirm presence in `opencode-sync-config.sh` and sync to `opencode.json` |
 
 ---
 
 ## Assumptions & Dependencies
 
-- `~/.config/opencode/tools/runbook_find_next_story.ts` (ARC-1348) is live. The new tool follows the identical file/export pattern.
+- `~/.config/opencode/tools/lib/parser.ts`, `./lib/types.ts`, `./lib/astWalker.ts` are live (confirmed ARC-1348). `parseRunbook()` is imported from `./lib/parser.ts`.
+- `ParsedRunbook` (from `./lib/types.ts`) exposes `waves[] → steps[] → subSteps[]`. `RunbookSubStep` fields are `{ label: string; checked: boolean }` — **no line number or character offset**. The AST is used for structural validation only; the actual file patch is performed on the raw text.
+- The raw patch is anchored to the story key: the regex targets the `🔒 Claimed:` line that appears as a sub-item inside the story's list block. The regex pattern matches the story's checked/unchecked top-level item line followed (within the same block) by the `🔒 Claimed:` sub-item, using a two-capture approach described in Step 2.
 - `@opencode-ai/plugin` is available at `~/.config/opencode/node_modules/@opencode-ai/plugin/` (confirmed ARC-1348).
 - The OpenCode Bun runtime provides `Bun.$\`command\`` for shell execution. `child_process` is not used.
 - Tools in `~/.config/opencode/tools/` are auto-discovered — no `"plugin"` array change in `opencode.json` is needed (confirmed ARC-1348).
-- `opencode-sync-config.sh` already lists `runbook_claim_story` in the `build` and `senior-coder` allowlists. The corresponding entry must be present in the live `~/.config/opencode/opencode.json`.
-- The runbook markdown uses a consistent format for the `🔒 Claimed:` sub-item. The unchecked form is `- [ ] 🔒 Claimed:` (or `- [ ] 🔒 Claimed: _(fill in)_`). The tool targets the first sub-item line under the named story's top-level task item that matches `🔒 Claimed:`.
-- `repo_path` is the absolute path to the git repository root (e.g. `/repos/pa.aid.runbook-executor`). The runbook file is inside that repository.
-- UTC timestamp format is `YYYY-MM-DD HH:MM` produced via `new Date().toISOString().slice(0, 16).replace('T', ' ')`.
-- The tool does NOT use the AST parser (`lib/parser.ts`). The patch operates via regex on raw file text — this is intentional to avoid a parse→re-serialize round-trip that would corrupt whitespace and formatting.
-- `pa.aid.config.md` tools directory is the source of truth at `/home/zimmermann/.config-src/pa.aid.config.md/tools/`. The `~/.config/opencode/tools/` symlink points there. The tool file is committed to `pa.aid.config.md`.
+- `opencode-sync-config.sh` already lists `runbook_claim_story` in the `build` and `senior-coder` allowlists (to be confirmed in Step 5).
+- UTC timestamp format: `new Date().toISOString().slice(0, 16).replace('T', ' ')` → `YYYY-MM-DD HH:MM`.
+- `pa.aid.config.md` tools directory is the source of truth at `/home/zimmermann/.config-src/pa.aid.config.md/tools/`. `~/.config/opencode/tools/` is a symlink pointing there.
 
 ---
 
 ## Implementation Steps
 
-### Step 1: Identify the story's `🔒 Claimed:` sub-item by raw text scan
+### Step 1: Parse and validate via AST
 
 **Files:** `~/.config/opencode/tools/runbook_claim_story.ts` (new)
-**Action:** Write a helper function `findClaimedSubItem(text: string, storyKey: string)` that scans raw runbook file text. The function:
-1. Locates the story's top-level task item — the line matching `- [ ] **{storyKey}**` or `- [x] **{storyKey}**` (the story may be checked).
-2. Scans subsequent lines with greater indentation until a line matching `/🔒 Claimed:/` is found or a new top-level item begins.
-3. Returns an object `{ found: boolean; alreadyClaimed: boolean; lineIndex: number }` where `lineIndex` is the zero-based index into `lines[]` of the `🔒 Claimed:` line.
+**Action:** Write a helper function `validateClaim(runbook_path: string, story_key: string): { status: 'ok' | 'not_found' | 'no_sub_item' | 'already_claimed' }` that:
 
-The function returns `{ found: false }` when no `🔒 Claimed:` line exists under the story, and `{ found: true, alreadyClaimed: true }` when the line starts with `- [x]`.
+1. Calls `parseRunbook(runbook_path)` (imported from `./lib/parser.ts`).
+2. Iterates `parsed.waves → steps` to find the step whose `id` ends with the `story_key` (accounting for the namespace prefix applied by `parseRunbook`).
+3. If no matching step is found, returns `{ status: 'not_found' }`.
+4. Searches `step.subSteps` for a sub-item whose `label` matches `/claimed/i` and contains `🔒`.
+5. If no such sub-item exists, returns `{ status: 'no_sub_item' }`.
+6. If the sub-item exists and `subStep.checked === true`, returns `{ status: 'already_claimed' }`.
+7. Otherwise returns `{ status: 'ok' }`.
 
-**Verification:** Unit test cases in Step 5 cover: found+unchecked, found+already-claimed, not-found.
+This function uses the AST's hierarchical structure to guarantee that story lookup is key-scoped (not a flat text search). The sub-item state check is structurally authoritative.
+
+**Verification:** Unit tests in Step 5 cover all four status codes.
 
 ---
 
-### Step 2: Implement the in-place text patch
+### Step 2: Patch the raw file using a story-key-anchored replacement
 
 **Files:** `~/.config/opencode/tools/runbook_claim_story.ts`
-**Action:** Write a helper function `patchClaimedLine(line: string, lane: string, timestamp: string): string` that replaces the checkbox `[ ]` with `[x]` and appends `{lane} / {timestamp}` after `🔒 Claimed:`. The function must preserve leading whitespace so indentation is unchanged.
+**Action:** Write a helper function `patchClaimedLine(raw: string, story_key: string, lane: string, timestamp: string): string` that performs the in-place text replacement.
 
-The timestamp is produced inline in `execute` via `new Date().toISOString().slice(0, 16).replace('T', ' ')` (UTC, `YYYY-MM-DD HH:MM`).
+The function uses a two-step approach:
 
-Write a helper `readLines(path: string): string[]` and `writeLines(path: string, lines: string[]): void` that use `Bun.file(path).text()` and `Bun.write(path, content)` respectively.
+1. Locate the story's list block in the raw text using a pattern that matches the story key in the top-level item line: the regex `/^([ \t]*- \[[ x]\].*\*{0,2}` + escaped `story_key` + `/\*{0,2}.*\n(?:[ \t]+.*\n)*?[ \t]*- \[ \] (🔒 Claimed:.*)/m`. This anchors the `🔒 Claimed:` sub-item search to the story's own block, preventing false matches from other stories that also have `🔒 Claimed:` sub-items.
+2. Replace only the `🔒 Claimed:` sub-item line's checkbox and trailing content: transform `- [ ] 🔒 Claimed:…` into `- [x] 🔒 Claimed: {lane} / {timestamp}`, preserving the leading indentation.
 
-**Verification:** Unit test for `patchClaimedLine` confirms leading whitespace is preserved and the output matches `  - [x] 🔒 Claimed: {lane} / {timestamp}` exactly.
+The replacement is performed with `String.prototype.replace` using a callback that reconstructs the full matched segment, patching only the `🔒 Claimed:` sub-item portion.
+
+If the pattern does not match (safety check after the AST validated `ok`), the function returns `null` to signal a patch failure without writing.
+
+**Verification:** Unit tests in Step 5 cover: correct indentation preserved, placeholder replacement, already-claimed guard (not reached since AST catches it first).
 
 ---
 
 ### Step 3: Implement the `execute` function with guards and git operations
 
 **Files:** `~/.config/opencode/tools/runbook_claim_story.ts`
-**Action:** The `execute(args)` function must:
+**Action:** The `execute(args)` function:
 
-1. Read the runbook file with `readLines(runbook_path)`.
-2. Call `findClaimedSubItem(text, story_key)`.
-3. **Guard — not found:** if `found === false`, return `"No Claimed sub-item found for story {story_key}"` immediately with no file write.
-4. **Guard — already claimed:** if `alreadyClaimed === true`, return `"Story {story_key} is already claimed"` immediately with no file write.
-5. Produce `timestamp` and call `patchClaimedLine` on the target line. Write the updated lines back with `writeLines`.
-6. Run `git add {runbook_path}` in `repo_path` via `Bun.$\`git -C ${repo_path} add ${runbook_path}\``. On non-zero exit, return the stderr as an error string.
-7. Run `git commit -m "chore({lane}): claim {story_key}"` via `Bun.$\`git -C ${repo_path} commit -m ...\``. On non-zero exit, return the stderr.
-8. Run `git push` via `Bun.$\`git -C ${repo_path} push\``. On non-zero exit: the file and local commit are already written — return `"Push failed for {story_key}. Local commit preserved. Re-run: git -C {repo_path} push"`.
-9. On success, return `"Claimed {story_key} as {lane} at {timestamp}. Committed and pushed."`.
+1. Calls `validateClaim(runbook_path, story_key)`.
+2. **Guard — not found:** if `status === 'not_found'`, return `"No story found with key {story_key} in runbook"` immediately.
+3. **Guard — no sub-item:** if `status === 'no_sub_item'`, return `"No Claimed sub-item found for story {story_key}"` immediately.
+4. **Guard — already claimed:** if `status === 'already_claimed'`, return `"Story {story_key} is already claimed"` immediately.
+5. Reads the runbook file with `await Bun.file(runbook_path).text()`.
+6. Produces `timestamp` via `new Date().toISOString().slice(0, 16).replace('T', ' ')`.
+7. Calls `patchClaimedLine(raw, story_key, lane, timestamp)`. If `null` is returned, returns `"Patch failed: could not locate Claimed sub-item in raw text for {story_key}"` without writing.
+8. Writes the patched text with `await Bun.write(runbook_path, patched)`.
+9. Runs `git add {runbook_path}` via `Bun.$\`git -C ${repo_path} add ${runbook_path}\``. On non-zero exit, returns stderr as error string.
+10. Runs `git commit -m "chore({lane}): claim {story_key}"` via `Bun.$`. On non-zero exit, returns stderr.
+11. Runs `git push` via `Bun.$\`git -C ${repo_path} push\``. On non-zero exit: local file and commit are already saved — returns `"Push failed for {story_key}. Local commit preserved. Re-run: git -C {repo_path} push"`.
+12. On success, returns `"Claimed {story_key} as {lane} at {timestamp}. Committed and pushed."`.
 
-Shell commands are wrapped individually in try/catch so a push failure does not roll back the commit.
+Each git command is wrapped in its own try/catch so a push failure does not unwind the commit.
 
-**Verification:** Correct return strings match the AC wording exactly. Unit tests in Step 5 cover all branches.
+**Verification:** Guard return strings match AC wording exactly. Unit tests in Step 5 cover all branches.
 
 ---
 
 ### Step 4: Wire the tool export and args schema
 
 **Files:** `~/.config/opencode/tools/runbook_claim_story.ts`
-**Action:** Export the tool using `export default tool({...})` with the following args schema:
+**Action:** Export using `export default tool({...})` with the following args schema:
 
 - `runbook_path`: `tool.schema.string().describe("Absolute path to the runbook markdown file")`
 - `story_key`: `tool.schema.string().describe("Story key to claim, e.g. ARC-1285")`
 - `lane`: `tool.schema.string().describe("Lane name used in the claim timestamp, e.g. core-infrastructure")`
 - `repo_path`: `tool.schema.string().describe("Absolute path to the git repository root containing the runbook file")`
 
-Top of file imports: `import { tool } from '@opencode-ai/plugin';` — no other imports except the Bun built-ins (`Bun.file`, `Bun.write`, `Bun.$`) which are globally available in the runtime.
+Top-of-file imports:
+```typescript
+import { tool } from '@opencode-ai/plugin';
+import { parseRunbook } from './lib/parser.ts';
+import type { ParsedRunbook } from './lib/types.ts';
+```
 
-**Verification:** File exports exactly one default `tool({...})` object. Running `node --experimental-strip-types --check ~/.config/opencode/tools/runbook_claim_story.ts` (or equivalent syntax check) exits without errors.
+No other external imports. `Bun.file`, `Bun.write`, `Bun.$` are globally available in the runtime.
+
+Export `validateClaim` and `patchClaimedLine` as named exports so the test file can import them directly.
+
+**Verification:** File exports exactly one default `tool({...})` object. Running `node --experimental-strip-types --check ~/.config/opencode/tools/runbook_claim_story.ts` exits without errors.
 
 ---
 
 ### Step 5: Write unit tests
 
 **Files:** `~/.config/opencode/tools/tests/runbook_claim_story.test.ts`
-**Action:** Write tests using `node:test` and `node:assert/strict` (same runner as `runbook_find_next_story.test.ts`). Export `findClaimedSubItem` and `patchClaimedLine` from the tool file so they can be imported. Tests must cover:
+**Action:** Tests use `node:test` and `node:assert/strict` (same runner as `runbook_find_next_story.test.ts`). Import `validateClaim` and `patchClaimedLine` from `../runbook_claim_story.ts`. For `validateClaim`, write fixture runbooks to temp files (using `writeTmpMarkdown` helper pattern from `runbook_find_next_story.test.ts`). Tests must cover:
 
-1. **Happy path — unchecked sub-item found:** fixture text with `- [ ] 🔒 Claimed:` under the target story → `found: true, alreadyClaimed: false`, `lineIndex` points to the correct line.
-2. **Already claimed:** fixture with `- [x] 🔒 Claimed: lane / 2026-01-01 12:00` → `found: true, alreadyClaimed: true`.
-3. **No sub-item:** fixture with no `🔒 Claimed:` line under the target story → `found: false`.
-4. **`patchClaimedLine` output:** input `  - [ ] 🔒 Claimed:` → output `  - [x] 🔒 Claimed: core-infrastructure / 2026-07-02 10:00` with original indentation preserved.
-5. **Wrong story key:** fixture has `🔒 Claimed:` only under a different story key → `found: false` for the requested key.
-6. **Story not present in runbook:** fixture contains no matching story item → `found: false`.
-7. **`patchClaimedLine` with trailing placeholder:** input `  - [ ] 🔒 Claimed: _(fill in)_` → output `  - [x] 🔒 Claimed: {lane} / {timestamp}` (placeholder replaced, not appended).
+1. **validateClaim — happy path:** fixture with `- [ ] 🔒 Claimed:` under target story → `{ status: 'ok' }`.
+2. **validateClaim — already claimed:** fixture with `- [x] 🔒 Claimed: lane / 2026-01-01 12:00` → `{ status: 'already_claimed' }`.
+3. **validateClaim — no sub-item:** fixture with no `🔒 Claimed:` line under target story → `{ status: 'no_sub_item' }`.
+4. **validateClaim — story not present:** fixture contains no matching story key → `{ status: 'not_found' }`.
+5. **validateClaim — wrong story key:** fixture has `🔒 Claimed:` only under a different story → `{ status: 'not_found' }` for the requested key.
+6. **patchClaimedLine — preserves indentation:** input raw text with `  - [ ] 🔒 Claimed:` indented two spaces under the story → output line is `  - [x] 🔒 Claimed: core-infrastructure / 2026-07-02 10:00` with identical leading whitespace.
+7. **patchClaimedLine — replaces trailing placeholder:** input `  - [ ] 🔒 Claimed: _(fill in)_` → output `  - [x] 🔒 Claimed: {lane} / {timestamp}` (placeholder fully replaced, not appended).
+8. **patchClaimedLine — story-scoped:** raw text with two stories both having `🔒 Claimed:` sub-items; patch targets only the correct story → second story's `🔒 Claimed:` line is unchanged.
 
 Run command: `node --experimental-strip-types --test ~/.config/opencode/tools/tests/runbook_claim_story.test.ts`
 
-**Verification:** All 7 tests pass with exit code 0.
+**Verification:** All 8 tests pass with exit code 0.
 
 ---
 
 ### Step 6: Commit tool file to `pa.aid.config.md`
 
-**Files:** `/home/zimmermann/.config-src/pa.aid.config.md/tools/runbook_claim_story.ts`
-**Action:** The `~/.config/opencode/tools/` directory is a symlink to `/home/zimmermann/.config-src/pa.aid.config.md/tools/`. The file written in Steps 1–4 therefore already lives in the correct source location. Commit it:
+**Files:** `/home/zimmermann/.config-src/pa.aid.config.md/tools/runbook_claim_story.ts`, `/home/zimmermann/.config-src/pa.aid.config.md/tools/tests/runbook_claim_story.test.ts`
+**Action:** The `~/.config/opencode/tools/` directory is a symlink to `/home/zimmermann/.config-src/pa.aid.config.md/tools/`. The files written in Steps 1–4 already live in the correct source location. Commit:
 
 ```bash
 git -C /home/zimmermann/.config-src/pa.aid.config.md add tools/runbook_claim_story.ts tools/tests/runbook_claim_story.test.ts
@@ -141,18 +163,18 @@ git -C /home/zimmermann/.config-src/pa.aid.config.md commit -m "feat(agent-tools
 ### Step 7: Confirm allowlist in `opencode.json` and restart OpenCode
 
 **Files:** `~/.config/opencode/opencode.json`, `/repos/pa.aid.wsl-setup.sh/components/opencode/opencode-sync-config.sh`
-**Action:** `opencode-sync-config.sh` already lists `runbook_claim_story: True` for `build` and `senior-coder` agents (confirmed via grep). Verify that the live `~/.config/opencode/opencode.json` reflects this — the tool should appear in the `tools` allowlist under both agents. If it is absent (because `opencode.json` was not regenerated since the script was updated), patch it directly using the same Python-dict structure already present in the file for `runbook_find_next_story`.
+**Action:** Grep `opencode-sync-config.sh` for `runbook_claim_story` to confirm it is listed for `build` and `senior-coder` agents. Verify the live `~/.config/opencode/opencode.json` reflects this. If absent (because `opencode.json` was not regenerated since the script was updated), patch it directly using the same Python-dict structure already used for `runbook_find_next_story`.
 
 Restart OpenCode to load the new tool.
 
-**Verification:** After restart, invoke `runbook_claim_story` via OpenCode tool call against a test fixture (or use the smoke test in Step 8). Confirm it does not return "tool not found".
+**Verification:** After restart, a tool call to `runbook_claim_story` with invalid args returns a schema error, not "tool not found".
 
 ---
 
 ### Step 8: End-to-end smoke test
 
 **Files:** Live runbook at `/repos/pa.aid.runbook-executor/docs/plans/runbook-agent-tools.md`
-**Action:** Identify the first unclaimed story in the agent-tools runbook (expected: ARC-1349 or the next unclaimed entry). Call `runbook_claim_story` with:
+**Action:** Identify the first unclaimed story in the agent-tools runbook. Call `runbook_claim_story` with:
 - `runbook_path`: absolute path to `runbook-agent-tools.md`
 - `story_key`: the identified key
 - `lane`: `agent-tools`
@@ -160,14 +182,14 @@ Restart OpenCode to load the new tool.
 
 Confirm the runbook file is updated in-place, `git log` shows the new commit, and `git push` succeeds.
 
-**Verification:** `git -C /repos/pa.aid.runbook-executor log --oneline -1` shows `chore(agent-tools): claim {KEY}`.
+**Verification:** `git -C /repos/pa.aid.runbook-executor log --oneline -1` shows `chore(agent-tools): claim {KEY}`. The `🔒 Claimed:` line in the runbook is `- [x] 🔒 Claimed: agent-tools / {timestamp}`.
 
 ---
 
 ## Testing & Validation
 
 **Unit tests:**
-Run `node --experimental-strip-types --test ~/.config/opencode/tools/tests/runbook_claim_story.test.ts`. All 7 scenarios must pass with exit code 0.
+Run `node --experimental-strip-types --test ~/.config/opencode/tools/tests/runbook_claim_story.test.ts`. All 8 scenarios must pass with exit code 0.
 
 **Type check:**
 Run `node --experimental-strip-types --check ~/.config/opencode/tools/runbook_claim_story.ts`. No errors.
@@ -179,18 +201,18 @@ Confirm `runbook_claim_story` appears in `~/.config/opencode/opencode.json` unde
 Call the tool against the live agent-tools runbook via OpenCode session. Confirm the runbook file is patched, the commit appears in git log, and the push succeeds.
 
 **Guard validation:**
-Manually invoke the tool a second time on the same story after it is claimed. Confirm the return value is `"Story {KEY} is already claimed"` and no duplicate commit is made.
+Invoke the tool a second time on the same story after it is claimed. Confirm the return value is `"Story {KEY} is already claimed"` and no duplicate commit is made.
 
 ---
 
 ## Risks & Open Questions
 
-1. **Regex fragility for story key matching:** The `findClaimedSubItem` function must locate the story's section boundary reliably. Runbook markdown uses `- [ ] **{KEY}**` as the top-level task item. If stories use inconsistent bold-wrap formatting, the scan may miss the section. Mitigation: test against the actual runbook files during Step 8.
+1. **AST namespace prefix on step IDs:** `parseRunbook()` prepends the lane name as a namespace (e.g. `agent-tools__ARC-1349`). The `validateClaim` function must match the story key using a suffix comparison (`step.id` ends with `story_key` or equals `story_key` after stripping the namespace prefix). If the lane is null, the filename is used as the namespace. Mitigation: strip everything before and including `__` before comparing to `story_key`.
 
-2. **Multi-story runbooks with sub-items of varying indentation:** The sub-item scan advances until a line at equal or lesser indentation to the story item is found. If indentation is inconsistent (tabs vs spaces), the boundary detection may be off. Mitigation: normalize indentation check to strip-then-compare leading chars.
+2. **Story-anchored regex boundary:** The regex in `patchClaimedLine` must stop at the next top-level list item to avoid spanning across stories. If two consecutive stories share indentation and neither has a blank-line separator, the regex may over-reach. Mitigation: test against the actual runbook files during Step 8; add a blank-line anchor to the pattern if needed.
 
-3. **Concurrent claims from two agents:** If two agents call `runbook_claim_story` for the same story simultaneously, the second call will either: (a) see the already-claimed guard if it reads after the first write, or (b) produce a duplicate commit. This is an inherent TOCTOU race. Mitigation: the `already-claimed` guard is checked before any write — acceptable for the current single-agent workflow.
+3. **Multi-story runbooks with non-unique `🔒 Claimed:` text:** The story-anchored regex (test 8 in Step 5) verifies the patch is scoped correctly. If the runbook format deviates significantly, the patch returns `null` and the tool reports a patch failure without writing the file — no silent corruption.
 
-4. **Push failure leaving repo in diverged state:** After a successful local commit, a push failure leaves the local branch ahead of remote. The tool returns instructions to re-run `git push`. The agent must not retry the full claim (which would double-commit). The push-only retry path is safe because the file and commit already exist.
+4. **Concurrent claims from two agents:** If two agents call `runbook_claim_story` for the same story simultaneously, the second call reads after the first write and hits the `already_claimed` guard (AST sees `checked: true`). This is inherently a TOCTOU race; acceptable for the current single-agent workflow.
 
-5. **`patchClaimedLine` trailing content replacement:** The existing sub-item may have trailing text like `_(fill in)_`. The replacement must overwrite the entire line content after `🔒 Claimed:`, not append. Ensure the regex replaces from `🔒 Claimed:` to end-of-line, not just the checkbox prefix.
+5. **Push failure leaving repo in diverged state:** After a successful local commit, a push failure leaves the local branch ahead of remote. The tool returns retry instructions. The agent must not retry the full claim (double commit risk). The push-only retry path is safe because file and commit already exist.
