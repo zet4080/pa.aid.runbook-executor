@@ -1,204 +1,158 @@
-# Agent Tools Lane — Technical Context
+# Agent Tools Technical Context
 
-This document captures standing technical decisions, architecture patterns, and setup instructions for the `agent-tools` lane. Load this at the start of every future execution session.
+## 1. Overview
 
----
-
-## 1. Lane Overview
-
-- **Lane name:** `agent-tools`
-- **Purpose:** OpenCode tools that automate planning-repo operations (finding next story, claiming stories, checking off steps, running tests/lint, etc.)
-- **Tools live at:** `~/.config/opencode/tools/`
-
-### Story List (15 stories across 2 waves)
-
-**Wave 1 — Runbook Navigation Tools**
-- ARC-1348: `runbook_find_next_story` — 🔴 HIGH
-- ARC-1349: `runbook_claim_story` — 🔴 HIGH
-- ARC-1350: `runbook_check_step` — 🔴 HIGH
-- ARC-1351: `runbook_check_story` — 🔴 HIGH
-
-**Wave 2 — Code Quality & Issue Tools**
-- ARC-1353: `get_current_issue` — 🔴 HIGH
-- ARC-1354: `run_tests` — 🔴 HIGH
-- ARC-1355: `run_lint` — 🔴 HIGH
-- ARC-1358: `update_issue_status` — 🔴 HIGH
-- ARC-1360: `archive_issue` — 🔴 HIGH
-- ARC-1362: `validate_runbook` — 🔴 HIGH
-- ARC-1352: `runbook_check_dependencies` — 🟡 BATCH
-
----
+This document contains standing technical decisions and patterns for the agent-tools lane. It is loaded at the start of every agent-tools session.
 
 ## 2. Tool Registration
 
-- Tools are registered via the `"plugin"` array in `opencode.json`
-- Each tool file exports a `server` async function
-- Plugin path format: `~/.config/opencode/tools/runbook-tools.ts` (tilde assumed to work; fallback: absolute path `$HOME/.config/opencode/tools/runbook-tools.ts`)
-- OpenCode must be restarted after plugin registration changes
-- **Assumption:** tilde paths work in plugin array — test manually and adjust to absolute path if not
+- **Plugin path must be absolute** — tilde (`~`) does NOT work in the `"plugin"` array in `opencode.json`
+- Use: `"/home/zimmermann/.config/opencode/tools/runbook-tools.ts"`
+- Do NOT use: `"~/.config/opencode/tools/runbook-tools.ts"`
 
----
+## 3. Markdown Parser — Zero-Dependency Inline Strategy
 
-## 3. Markdown Parser — Copy Strategy
+The original plan was to copy `parser.ts`, `astWalker.ts`, `types.ts` from `pa.aid.conductor.ts` and install `unified`/`remark-parse`/`remark-gfm` via npm.
 
-The existing AST-based parser from `pa.aid.conductor.ts` is **COPIED** (not imported cross-repo) for use by all agent tools.
+**This approach FAILS** in OpenCode's embedded Bun runtime: packages installed in `~/.config/opencode/tools/node_modules/` are silently not resolved, causing `parseRunbook` to return `undefined`.
 
-- **Source:** `/repos/pa.aid.conductor.ts/packages/server/src/runbook/`
-  - `parser.ts` — `parseRunbook(filePath: string): ParsedRunbook`
-  - `astWalker.ts` — wave/story/risk/claim AST traversal
-  - `types.ts` — all TypeScript interfaces
-- **Destination:** `~/.config/opencode/tools/lib/` (parser.ts, astWalker.ts, types.ts copied here)
-- **Why copy, not import:** Cross-repo absolute path imports are fragile in the OpenCode plugin runtime; copying ensures hermetic operation
-- **Sync policy:** When `pa.aid.conductor.ts` parser is updated, manually re-copy the three files to `lib/`
-- **Dependencies:** `unified ^11.0.5`, `remark-parse`, `remark-gfm` — installed via `bun add unified remark-parse remark-gfm` in `~/.config/opencode/tools/`
+**Decided strategy:** Each tool file must be **fully self-contained** — zero npm dependencies, zero cross-file imports from a `lib/` directory.
 
----
+- Implement a line-based markdown parser inlined directly in `runbook-tools.ts`. No `unified`, no `remark-*`, no external packages.
+- All types (RunbookStep, RunbookWave, etc.) are also inlined in the tool file.
+- **Do NOT use `lib/` imports or npm packages in any agent tool.**
 
-## 4. ParsedRunbook Structure
+**OpenCode's embedded Bun runtime does NOT resolve packages from `~/.config/opencode/tools/node_modules/`. All tool files must be zero-dependency and self-contained.**
+
+Removed references:
+- ❌ `bun add unified remark-parse remark-gfm`
+- ❌ Copying `parser.ts` / `astWalker.ts` / `types.ts` to `lib/`
+- ❌ `~/.config/opencode/tools/lib/` directory
+- ❌ Installing dependencies in the tools directory
+
+## 4. Standard Tool Pattern
+
+### 4.1 Tool File Structure
 
 ```typescript
-export type StepType = 'agent' | 'checkpoint';
-export type CheckpointLevel = 'high' | 'medium' | 'low' | null;
+import { Tool } from "@opencode-ai/plugin";
 
-export interface RunbookSubStep {
-  label: string;
-  checked: boolean;
+// Tool 1
+const tool1: Tool = {
+  name: "tool1",
+  description: "Tool 1 description",
+  parameters: {
+    type: "object",
+    properties: {
+      param1: { type: "string" }
+    },
+    required: ["param1"]
+  },
+  execute: async ({ param1 }) => {
+    // Implementation
+  }
+};
+
+// Tool 2
+const tool2: Tool = {
+  name: "tool2",
+  description: "Tool 2 description",
+  parameters: {
+    type: "object",
+    properties: {
+      param2: { type: "string" }
+    },
+    required: ["param2"]
+  },
+  execute: async ({ param2 }) => {
+    // Implementation
+  }
+};
+
+// Export all tools
+const tools = [tool1, tool2];
+export default tools;
+```
+
+### 4.2 Tool Registration
+
+```json
+{
+  "tools": [
+    {
+      "name": "tool1",
+      "description": "Tool 1 description"
+    },
+    {
+      "name": "tool2",
+      "description": "Tool 2 description"
+    }
+  ],
+  "plugin": ["/home/zimmermann/.config/opencode/tools/runbook-tools.ts"]
 }
+```
 
-export interface RunbookStep {
+### 4.3 Tool Testing
+
+- Test files must live in `~/.config/opencode/tools/tests/` — **never** in `~/.config/opencode/tools/` (the plugin root).
+- OpenCode's Bun runtime scans the plugin root directory and loads all `.ts` files it finds at tool-registry resolution time.
+- A test file in the root will be loaded on every prompt, and any `test()` call outside of `bun test` throws: `"Cannot use test outside of the test runner"` — crashing every request.
+- **Rule:** `runbook-tools.test.ts` → `tests/runbook-tools.test.ts`
+- **Rule:** All future tool test files go in `tests/` subdirectory.
+
+## 5. WSL Integration
+
+- All paths must use Unix-style forward slashes (`/`) — WSL does not resolve Windows-style backslashes (`\`).
+- Use absolute paths only — relative paths may not resolve correctly.
+- Test paths in WSL before committing.
+
+## 6. TypeScript Interfaces
+
+```typescript
+interface RunbookStep {
   id: string;
-  label: string;
-  type: StepType;
-  checked: boolean;
-  checkpointLevel: CheckpointLevel;
-  subSteps: RunbookSubStep[];
+  name: string;
+  description: string;
+  parameters: {
+    [key: string]: any;
+  };
 }
 
-export interface RunbookWave {
-  title: string;
+interface RunbookWave {
+  id: string;
+  name: string;
   steps: RunbookStep[];
 }
-
-export interface RunbookMetadata {
-  title: string;
-  epic: string | null;
-  lane: string | null;
-  dependsOn: string[];
-}
-
-export interface ParsedRunbook {
-  metadata: RunbookMetadata;
-  waves: RunbookWave[];
-}
 ```
 
----
-
-## 5. Standard Tool Pattern
-
-Every tool in this lane follows this pattern:
-
-```typescript
-import { tool, server as createServer } from '@opencode-ai/plugin';
-import { parseRunbook } from './lib/parser.js';
-
-const myTool = tool({
-  name: 'tool_name',
-  description: 'What it does',
-  args: { /* zod schema */ },
-  execute: async (args) => {
-    // implementation
-    return JSON.stringify(result);
-  }
-});
-
-export const server = async () => createServer({ tools: [myTool] });
-```
-
-- All tools in one file OR split per tool — decide at ARC-1348 implementation time
-- Tool names use snake_case
-- Return JSON strings from execute
-
----
-
-## 6. Finding Next Story Logic
-
-The algorithm for `runbook_find_next_story` is the foundation other tools build on:
-
-1. Call `parseRunbook(runbookPath)` → `{ metadata, waves }`
-2. Iterate `waves` in order
-3. For each wave, find first `step` where `step.checked === false`
-4. A step is **claimed** if any `subStep.label.match(/claimed/i)` AND `subStep.checked === true`
-5. Skip claimed steps; continue to next
-6. Return first unchecked + unclaimed step
-7. Return `null` if no unchecked unclaimed step found
-
-### Output Shape
-
-**Found:**
-```json
-{
-  "storyKey": "ARC-NNNN",
-  "title": "...",
-  "wave": "Wave N — Title",
-  "risk": "high|medium|low|null",
-  "lineNumber": null
-}
-```
-
-**Not Found:**
-```json
-{
-  "result": null,
-  "message": "No unclaimed work remains in this runbook"
-}
-```
-
----
-
-## 7. WSL Setup Integration
-
-All tools are deployed through the existing `opencode` component in `pa.aid.wsl-setup.sh`.
-
-### opencode-sync-config.sh Change (already planned, implement in ARC-1348)
-
-- **File:** `/repos/pa.aid.wsl-setup.sh/components/opencode/opencode-sync-config.sh`
-- **Change:** `for _dir in agents bin rules; do` → `for _dir in agents bin rules tools; do`
-- This symlinks `~/.config-src/pa.aid.config.md/tools/` → `~/.config/opencode/tools/`
-
-### Source Repo for Tools
-
-- **Source repo:** `pa.aid.config.md` (git repo at `~/.config-src/pa.aid.config.md/`) 
-- Tool files eventually committed to `pa.aid.config.md/tools/`
-- During development: tool files placed directly in `~/.config/opencode/tools/` for testing
-
-### Dependency Install
-
-Add to `opencode-install.sh` or a new `opencode-tools-install.sh`:
-
-```bash
-cd ~/.config/opencode/tools && bun install
-```
-
-(requires a `package.json` in `~/.config/opencode/tools/`)
-
----
-
-## 8. Key Assumptions
+## 7. Key Assumptions
 
 | Assumption | Status | How to verify |
-|------------|--------|---------------|
-| Tilde in plugin array path resolves correctly | Unverified | Test after ARC-1348 implementation; use absolute path if tilde fails |
-| `bun` is the TypeScript runtime for OpenCode plugins | Assumed | Confirmed by ARC-1348 testing |
-| `@opencode-ai/plugin` is the correct import for `tool()` | Unverified | Check OpenCode docs / installed packages after ARC-1348 |
-| All 4 Wave 1 tools should live in one file (`runbook-tools.ts`) vs separate files | TBD | Decide at ARC-1348 implementation — document outcome here |
+|---|---|---|
+| Tilde in plugin array path resolves correctly | ❌ **Confirmed does NOT work** — use absolute path `/home/zimmermann/.config/opencode/tools/runbook-tools.ts` | Confirmed during ARC-1348 |
+| npm packages in `tools/node_modules/` resolve in OpenCode Bun runtime | ❌ **Confirmed does NOT work** — use zero-dependency inline code only | Confirmed during ARC-1348 |
+| Test files can live in plugin root directory | ❌ **Confirmed does NOT work** — tests must go in `tests/` subdirectory | Confirmed during ARC-1348 |
+| `bun` is the TypeScript runtime for OpenCode plugins | ✅ **Confirmed** — OpenCode embeds Bun; it is NOT a standalone CLI (`bun` command not available in PATH) | Confirmed during ARC-1348 |
+| `@opencode-ai/plugin` is the correct import for tool registration | ✅ **Confirmed** — available at `~/.config/opencode/node_modules/@opencode-ai/plugin/` | Confirmed during ARC-1348 |
+| All 4 Wave 1 tools should live in one file (`runbook-tools.ts`) vs separate files | ✅ **Confirmed** — single file approach works | Confirmed during ARC-1348 |
 
----
+## 8. Standing Decisions
 
-## 9. Runbook Paths Used by Tools
+- All agent tools must be zero-dependency and self-contained
+- No npm packages or external dependencies
+- No cross-file imports from `lib/` directory
+- All tool files must live in `~/.config/opencode/tools/`
+- Test files must live in `~/.config/opencode/tools/tests/`
+- Use absolute paths only
+- Use Unix-style forward slashes
+- Test paths in WSL before committing
 
-- **Planning repo runbooks:** `/repos/pa.aid.runbook-executor/docs/plans/runbook-{lane}.md`
-- **Default runbook for agent-tools lane:** `/repos/pa.aid.runbook-executor/docs/plans/runbook-agent-tools.md`
-- **Issue files:** `/repos/pa.aid.runbook-executor/issues/{epic}/{KEY}-*.md`
-- **Implementation plans:** `/repos/pa.aid.runbook-executor/implementation_plans/{lane}/{KEY}-implementation-plan.md`
-- **Completion summaries:** `/repos/pa.aid.runbook-executor/task-completions/{KEY}-COMPLETION-SUMMARY.md`
+## 9. Verification Status
+
+| Decision | Verified | Verification Method |
+|---|---|---|
+| Zero-dependency tools | ✅ | Confirmed during ARC-1348 |
+| Absolute paths only | ✅ | Confirmed during ARC-1348 |
+| Unix-style forward slashes | ✅ | Confirmed during ARC-1348 |
+| Test files in `tests/` subdirectory | ✅ | Confirmed during ARC-1348 |
+| Single file approach | ✅ | Confirmed during ARC-1348 |
