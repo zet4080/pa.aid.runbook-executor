@@ -42,8 +42,8 @@ AC mapping:
 |----------|-----------|
 | Plugin registration mechanism | Assume `opencode.json` `"plugin"` array; test manually and adjust if OpenCode uses a `tools/` directory scan instead |
 | Tilde path in `opencode.json` | Assume tilde works; if not, use absolute path `/home/zimmermann/.config/opencode/tools/runbook-tools.ts` |
-| Import strategy for parser | **Prefer cross-repo import** from `/repos/pa.aid.conductor.ts/packages/server/src/runbook/parser.ts` — Bun can resolve absolute paths at runtime. Fall back to copying `parser.ts`, `astWalker.ts`, `types.ts` into `~/.config/opencode/tools/lib/` if cross-repo import proves unreliable |
-| Dependency installation | Cross-repo import: no extra install needed (dependencies already installed in conductor.ts). Copy strategy: run `bun add unified remark-parse remark-gfm` inside `~/.config/opencode/tools/` |
+| Import strategy for parser | **Copy** `parser.ts`, `astWalker.ts`, `types.ts` from `/repos/pa.aid.conductor.ts/packages/server/src/runbook/` into `~/.config/opencode/tools/lib/`. Cross-repo imports are fragile in the OpenCode plugin runtime. |
+| Dependency installation | Run `bun add unified remark-parse remark-gfm` inside `~/.config/opencode/tools/` |
 | `lineNumber` in output | Omit or return `null` — AST-based parser does not track line numbers per step |
 | Tool file name | `runbook-tools.ts` (kebab-case, matches tools directory convention) |
 
@@ -60,18 +60,16 @@ AC mapping:
 
 ---
 
-### Step 2: Decide import strategy — cross-repo import vs copy
+### Step 2: Set up parser dependency — copy files and install dependencies
 
 **Files:** `/repos/pa.aid.conductor.ts/packages/server/src/runbook/parser.ts`, `/repos/pa.aid.conductor.ts/packages/server/src/runbook/astWalker.ts`, `/repos/pa.aid.conductor.ts/packages/server/src/runbook/types.ts`
-**Action:** Attempt to import `parseRunbook` using an absolute path import pointing to the conductor.ts parser. In Bun, absolute TypeScript imports resolve at runtime. Check whether the conductor.ts `node_modules` (unified, remark-parse, remark-gfm) are resolvable from the tool file's context.
+**Action:** Copy the three parser source files from `/repos/pa.aid.conductor.ts/packages/server/src/runbook/` into `~/.config/opencode/tools/lib/`. Then run `bun add unified remark-parse remark-gfm` in `~/.config/opencode/tools/` to install the required markdown parsing dependencies.
 
-If cross-repo import works: proceed with it — no file copying or extra dependencies needed.
+Cross-repo imports (absolute path imports pointing into `/repos/pa.aid.conductor.ts/`) are fragile in the OpenCode plugin runtime — the copy strategy is the decided approach.
 
-If cross-repo import fails (module resolution error at tool load time): copy the three source files (`parser.ts`, `astWalker.ts`, `types.ts`) into `~/.config/opencode/tools/lib/` and import from there. In this case, also run `bun add unified remark-parse remark-gfm` inside `~/.config/opencode/tools/`.
+Document the copy operation in the completion summary.
 
-Document which strategy was chosen for the completion summary.
-
-**Verification:** A minimal Bun script `import { parseRunbook } from '<chosen path>'; console.log(typeof parseRunbook)` exits 0 and prints `"function"`.
+**Verification:** A minimal Bun script `import { parseRunbook } from './lib/parser'; console.log(typeof parseRunbook)` exits 0 and prints `"function"`.
 
 ---
 
@@ -103,7 +101,7 @@ Document which strategy was chosen for the completion summary.
 
 The full module structure:
 - Import `tool` from `"@opencode-ai/plugin/tool"`.
-- Import `parseRunbook` from the chosen source (cross-repo path or `./lib/parser`).
+- Import `parseRunbook` from `./lib/parser`.
 - Define `runbook_find_next_story` using `tool({ description, args, execute })`:
   - `description`: `"Parse a runbook markdown file and return the first unchecked, unclaimed story in wave order. Returns null if no unclaimed work remains."`
   - `args`: one field — `runbook_path: tool.schema.string().describe("Absolute path to the runbook markdown file")`
@@ -221,7 +219,7 @@ Call the tool against the live runbook file and confirm it returns `storyKey: "A
 
 ## Risks & Open Questions
 
-1. **Cross-repo import resolution:** Whether Bun can resolve an absolute path import pointing to `/repos/pa.aid.conductor.ts/packages/server/src/runbook/parser.ts` depends on whether the conductor.ts `node_modules` are resolvable from the tool file's context. If not, fall back to the copy strategy (Step 2).
+1. **Parser file staleness:** The copied `parser.ts`, `astWalker.ts`, and `types.ts` files in `~/.config/opencode/tools/lib/` will not automatically stay in sync with upstream changes in `pa.aid.conductor.ts`. If the parser interface changes, the tool files must be re-copied manually.
 
 2. **Plugin path resolution:** It is not yet confirmed whether the `"plugin"` array in `opencode.json` supports tilde (`~`) in paths. If not, use the absolute path. Verify at Step 4.
 
@@ -265,9 +263,7 @@ This uses the existing backup-and-symlink pattern (already implemented in the lo
 
 ### Dependency installation
 
-**Cross-repo import strategy (preferred):** No extra install step needed. The `unified`, `remark-parse`, and `remark-gfm` packages are already installed in `/repos/pa.aid.conductor.ts/node_modules/` and will be resolved via Bun's module resolution when the cross-repo import path is used.
-
-**Copy strategy (fallback):** If the copy approach is used, add a step to install dependencies inside the tools directory:
+**Decided strategy (copy):** Copy `parser.ts`, `astWalker.ts`, `types.ts` from `/repos/pa.aid.conductor.ts/packages/server/src/runbook/` into `~/.config/opencode/tools/lib/`, then install dependencies inside the tools directory:
 ```bash
 cd ~/.config/opencode/tools && bun add unified remark-parse remark-gfm
 ```
@@ -278,7 +274,7 @@ This can be added to `opencode-install.sh` or a new `opencode-tools-install.sh` 
 | File | Change |
 |------|--------|
 | `components/opencode/opencode-sync-config.sh` | Add `tools` to the `for _dir in` loop (one word, one line) |
-| `components/opencode/opencode-install.sh` *(conditional)* | Add `bun add` step only if copy strategy is used |
+| `components/opencode/opencode-install.sh` | Add `bun add` step for unified/remark-parse/remark-gfm |
 
 ---
 
