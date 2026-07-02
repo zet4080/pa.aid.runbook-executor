@@ -16,22 +16,29 @@ Tools placed in `~/.config/opencode/tools/` are **automatically discovered** by 
 
 **Plugin array in opencode.json:** NOT needed. Remove any existing `"plugin"` entries for tools in `~/.config/opencode/tools/`.
 
-## 2b. Agent Tool Allowlists (opencode.json)
+## 2b. Agent Tool Allowlists — managed in `pa.aid.wsl-setup.sh`
 
-Custom tools are auto-discovered but access is controlled per-agent in `opencode.json`. When adding a new tool, add it to the appropriate agent allowlists:
+Custom tools are auto-discovered from `~/.config/opencode/tools/` but access is controlled per-agent. Tool allowlists are managed in the **Python config generator**, not in `opencode.json` directly.
+
+**Source of truth:** `/repos/pa.aid.wsl-setup.sh/components/opencode/opencode-sync-config.sh`
+- The `opencode.json` is generated from scratch by embedded Python in this script
+- Do NOT commit `opencode.json` to `pa.aid.config.md` — it is generated, not stored
+- To add a tool to an agent's allowlist: edit the `"agent"` dict in `opencode-sync-config.sh`
 
 | Agent | Tools allowed | Reason |
 |---|---|---|
-| **build** | All runbook tools | Primary execution agent |
-| **senior-coder** | All runbook tools | Fallback execution agent |
+| **build** | All 11 runbook tools | Primary execution agent |
+| **senior-coder** | All 11 runbook tools | Fallback execution agent |
 | **plan** | `validate_runbook`, `get_current_issue` | Planning workflow support |
 | **debug** | `run_tests`, `run_lint` | Reproducing failures |
 
 **When adding a new tool:**
 1. Create `~/.config/opencode/tools/{tool_name}.ts`
-2. Add to `opencode.json` agent allowlists for the agents that need it
-3. Commit both to `pa.aid.config.md` config repo
-4. Restart OpenCode
+2. Edit `opencode-sync-config.sh` — add tool to the `"agent"` dict for relevant agents
+3. For immediate use on current machine: update `~/.config/opencode/opencode.json` directly with the same Python patch (the wsl-setup script regenerates it on next full setup run)
+4. Commit tool file to `pa.aid.config.md` tools/ directory
+5. Commit `opencode-sync-config.sh` change to `pa.aid.wsl-setup.sh`
+6. Restart OpenCode
 
 ## 3. Markdown Parser — Zero-Dependency Inline Strategy
 
