@@ -38,9 +38,9 @@
 
 ### 🔴 HIGH — ARC-1349: `runbook_claim_story`
 
-- [ ] Confirm ARC-1348 complete
+- [x] Confirm ARC-1348 complete
 - [ ] **ARC-1349** — Implement `runbook_claim_story` OpenCode tool
-  - [ ] 🔒 Claimed: _(fill in: agent-tools / YYYY-MM-DD HH:MM before starting)_
+  - [x] 🔒 Claimed: agent-tools / 2026-07-02 14:52
   - [ ] Read `issues/agent-tools/ARC-1349-tool-runbook-claim-story.md`
   - [ ] Write `implementation_plans/agent-tools/ARC-1349-implementation-plan.md`
   - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
