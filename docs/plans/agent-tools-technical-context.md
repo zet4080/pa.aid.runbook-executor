@@ -4,18 +4,17 @@
 
 This document contains standing technical decisions and patterns for the agent-tools lane. It is loaded at the start of every agent-tools session.
 
-## 2. Tool Registration
+## 2. Tool Registration — Auto-Discovery (No Registration Required)
 
-- **Plugin path must be absolute** — tilde (`~`) does NOT work in the `"plugin"` array in `opencode.json`
-- Use: `"/home/zimmermann/.config/opencode/tools/runbook_find_next_story.ts"`
-- Do NOT use: `"~/.config/opencode/tools/runbook_find_next_story.ts"` (tilde form)
+Tools placed in `~/.config/opencode/tools/` are **automatically discovered** by OpenCode. No `opencode.json` `"plugin"` array entry is needed.
 
-### File naming convention
+**How it works:**
+- File name = tool name: `runbook_find_next_story.ts` → tool `runbook_find_next_story`
+- `export default tool({...})` → single tool per file (preferred pattern for this lane)
+- Named exports: `export const foo = tool({...})` → tool named `<filename>_foo`
+- OpenCode scans the directory at startup — no restart config change needed (restart still needed after adding a new file)
 
-- Each tool lives in its own file named exactly after the tool: `{tool_name}.ts`
-- Example: `runbook_find_next_story` → `runbook_find_next_story.ts`
-- Do NOT bundle multiple tools in one file
-- Plugin array in `opencode.json` gets one entry per tool file
+**Plugin array in opencode.json:** NOT needed. Remove any existing `"plugin"` entries for tools in `~/.config/opencode/tools/`.
 
 ## 3. Markdown Parser — Zero-Dependency Inline Strategy
 
@@ -39,72 +38,48 @@ Removed references:
 
 ## 4. Standard Tool Pattern
 
-### 4.1 Tool File Structure
+Every tool in this lane follows this pattern:
 
 ```typescript
-import { Tool } from "@opencode-ai/plugin";
+import { tool } from "@opencode-ai/plugin"
 
-// Tool 1
-const tool1: Tool = {
-  name: "tool1",
-  description: "Tool 1 description",
-  parameters: {
-    type: "object",
-    properties: {
-      param1: { type: "string" }
-    },
-    required: ["param1"]
+// Internal helpers (not exported, or exported for testing)
+function myHelper(...) { ... }
+
+export default tool({
+  description: "What the tool does",
+  args: {
+    paramName: tool.schema.string().describe("Description of param"),
   },
-  execute: async ({ param1 }) => {
-    // Implementation
-  }
-};
-
-// Tool 2
-const tool2: Tool = {
-  name: "tool2",
-  description: "Tool 2 description",
-  parameters: {
-    type: "object",
-    properties: {
-      param2: { type: "string" }
-    },
-    required: ["param2"]
+  async execute(args, context) {
+    // context.directory — session working directory
+    // context.worktree  — git worktree root
+    // context.sessionID, context.messageID, context.agent
+    const result = myHelper(args.paramName);
+    return JSON.stringify(result);
   },
-  execute: async ({ param2 }) => {
-    // Implementation
-  }
-};
-
-// Export all tools
-const tools = [tool1, tool2];
-export default tools;
+})
 ```
 
-### 4.2 Tool Registration
+**Rules:**
+- One tool per file, file named after the tool (`tool_name.ts`)
+- `export default tool({...})` — not named export, not `server` export
+- All helper logic inlined in the same file (zero external imports except `@opencode-ai/plugin`)
+- Return JSON strings from `execute`
+- Use `tool.schema` (Zod) for arg validation
+- Use `Bun.$\`command\`` for shell execution if needed
 
-```json
-{
-  "tools": [
-    {
-      "name": "tool1",
-      "description": "Tool 1 description"
-    },
-    {
-      "name": "tool2",
-      "description": "Tool 2 description"
-    }
-  ],
-  "plugin": ["/home/zimmermann/.config/opencode/tools/runbook_find_next_story.ts"]
-}
-```
+### Shell commands in tools
 
-### 4.3 Tool Testing
+- Use `Bun.$\`command\`` (Bun shell utility, available in the OpenCode runtime)
+- Do NOT use `child_process.exec` or `execSync` — use Bun's built-in shell
 
-- Test files must live in `~/.config/opencode/tools/tests/` — **never** in `~/.config/opencode/tools/` (the plugin root).
-- OpenCode's Bun runtime scans the plugin root directory and loads all `.ts` files it finds at tool-registry resolution time.
-- A test file in the root will be loaded on every prompt, and any `test()` call outside of `bun test` throws: `"Cannot use test outside of the test runner"` — crashing every request.
- - **Rule:** All future tool test files go in `tests/` subdirectory, named `{tool_name}.test.ts`.
+### ⚠️ Test File Location — Critical
+
+- Test files must live in `~/.config/opencode/tools/tests/` — **never** in the plugin root
+- OpenCode's Bun runtime scans and loads all `.ts` files in the tools root at startup
+- A test file in the root crashes every session with `"Cannot use test outside of the test runner"`
+- Rule: `runbook_find_next_story.test.ts` → `tests/runbook_find_next_story.test.ts`
 
 ## 5. WSL Integration
 
@@ -141,6 +116,7 @@ interface RunbookWave {
 | `bun` is the TypeScript runtime for OpenCode plugins | ✅ **Confirmed** — OpenCode embeds Bun; it is NOT a standalone CLI (`bun` command not available in PATH) | Confirmed during ARC-1348 |
 | `@opencode-ai/plugin` is the correct import for tool registration | ✅ **Confirmed** — available at `~/.config/opencode/node_modules/@opencode-ai/plugin/` | Confirmed during ARC-1348 |
 | All 4 Wave 1 tools should live in one file (`runbook-tools.ts`) vs separate files | ❌ **Revised** — one file per tool, named after the tool (e.g. `runbook_find_next_story.ts`) | Confirmed during ARC-1348 (refactored) |
+| `"plugin"` array in opencode.json required | ❌ **NOT needed** — tools in `~/.config/opencode/tools/` are auto-discovered | Confirmed from official docs |
 
 ## 8. Standing Decisions
 
@@ -148,7 +124,8 @@ interface RunbookWave {
 - No npm packages or external dependencies
 - No cross-file imports from `lib/` directory
 - Each tool lives in its own file named exactly after the tool: `{tool_name}.ts`
-- Plugin array in `opencode.json` gets one entry per tool file
+- Tools in `~/.config/opencode/tools/` are auto-discovered — **no `"plugin"` array entry in opencode.json needed**
+- `export default tool({...})` is the required export pattern (single tool per file)
 - All tool files must live in `~/.config/opencode/tools/`
 - Test files must live in `~/.config/opencode/tools/tests/`, named `{tool_name}.test.ts`
 - Use absolute paths only
@@ -164,3 +141,5 @@ interface RunbookWave {
 | Unix-style forward slashes | ✅ | Confirmed during ARC-1348 |
 | Test files in `tests/` subdirectory | ✅ | Confirmed during ARC-1348 |
 | Single file approach | ❌ Revised — one file per tool | Refactored during ARC-1348 |
+| Auto-discovery from `tools/` dir, no `"plugin"` array needed | ✅ | Confirmed from official OpenCode docs |
+| `export default tool({...})` is correct export pattern | ✅ | Confirmed from official OpenCode docs |
