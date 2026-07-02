@@ -7,8 +7,15 @@ This document contains standing technical decisions and patterns for the agent-t
 ## 2. Tool Registration
 
 - **Plugin path must be absolute** — tilde (`~`) does NOT work in the `"plugin"` array in `opencode.json`
-- Use: `"/home/zimmermann/.config/opencode/tools/runbook-tools.ts"`
-- Do NOT use: `"~/.config/opencode/tools/runbook-tools.ts"`
+- Use: `"/home/zimmermann/.config/opencode/tools/runbook_find_next_story.ts"`
+- Do NOT use: `"~/.config/opencode/tools/runbook_find_next_story.ts"` (tilde form)
+
+### File naming convention
+
+- Each tool lives in its own file named exactly after the tool: `{tool_name}.ts`
+- Example: `runbook_find_next_story` → `runbook_find_next_story.ts`
+- Do NOT bundle multiple tools in one file
+- Plugin array in `opencode.json` gets one entry per tool file
 
 ## 3. Markdown Parser — Zero-Dependency Inline Strategy
 
@@ -18,7 +25,7 @@ The original plan was to copy `parser.ts`, `astWalker.ts`, `types.ts` from `pa.a
 
 **Decided strategy:** Each tool file must be **fully self-contained** — zero npm dependencies, zero cross-file imports from a `lib/` directory.
 
-- Implement a line-based markdown parser inlined directly in `runbook-tools.ts`. No `unified`, no `remark-*`, no external packages.
+- Implement a line-based markdown parser inlined directly in the tool file. No `unified`, no `remark-*`, no external packages.
 - All types (RunbookStep, RunbookWave, etc.) are also inlined in the tool file.
 - **Do NOT use `lib/` imports or npm packages in any agent tool.**
 
@@ -88,7 +95,7 @@ export default tools;
       "description": "Tool 2 description"
     }
   ],
-  "plugin": ["/home/zimmermann/.config/opencode/tools/runbook-tools.ts"]
+  "plugin": ["/home/zimmermann/.config/opencode/tools/runbook_find_next_story.ts"]
 }
 ```
 
@@ -97,8 +104,7 @@ export default tools;
 - Test files must live in `~/.config/opencode/tools/tests/` — **never** in `~/.config/opencode/tools/` (the plugin root).
 - OpenCode's Bun runtime scans the plugin root directory and loads all `.ts` files it finds at tool-registry resolution time.
 - A test file in the root will be loaded on every prompt, and any `test()` call outside of `bun test` throws: `"Cannot use test outside of the test runner"` — crashing every request.
-- **Rule:** `runbook-tools.test.ts` → `tests/runbook-tools.test.ts`
-- **Rule:** All future tool test files go in `tests/` subdirectory.
+ - **Rule:** All future tool test files go in `tests/` subdirectory, named `{tool_name}.test.ts`.
 
 ## 5. WSL Integration
 
@@ -129,20 +135,22 @@ interface RunbookWave {
 
 | Assumption | Status | How to verify |
 |---|---|---|
-| Tilde in plugin array path resolves correctly | ❌ **Confirmed does NOT work** — use absolute path `/home/zimmermann/.config/opencode/tools/runbook-tools.ts` | Confirmed during ARC-1348 |
+| Tilde in plugin array path resolves correctly | ❌ **Confirmed does NOT work** — use absolute path `/home/zimmermann/.config/opencode/tools/runbook_find_next_story.ts` | Confirmed during ARC-1348 |
 | npm packages in `tools/node_modules/` resolve in OpenCode Bun runtime | ❌ **Confirmed does NOT work** — use zero-dependency inline code only | Confirmed during ARC-1348 |
 | Test files can live in plugin root directory | ❌ **Confirmed does NOT work** — tests must go in `tests/` subdirectory | Confirmed during ARC-1348 |
 | `bun` is the TypeScript runtime for OpenCode plugins | ✅ **Confirmed** — OpenCode embeds Bun; it is NOT a standalone CLI (`bun` command not available in PATH) | Confirmed during ARC-1348 |
 | `@opencode-ai/plugin` is the correct import for tool registration | ✅ **Confirmed** — available at `~/.config/opencode/node_modules/@opencode-ai/plugin/` | Confirmed during ARC-1348 |
-| All 4 Wave 1 tools should live in one file (`runbook-tools.ts`) vs separate files | ✅ **Confirmed** — single file approach works | Confirmed during ARC-1348 |
+| All 4 Wave 1 tools should live in one file (`runbook-tools.ts`) vs separate files | ❌ **Revised** — one file per tool, named after the tool (e.g. `runbook_find_next_story.ts`) | Confirmed during ARC-1348 (refactored) |
 
 ## 8. Standing Decisions
 
 - All agent tools must be zero-dependency and self-contained
 - No npm packages or external dependencies
 - No cross-file imports from `lib/` directory
+- Each tool lives in its own file named exactly after the tool: `{tool_name}.ts`
+- Plugin array in `opencode.json` gets one entry per tool file
 - All tool files must live in `~/.config/opencode/tools/`
-- Test files must live in `~/.config/opencode/tools/tests/`
+- Test files must live in `~/.config/opencode/tools/tests/`, named `{tool_name}.test.ts`
 - Use absolute paths only
 - Use Unix-style forward slashes
 - Test paths in WSL before committing
@@ -155,4 +163,4 @@ interface RunbookWave {
 | Absolute paths only | ✅ | Confirmed during ARC-1348 |
 | Unix-style forward slashes | ✅ | Confirmed during ARC-1348 |
 | Test files in `tests/` subdirectory | ✅ | Confirmed during ARC-1348 |
-| Single file approach | ✅ | Confirmed during ARC-1348 |
+| Single file approach | ❌ Revised — one file per tool | Refactored during ARC-1348 |
