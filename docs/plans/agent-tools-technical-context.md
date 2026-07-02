@@ -16,6 +16,23 @@ Tools placed in `~/.config/opencode/tools/` are **automatically discovered** by 
 
 **Plugin array in opencode.json:** NOT needed. Remove any existing `"plugin"` entries for tools in `~/.config/opencode/tools/`.
 
+## 2b. Agent Tool Allowlists (opencode.json)
+
+Custom tools are auto-discovered but access is controlled per-agent in `opencode.json`. When adding a new tool, add it to the appropriate agent allowlists:
+
+| Agent | Tools allowed | Reason |
+|---|---|---|
+| **build** | All runbook tools | Primary execution agent |
+| **senior-coder** | All runbook tools | Fallback execution agent |
+| **plan** | `validate_runbook`, `get_current_issue` | Planning workflow support |
+| **debug** | `run_tests`, `run_lint` | Reproducing failures |
+
+**When adding a new tool:**
+1. Create `~/.config/opencode/tools/{tool_name}.ts`
+2. Add to `opencode.json` agent allowlists for the agents that need it
+3. Commit both to `pa.aid.config.md` config repo
+4. Restart OpenCode
+
 ## 3. Markdown Parser — Zero-Dependency Inline Strategy
 
 The original plan was to copy `parser.ts`, `astWalker.ts`, `types.ts` from `pa.aid.conductor.ts` and install `unified`/`remark-parse`/`remark-gfm` via npm.
