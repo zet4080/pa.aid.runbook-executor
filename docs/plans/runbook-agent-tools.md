@@ -25,7 +25,7 @@
 
 ### 🔴 HIGH — ARC-1348: `runbook_find_next_story`
 
-- [ ] **ARC-1348** — Implement `runbook_find_next_story` OpenCode tool
+- [x] **ARC-1348** — Implement `runbook_find_next_story` OpenCode tool
   - [x] 🔒 Claimed: agent-tools / 2026-07-02 14:00
   - [ ] Read `issues/agent-tools/ARC-1348-tool-runbook-find-next-story.md`
   - [ ] Write `implementation_plans/agent-tools/ARC-1348-implementation-plan.md`
