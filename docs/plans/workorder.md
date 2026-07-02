@@ -2,7 +2,7 @@
 
 **Repo:** pa.aid.runbook-executor
 **Generated:** 2026-06-27
-**Stories:** 26 across 7 epics
+**Stories:** 41 across 8 epics
 
 ---
 
@@ -35,6 +35,7 @@ Workflow per story:
 | queue-scheduling-policy | Queue & Scheduling Policy | ARC-1296 | 3 | 10h | after ARC-1303 merged |
 | failure-handling | Failure Handling & Escalation | ARC-1300 | 3 | 10h | after ARC-1288 merged |
 | session-history | Session History | ARC-1309 | 3 | 9h | after ARC-1287 merged |
+| agent-tools | OpenCode Agent Tools | ARC-1348-epic | 15 | 38h | immediately |
 
 ```
 T=0       T=8       T=15      T=19      T=25      T=31      T=37
@@ -197,7 +198,8 @@ None. All three stories extend an established queue UI with incremental scope.
 | queue-scheduling-policy | 3 | 10h | 10h | 3 × 15 min = 0.75h |
 | failure-handling | 3 | 10h | 10h | 3 × 15 min = 0.75h |
 | session-history | 3 | 9h | 9h | 3 × 15 min = 0.75h |
-| **Total** | **26** | **37h** (parallel) | **92h** | **6.5h** |
+| agent-tools | 15 | 38h | 37h | 15 × 15 min = 3.75h |
+| **Total** | **41** | **38h** (parallel) | **129h** | **10.25h** |
 
 Agent-hours include 20% coordination overhead per lane.
 
@@ -205,7 +207,7 @@ Agent-hours include 20% coordination overhead per lane.
 
 ## Supervision Budget
 
-- 26 story checkpoints × 15 min = **6.5h supervisor time** across 37h wall-clock
+- 41 story checkpoints × 15 min = **10.25h supervisor time** across 38h wall-clock
 - ~18% supervision ratio (healthy; no wave gates)
 - No global sync gates — supervisor handles per-story reviews only
 
@@ -225,9 +227,45 @@ Agent-hours include 20% coordination overhead per lane.
 
 ---
 
+## Lane: agent-tools
+
+**Epic:** ARC-1348-epic | **Repo:** pa.aid.runbook-executor | **Start condition:** immediately
+
+| Story | Summary | Est. | Intra-lane depends on | Risk |
+|-------|---------|------|----------------------|------|
+| ARC-1348 | Implement `runbook_find_next_story` OpenCode tool | 3h | — | 🔴 HIGH |
+| ARC-1349 | Implement `runbook_claim_story` OpenCode tool | 3h | ARC-1348 | 🔴 HIGH |
+| ARC-1350 | Implement `runbook_check_step` OpenCode tool | 3h | ARC-1349 | 🔴 HIGH |
+| ARC-1351 | Implement `runbook_check_story` OpenCode tool | 2h | ARC-1349 | 🔴 HIGH |
+| ARC-1352 | Implement `runbook_check_dependencies` OpenCode tool | 2h | — | 🟡 MEDIUM |
+| ARC-1353 | Implement `get_current_issue` OpenCode tool | 2h | — | 🔴 HIGH |
+| ARC-1354 | Implement `run_tests` OpenCode tool | 3h | — | 🔴 HIGH |
+| ARC-1355 | Implement `run_lint` OpenCode tool | 2h | — | 🔴 HIGH |
+| ARC-1356 | Implement `run_typecheck` OpenCode tool | 2h | — | 🟡 MEDIUM |
+| ARC-1357 | Implement `get_branch_diff` OpenCode tool | 1h | — | 🟡 MEDIUM |
+| ARC-1358 | Implement `update_issue_status` OpenCode tool | 3h | — | 🔴 HIGH |
+| ARC-1359 | Implement `planning_commit` OpenCode tool | 2h | — | 🟡 MEDIUM |
+| ARC-1360 | Implement `archive_issue` OpenCode tool | 4h | ARC-1351, ARC-1358 | 🔴 HIGH |
+| ARC-1361 | Implement `preflight_check` OpenCode tool | 2h | — | 🟡 MEDIUM |
+| ARC-1362 | Implement `validate_runbook` OpenCode tool | 3h | — | 🔴 HIGH |
+
+**🔴 HIGH stories (individual checkpoints):**
+- ARC-1348 (foundational — all runbook navigation tools depend on this parser)
+- ARC-1349 (claim workflow — ARC-1350, ARC-1351, ARC-1360 depend on this)
+- ARC-1350 (step-level runbook write + commit)
+- ARC-1351 (story-level runbook write + commit; gates ARC-1360)
+- ARC-1353 (cross-cutting — used at start of every local-code-review)
+- ARC-1354 (framework detection + subprocess; used in every review)
+- ARC-1355 (framework detection + subprocess; used in every review)
+- ARC-1358 (markdown patch; gates ARC-1360)
+- ARC-1360 (atomic 6-step archive; most error-prone operation in close-issue)
+- ARC-1362 (parser-derived validation; must align with astWalker.ts)
+
+---
+
 ## On-Hold Items
 
-None. All 26 stories have named prerequisites and can begin once their start conditions are met.
+None. All 41 stories have named prerequisites and can begin once their start conditions are met.
 
 ---
 
