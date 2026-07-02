@@ -27,14 +27,14 @@
 
 - [x] **ARC-1348** — Implement `runbook_find_next_story` OpenCode tool
   - [x] 🔒 Claimed: agent-tools / 2026-07-02 14:00
-  - [ ] Read `issues/agent-tools/ARC-1348-tool-runbook-find-next-story.md`
-  - [ ] Write `implementation_plans/agent-tools/ARC-1348-implementation-plan.md`
-  - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
-  - [ ] Execute plan
-  - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
-  - [ ] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1348-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(agent-tools): implement runbook_find_next_story tool`
+  - [x] Read `issues/agent-tools/ARC-1348-tool-runbook-find-next-story.md`
+  - [x] Write `implementation_plans/agent-tools/ARC-1348-implementation-plan.md`
+  - [x] 🔴 INDIVIDUAL PLAN CHECKPOINT
+  - [x] Execute plan
+  - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
+  - [x] Lint / tests pass
+  - [x] Write `task-completions/ARC-1348-COMPLETION-SUMMARY.md`
+  - [x] Commit: `feat(agent-tools): implement runbook_find_next_story tool`
 
 ### 🔴 HIGH — ARC-1349: `runbook_claim_story`
 
