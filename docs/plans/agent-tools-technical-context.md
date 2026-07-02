@@ -40,25 +40,26 @@ Custom tools are auto-discovered from `~/.config/opencode/tools/` but access is 
 5. Commit `opencode-sync-config.sh` change to `pa.aid.wsl-setup.sh`
 6. Restart OpenCode
 
-## 3. Markdown Parser — Zero-Dependency Inline Strategy
+## 3. Markdown Parser — AST-based via shared lib/
 
-The original plan was to copy `parser.ts`, `astWalker.ts`, `types.ts` from `pa.aid.conductor.ts` and install `unified`/`remark-parse`/`remark-gfm` via npm.
+All tools use the AST parser copied from `pa.aid.conductor.ts`. This ensures both the conductor app and the OpenCode tools use identical parsing logic.
 
-**This approach FAILS** in OpenCode's embedded Bun runtime: packages installed in `~/.config/opencode/tools/node_modules/` are silently not resolved, causing `parseRunbook` to return `undefined`.
+**Source files (copy from pa.aid.conductor.ts when updated):**
+- `/repos/pa.aid.conductor.ts/packages/server/src/runbook/parser.ts` → `tools/lib/parser.ts`
+- `/repos/pa.aid.conductor.ts/packages/server/src/runbook/astWalker.ts` → `tools/lib/astWalker.ts`
+- `/repos/pa.aid.conductor.ts/packages/server/src/runbook/types.ts` → `tools/lib/types.ts`
 
-**Decided strategy:** Each tool file must be **fully self-contained** — zero npm dependencies, zero cross-file imports from a `lib/` directory.
+**Dependencies:** `unified`, `remark-parse`, `remark-gfm` — installed in `tools/node_modules/` via `npm install` in `~/.config/opencode/tools/`
 
-- Implement a line-based markdown parser inlined directly in the tool file. No `unified`, no `remark-*`, no external packages.
-- All types (RunbookStep, RunbookWave, etc.) are also inlined in the tool file.
-- **Do NOT use `lib/` imports or npm packages in any agent tool.**
+**Import in tool files:**
+```typescript
+import { parseRunbook } from "./lib/parser.ts"
+import type { ParsedRunbook } from "./lib/types.ts"
+```
 
-**OpenCode's embedded Bun runtime does NOT resolve packages from `~/.config/opencode/tools/node_modules/`. All tool files must be zero-dependency and self-contained.**
+**Sync policy:** When `pa.aid.conductor.ts` parser files change, re-copy all three files to `tools/lib/`.
 
-Removed references:
-- ❌ `bun add unified remark-parse remark-gfm`
-- ❌ Copying `parser.ts` / `astWalker.ts` / `types.ts` to `lib/`
-- ❌ `~/.config/opencode/tools/lib/` directory
-- ❌ Installing dependencies in the tools directory
+**Module resolution:** OpenCode's embedded Bun runtime resolves packages using standard Node resolution — walks up from the tool file's path. `tools/node_modules/` resolves correctly. Resolution failures are always loud (never silent).
 
 ## 4. Standard Tool Pattern
 
@@ -135,7 +136,9 @@ interface RunbookWave {
 | Assumption | Status | How to verify |
 |---|---|---|
 | Tilde in plugin array path resolves correctly | ❌ **Confirmed does NOT work** — use absolute path `/home/zimmermann/.config/opencode/tools/runbook_find_next_story.ts` | Confirmed during ARC-1348 |
-| npm packages in `tools/node_modules/` resolve in OpenCode Bun runtime | ❌ **Confirmed does NOT work** — use zero-dependency inline code only | Confirmed during ARC-1348 |
+| npm packages in `tools/node_modules/` resolve in OpenCode Bun runtime | ✅ **Confirmed WORKS** (earlier "does not work" claim was wrong) — Bun resolves from the tool file upward through parent `node_modules/`. Failed resolution throws a loud `ResolveMessage` and drops the tool; it is never silent. Original `parsed.waves` error was a runtime logic bug, not a resolution failure. | Re-verified via controlled probe experiment on v1.17.11. Confirmed ARC-1348 (AST parser now live in tools/lib/). |
+| Relative `./lib/*.ts` cross-file imports resolve | ✅ **Confirmed WORKS** | Re-verified via controlled probe experiment |
+| Shared packages at `~/.config/opencode/node_modules/` resolve | ✅ **Confirmed WORKS** | Re-verified via controlled probe experiment |
 | Test files can live in plugin root directory | ❌ **Confirmed does NOT work** — tests must go in `tests/` subdirectory | Confirmed during ARC-1348 |
 | `bun` is the TypeScript runtime for OpenCode plugins | ✅ **Confirmed** — OpenCode embeds Bun; it is NOT a standalone CLI (`bun` command not available in PATH) | Confirmed during ARC-1348 |
 | `@opencode-ai/plugin` is the correct import for tool registration | ✅ **Confirmed** — available at `~/.config/opencode/node_modules/@opencode-ai/plugin/` | Confirmed during ARC-1348 |
@@ -144,9 +147,8 @@ interface RunbookWave {
 
 ## 8. Standing Decisions
 
-- All agent tools must be zero-dependency and self-contained
-- No npm packages or external dependencies
-- No cross-file imports from `lib/` directory
+- Inlining a tool's logic (zero external deps) is an acceptable **convenience choice**, not a technical requirement
+- npm packages and `lib/` cross-file imports **are supported** and are the recommended approach when duplication would otherwise grow (verified on v1.17.11)
 - Each tool lives in its own file named exactly after the tool: `{tool_name}.ts`
 - Tools in `~/.config/opencode/tools/` are auto-discovered — **no `"plugin"` array entry in opencode.json needed**
 - `export default tool({...})` is the required export pattern (single tool per file)
@@ -160,7 +162,8 @@ interface RunbookWave {
 
 | Decision | Verified | Verification Method |
 |---|---|---|
-| Zero-dependency tools | ✅ | Confirmed during ARC-1348 |
+| Zero-dependency tools (optional convenience, not required) | ✅ | Works, but not mandatory |
+| npm packages + `lib/` imports supported | ✅ | Controlled probe experiment on v1.17.11 |
 | Absolute paths only | ✅ | Confirmed during ARC-1348 |
 | Unix-style forward slashes | ✅ | Confirmed during ARC-1348 |
 | Test files in `tests/` subdirectory | ✅ | Confirmed during ARC-1348 |
