@@ -1,10 +1,10 @@
 ---
 key: ARC-1363
 story: Extend generate_runbook data model to reproduce the canonical batch-structured runbook format
-status: pending
-selected_approach:
-decided_by:
-decided_at:
+status: decided
+selected_approach: Option 1
+decided_by: Jochen Zimmermann
+decided_at: 003.07.2026
 ---
 
 ## Decision Context
