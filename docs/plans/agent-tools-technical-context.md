@@ -170,3 +170,19 @@ interface RunbookWave {
 | Single file approach | ❌ Revised — one file per tool | Refactored during ARC-1348 |
 | Auto-discovery from `tools/` dir, no `"plugin"` array needed | ✅ | Confirmed from official OpenCode docs |
 | `export default tool({...})` is correct export pattern | ✅ | Confirmed from official OpenCode docs |
+| Parser-first principle — all runbook reads via `parseRunbook()` | ✅ | Standing decision; no raw regex scanning as parse substitute |
+
+## 10. Parser-First Principle
+
+**Standing Decision:** Every tool that reads runbook content MUST use `parseRunbook()` from `./lib/parser.ts`. No tool may perform raw regex scanning of runbook markdown as a substitute for parsing.
+
+For structural validation that requires access below the `ParsedRunbook` surface (e.g. catching non-wave H2 headings that the AST walker silently skips), use `unified().use(remarkParse).parse(content)` to get the raw mdast and walk it alongside the `ParsedRunbook`.
+
+| Scope | Approach |
+|---|---|
+| Metadata fields (title, epic, lane, depends_on) | Use `ParsedRunbook.metadata.*` fields from `parseRunbook()` |
+| Wave/step enumeration | Use `ParsedRunbook.waves[].steps[]` |
+| Sub-parser-level checks (non-wave H2s, bold fields not in metadata model) | Walk raw mdast from `unified().use(remarkParse).parse(content)` |
+| Never | Raw line-by-line regex scan as sole parsing strategy |
+
+**Rationale:** The `parseRunbook()` function in `./lib/parser.ts` is the shared parser between the conductor app and agent tools. Using it for all reads ensures tools and the conductor agree on runbook structure. It also means parser updates (e.g. new metadata fields) automatically propagate to validation tools.

@@ -102,18 +102,22 @@ The parser's requirements are non-obvious and derived from `astWalker.ts` source
 | `structure.missing_summary` | Checkpoint summary table present at end of file |
 | `summary.count_mismatch` | If summary table is present, HIGH/batch/gate counts match actual counts in body |
 
+## Implementation Note
+
+Validation operates on the `ParsedRunbook` data model (metadata, waves, steps, sub-steps) and NOT on raw text. The tool imports `parseRunbook()` from `~/.config/opencode/tools/lib/parser.ts` which returns a `ParsedRunbook` containing extracted metadata fields and parsed wave/step structures. Raw regex scanning of runbook text is used only as a supplement for structural checks below the `ParsedRunbook` surface level (e.g., detecting non-wave H2 headings that the AST walker skips).
+
 ## In Scope
 
 - TypeScript tool file at `~/.config/opencode/tools/validate_runbook.ts`
 - Validates against parser rules derived from `pa.aid.conductor.ts/packages/server/src/runbook/astWalker.ts`
-- Pure markdown text parsing — no dependency on the conductor parser itself
+- **Approach:** Use `parseRunbook()` from `./lib/parser.ts` to produce a `ParsedRunbook` AST. Validate the structured AST fields against the rule table. For rules that check markdown elements the parser silently ignores (e.g. non-wave H2 headings), use the mdast directly via `unified().use(remarkParse).parse(content)` alongside the structured parse.
 - Returns: `{ valid: boolean, errors: RuleViolation[], warnings: RuleViolation[], summary: string }`
   where `RuleViolation = { rule: string, message: string, line?: number }`
 - Reports line numbers where possible
 
 ## Out of Scope
 
-- Running the actual `pa.aid.conductor.ts` parser (avoid runtime dependency)
+- Running the full `pa.aid.conductor.ts` server (runtime server dependency)
 - Validating issue file content or implementation plans
 - Fixing the runbook (tool is read-only)
 - Validating semantic correctness of commit messages or feature goal wording
