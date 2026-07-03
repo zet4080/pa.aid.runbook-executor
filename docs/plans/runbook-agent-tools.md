@@ -39,20 +39,46 @@
 ### 🔴 HIGH — ARC-1349: `runbook_claim_story`
 
 - [x] Confirm ARC-1348 complete
-- [ ] **ARC-1349** — Implement `runbook_claim_story` OpenCode tool
+- [x] **ARC-1349** — Implement `runbook_claim_story` OpenCode tool
   - [x] 🔒 Claimed: agent-tools / 2026-07-02 14:52
-  - [ ] Read `issues/agent-tools/ARC-1349-tool-runbook-claim-story.md`
-  - [ ] Write `implementation_plans/agent-tools/ARC-1349-implementation-plan.md`
+  - [x] Read `issues/agent-tools/ARC-1349-tool-runbook-claim-story.md`
+  - [x] Write `implementation_plans/agent-tools/ARC-1349-implementation-plan.md`
+  - [x] 🔴 INDIVIDUAL PLAN CHECKPOINT
+  - [x] Execute plan
+  - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
+  - [x] Lint / tests pass
+  - [x] Write `task-completions/ARC-1349-COMPLETION-SUMMARY.md`
+  - [x] Commit: `feat(agent-tools): implement runbook_claim_story tool`
+
+### 🔴 HIGH — ARC-1362: `validate_runbook`
+
+- [ ] **ARC-1362** — Implement `validate_runbook` OpenCode tool
+  - [ ] 🔒 Claimed: _(fill in: agent-tools / YYYY-MM-DD HH:MM before starting)_
+  - [ ] Read `issues/agent-tools/ARC-1362-tool-validate-runbook.md`
+  - [ ] Write `implementation_plans/agent-tools/ARC-1362-implementation-plan.md`
   - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
   - [ ] Execute plan
   - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
   - [ ] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1349-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(agent-tools): implement runbook_claim_story tool`
+  - [ ] Write `task-completions/ARC-1362-COMPLETION-SUMMARY.md`
+  - [ ] Commit: `feat(agent-tools): implement validate_runbook tool`
+
+### 🔴 HIGH — ARC-1363: `generate_runbook`
+
+- [ ] **ARC-1363** — Implement `generate_runbook` OpenCode tool
+  - [ ] 🔒 Claimed: _(fill in: agent-tools / YYYY-MM-DD HH:MM before starting)_
+  - [ ] Read `issues/agent-tools/ARC-1363-tool-generate-runbook.md`
+  - [ ] Write `implementation_plans/agent-tools/ARC-1363-implementation-plan.md`
+  - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
+  - [ ] Execute plan
+  - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
+  - [ ] Lint / tests pass
+  - [ ] Write `task-completions/ARC-1363-COMPLETION-SUMMARY.md`
+  - [ ] Commit: `feat(agent-tools): implement generate_runbook tool`
 
 ### 🔴 HIGH — ARC-1350: `runbook_check_step`
 
-- [ ] Confirm ARC-1349 complete
+- [x] Confirm ARC-1349 complete
 - [ ] **ARC-1350** — Implement `runbook_check_step` OpenCode tool
   - [ ] 🔒 Claimed: _(fill in: agent-tools / YYYY-MM-DD HH:MM before starting)_
   - [ ] Read `issues/agent-tools/ARC-1350-tool-runbook-check-step.md`
@@ -66,7 +92,7 @@
 
 ### 🔴 HIGH — ARC-1351: `runbook_check_story`
 
-- [ ] Confirm ARC-1349 complete
+- [x] Confirm ARC-1349 complete
 - [ ] **ARC-1351** — Implement `runbook_check_story` OpenCode tool
   - [ ] 🔒 Claimed: _(fill in: agent-tools / YYYY-MM-DD HH:MM before starting)_
   - [ ] Read `issues/agent-tools/ARC-1351-tool-runbook-check-story.md`
@@ -80,7 +106,7 @@
 
 ### Wave 1 gate
 
-- [ ] ARC-1348, ARC-1349, ARC-1350, ARC-1351 all checked off
+- [ ] ARC-1348, ARC-1349, ARC-1362, ARC-1363, ARC-1350, ARC-1351 all checked off
 - [ ] All completion summaries written
 - [ ] 🟢 WAVE GATE — Wave 1 closed; Wave 2 may begin
 
@@ -155,19 +181,6 @@
   - [ ] Write `task-completions/ARC-1360-COMPLETION-SUMMARY.md`
   - [ ] Commit: `feat(agent-tools): implement archive_issue tool`
 
-### 🔴 HIGH — ARC-1362: `validate_runbook`
-
-- [ ] **ARC-1362** — Implement `validate_runbook` OpenCode tool
-  - [ ] 🔒 Claimed: _(fill in: agent-tools / YYYY-MM-DD HH:MM before starting)_
-  - [ ] Read `issues/agent-tools/ARC-1362-tool-validate-runbook.md`
-  - [ ] Write `implementation_plans/agent-tools/ARC-1362-implementation-plan.md`
-  - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
-  - [ ] Execute plan
-  - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
-  - [ ] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1362-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(agent-tools): implement validate_runbook tool`
-
 ### 🟡 Batch — Supporting tools (ARC-1352, ARC-1356, ARC-1357, ARC-1359, ARC-1361)
 
 - [ ] 🔒 Claimed: _(fill in: agent-tools / YYYY-MM-DD HH:MM before starting)_
@@ -208,7 +221,7 @@
 
 ### Wave 2 gate
 
-- [ ] All Wave 2 stories checked off (ARC-1352, ARC-1353, ARC-1354, ARC-1355, ARC-1356, ARC-1357, ARC-1358, ARC-1359, ARC-1360, ARC-1361, ARC-1362)
+- [ ] All Wave 2 stories checked off (ARC-1352, ARC-1353, ARC-1354, ARC-1355, ARC-1356, ARC-1357, ARC-1358, ARC-1359, ARC-1360, ARC-1361)
 - [ ] All completion summaries written
 - [ ] 🟢 WAVE GATE — agent-tools lane complete; all 15 tools deployed to `~/.config/opencode/tools/`
 
@@ -221,6 +234,6 @@
 
 | Wave | HIGH checkpoints | Batch checkpoints | Wave gates | Total |
 |------|-----------------|-------------------|------------|-------|
-| Wave 1 | 4 (ARC-1348, ARC-1349, ARC-1350, ARC-1351) | 0 | 1 | 5 |
-| Wave 2 | 6 (ARC-1353, ARC-1354, ARC-1355, ARC-1358, ARC-1360, ARC-1362) | 1 (ARC-1352, ARC-1356, ARC-1357, ARC-1359, ARC-1361) | 1 | 8 |
-| **Total** | **10** | **1** | **2** | **13** |
+| Wave 1 | 6 (ARC-1348, ARC-1349, ARC-1362, ARC-1363, ARC-1350, ARC-1351) | 0 | 1 | 7 |
+| Wave 2 | 5 (ARC-1353, ARC-1354, ARC-1355, ARC-1358, ARC-1360) | 1 (ARC-1352, ARC-1356, ARC-1357, ARC-1359, ARC-1361) | 1 | 7 |
+| **Total** | **11** | **1** | **2** | **14** |
