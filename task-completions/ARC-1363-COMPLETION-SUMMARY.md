@@ -114,3 +114,32 @@ Regression check (`validate_runbook.test.ts`): 9/9 pass — no regressions.
 - Added standard workflow sub-items to every story block: Lint/tests, Write completion summary, Commit
 - HIGH stories additionally get: Write implementation plan, INDIVIDUAL PLAN CHECKPOINT sub-items
 - lane_name threaded through buildStoryBlock() for correct path generation
+
+---
+
+## Option 1 Rework — Canonical Batch Model (2026-07-03)
+
+**Trigger:** Testing against the real hand-written runbook `runbook-documentation-cleanup.md` (184 lines) revealed the flat `waves[].stories[]` schema could not express the canonical format. Approved via `decisions/ARC-1363-batch-model-approach-decision.md` (Option 1). See rewritten plan `implementation_plans/agent-tools/ARC-1363-implementation-plan.md`.
+
+### generate_runbook — expanded to canonical structure
+- New nested schema: waves contain `high_stories[]` (individual 9-step blocks) and `batches[]` (shared claim + shared Read/Write-plans + one BATCH PLAN CHECKPOINT + per-story Execute items + `☑ all complete`). Top-level `on_hold[]`, plus metadata fields (`feature_goal`, `repos`, `waves_participated`, `depends_on`, `skills`, `out_of_checklist_note`).
+- Emits full canonical preamble: Load/Stop/Resume blockquote, `## Checkpoint model` table, `## HIGH story workflow`, `## MEDIUM/LOW batch workflow`, per-wave gate blockquote, on-hold conditional blocks, `### Wave N gate` checklist, On-Hold Register table, and the 5-column Checkpoint Summary.
+- Backward-compatible: legacy flat `stories[]` input is auto-adapted (🔴 → HIGH blocks; 🟡/🟢 → batches).
+
+### validate_runbook — batch-aware
+- New `groupBlocksByH3()` reconstructs block structure from raw mdast (parser unchanged).
+- `story.missing_claimed`: one claim per HIGH/batch/on-hold **block** (not per story). Claim marker now matched as a `Claimed:` label — fixes a false positive when a story title contained the word "claimed".
+- `step.duplicate_id`: only flags a key defined as a story in two blocks; batch "Read all issues"/"Write all plans" aggregation lists excluded.
+- `wave.missing_gate` recognizes `### Wave N gate` blocks; `summary.count_mismatch` accepts the 5-column canonical table.
+
+### Dual conformance oracle — both clean
+- **Original** `runbook-documentation-cleanup.md` → `{ valid: true, errors: [], warnings: [] }` (previously 18 false errors).
+- **Regenerated** `runbook-documentation-cleanup-GENERATED.md` (184 lines, 3 batches, 15 stories, on-hold PA-68581, all sections) → `{ valid: true, errors: [], warnings: [] }`, structurally faithful to the original.
+
+### Test evidence
+```
+node --experimental-strip-types --test tests/generate_runbook.test.ts tests/validate_runbook.test.ts
+tests 22 | pass 22 | fail 0
+```
+- generate_runbook: 10 tests (minimal, HIGH block, deps, batch single-claim, per-wave counts, missing-field, preamble/workflow docs, on-hold block, legacy adapter, conformance oracle).
+- validate_runbook: 12 tests (metadata, wave.exists, duplicate, HIGH missing-claimed, feature_goal, wave.heading, file-not-found, batch-level claim satisfies members, Read-list not duplicate, batch missing-claim flagged).
