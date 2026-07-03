@@ -98,9 +98,14 @@ Regression check (`validate_runbook.test.ts`): 9/9 pass — no regressions.
 
 ---
 
+## Post-Implementation Fix (2026-07-03)
+- Fixed wave gate format: promoted `🟢 WAVE GATE` from sub-item to top-level list item so `validate_runbook` correctly detects it
+
+---
+
 ## Design Notes
 
 - **`tool.schema` nested Zod types:** Confirmed available — `tool.schema` is the full `z` Zod namespace. However, the `waves` input is accepted as a JSON string to simplify the tool call interface for agents using the OpenCode tool UI.
 - **Checkpoint summary count matching:** The `validate_runbook` summary count check uses `/🔴\s*(?:HIGH|INDIVIDUAL PLAN CHECKPOINT)/gi`. H3 headings use format `### 🔴 ARC-XXXX — title` (not `### 🔴 HIGH — ARC-XXXX`) to prevent H3 headings from contributing to the count, ensuring the table's HIGH count equals exactly `sum(checkpoint_count ?? 1)` for HIGH stories.
-- **Wave gate requirement:** Each wave section includes a `### Wave N Gate` subsection with a `🟢 WAVE GATE` sub-item. This satisfies `wave.missing_gate` validation (astWalker classifies `GATE` keyword as a low checkpoint).
+- **Wave gate requirement:** Each wave section includes a `### Wave N gate` subsection with `🟢 WAVE GATE` as a **top-level list item**. This satisfies `wave.missing_gate` validation (astWalker classifies `GATE` keyword as a low checkpoint; sub-items are not scanned by the gate check).
 - **Parser-First principle (inverse):** Generated markdown is validated by writing to a temp file and calling `parseRunbook()` before writing to the final output path — if parsing fails, the tool returns an error and cleans up.

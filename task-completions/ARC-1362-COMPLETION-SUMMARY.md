@@ -43,3 +43,6 @@ Implement a TypeScript tool to validate runbook markdown files against the struc
 ## Review Result
 
 Clean — all 9 tests pass, type check passes (`node --experimental-strip-types --check`), no BLOCKER/ISSUE findings.
+
+## Post-Implementation Fix (2026-07-03)
+- Removed ARC key requirement from `metadata.title` rule — Jira key format is not enforced at the tool level
