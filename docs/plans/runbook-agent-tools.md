@@ -65,16 +65,16 @@
 
 ### 🔴 HIGH — ARC-1363: `generate_runbook`
 
-- [ ] **ARC-1363** — Implement `generate_runbook` OpenCode tool
+- [x] **ARC-1363** — Implement `generate_runbook` OpenCode tool
   - [x] 🔒 Claimed: agent-tools / 2026-07-03 11:33
-  - [ ] Read `issues/agent-tools/ARC-1363-tool-generate-runbook.md`
-  - [ ] Write `implementation_plans/agent-tools/ARC-1363-implementation-plan.md`
-  - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
-  - [ ] Execute plan
-  - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
-  - [ ] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1363-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(agent-tools): implement generate_runbook tool`
+  - [x] Read `issues/agent-tools/ARC-1363-tool-generate-runbook.md`
+  - [x] Write `implementation_plans/agent-tools/ARC-1363-implementation-plan.md`
+  - [x] 🔴 INDIVIDUAL PLAN CHECKPOINT
+  - [x] Execute plan
+  - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
+  - [x] Lint / tests pass
+  - [x] Write `task-completions/ARC-1363-COMPLETION-SUMMARY.md`
+  - [x] Commit: `feat(agent-tools): implement generate_runbook tool`
 
 ### 🔴 HIGH — ARC-1350: `runbook_check_step`
 
