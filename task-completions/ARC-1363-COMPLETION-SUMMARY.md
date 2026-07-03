@@ -109,3 +109,8 @@ Regression check (`validate_runbook.test.ts`): 9/9 pass — no regressions.
 - **Checkpoint summary count matching:** The `validate_runbook` summary count check uses `/🔴\s*(?:HIGH|INDIVIDUAL PLAN CHECKPOINT)/gi`. H3 headings use format `### 🔴 ARC-XXXX — title` (not `### 🔴 HIGH — ARC-XXXX`) to prevent H3 headings from contributing to the count, ensuring the table's HIGH count equals exactly `sum(checkpoint_count ?? 1)` for HIGH stories.
 - **Wave gate requirement:** Each wave section includes a `### Wave N gate` subsection with `🟢 WAVE GATE` as a **top-level list item**. This satisfies `wave.missing_gate` validation (astWalker classifies `GATE` keyword as a low checkpoint; sub-items are not scanned by the gate check).
 - **Parser-First principle (inverse):** Generated markdown is validated by writing to a temp file and calling `parseRunbook()` before writing to the final output path — if parsing fails, the tool returns an error and cleans up.
+
+## Post-Implementation Fix 2 (2026-07-03)
+- Added standard workflow sub-items to every story block: Lint/tests, Write completion summary, Commit
+- HIGH stories additionally get: Write implementation plan, INDIVIDUAL PLAN CHECKPOINT sub-items
+- lane_name threaded through buildStoryBlock() for correct path generation
