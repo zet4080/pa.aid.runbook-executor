@@ -53,7 +53,7 @@
 ### 🔴 HIGH — ARC-1362: `validate_runbook`
 
 - [ ] **ARC-1362** — Implement `validate_runbook` OpenCode tool
-  - [ ] 🔒 Claimed: _(fill in: agent-tools / YYYY-MM-DD HH:MM before starting)_
+  - [x] 🔒 Claimed: agent-tools / 2026-07-03 09:40
   - [ ] Read `issues/agent-tools/ARC-1362-tool-validate-runbook.md`
   - [ ] Write `implementation_plans/agent-tools/ARC-1362-implementation-plan.md`
   - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
