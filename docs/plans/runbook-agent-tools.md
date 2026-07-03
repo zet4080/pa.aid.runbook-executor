@@ -66,7 +66,7 @@
 ### 🔴 HIGH — ARC-1363: `generate_runbook`
 
 - [ ] **ARC-1363** — Implement `generate_runbook` OpenCode tool
-  - [ ] 🔒 Claimed: _(fill in: agent-tools / YYYY-MM-DD HH:MM before starting)_
+  - [x] 🔒 Claimed: agent-tools / 2026-07-03 11:33
   - [ ] Read `issues/agent-tools/ARC-1363-tool-generate-runbook.md`
   - [ ] Write `implementation_plans/agent-tools/ARC-1363-implementation-plan.md`
   - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
