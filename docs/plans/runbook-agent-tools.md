@@ -52,16 +52,16 @@
 
 ### 🔴 HIGH — ARC-1362: `validate_runbook`
 
-- [ ] **ARC-1362** — Implement `validate_runbook` OpenCode tool
+- [x] **ARC-1362** — Implement `validate_runbook` OpenCode tool
   - [x] 🔒 Claimed: agent-tools / 2026-07-03 09:40
-  - [ ] Read `issues/agent-tools/ARC-1362-tool-validate-runbook.md`
-  - [ ] Write `implementation_plans/agent-tools/ARC-1362-implementation-plan.md`
-  - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
-  - [ ] Execute plan
-  - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
-  - [ ] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1362-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(agent-tools): implement validate_runbook tool`
+  - [x] Read `issues/agent-tools/ARC-1362-tool-validate-runbook.md`
+  - [x] Write `implementation_plans/agent-tools/ARC-1362-implementation-plan.md`
+  - [x] 🔴 INDIVIDUAL PLAN CHECKPOINT
+  - [x] Execute plan
+  - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
+  - [x] Lint / tests pass
+  - [x] Write `task-completions/ARC-1362-COMPLETION-SUMMARY.md`
+  - [x] Commit: `feat(agent-tools): implement validate_runbook tool`
 
 ### 🔴 HIGH — ARC-1363: `generate_runbook`
 
