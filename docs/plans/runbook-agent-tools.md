@@ -81,12 +81,12 @@
 - [x] Confirm ARC-1349 complete
 - [ ] **ARC-1350** — Implement `runbook_check_step` OpenCode tool
   - [x] 🔒 Claimed: agent-tools / 2026-07-04 14:38
-  - [ ] Read `issues/agent-tools/ARC-1350-tool-runbook-check-step.md`
-  - [ ] Write `implementation_plans/agent-tools/ARC-1350-implementation-plan.md`
-  - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
-  - [ ] Execute plan
-  - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
-  - [ ] Lint / tests pass
+  - [x] Read `issues/agent-tools/ARC-1350-tool-runbook-check-step.md`
+  - [x] Write `implementation_plans/agent-tools/ARC-1350-implementation-plan.md`
+  - [x] 🔴 INDIVIDUAL PLAN CHECKPOINT
+  - [x] Execute plan
+  - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
+  - [x] Lint / tests pass
   - [ ] Write `task-completions/ARC-1350-COMPLETION-SUMMARY.md`
   - [ ] Commit: `feat(agent-tools): implement runbook_check_step tool`
 
