@@ -80,7 +80,7 @@
 
 - [x] Confirm ARC-1349 complete
 - [ ] **ARC-1350** — Implement `runbook_check_step` OpenCode tool
-  - [ ] 🔒 Claimed: _(fill in: agent-tools / YYYY-MM-DD HH:MM before starting)_
+  - [x] 🔒 Claimed: agent-tools / 2026-07-04 14:38
   - [ ] Read `issues/agent-tools/ARC-1350-tool-runbook-check-step.md`
   - [ ] Write `implementation_plans/agent-tools/ARC-1350-implementation-plan.md`
   - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
