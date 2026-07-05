@@ -95,16 +95,16 @@
 - [x] Read all issues: ARC-1305
 - [x] Write all implementation plans
 - [x] 🟡 BATCH PLAN CHECKPOINT
-- [ ] Execute ARC-1305
-  - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
-  - [ ] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1305-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(checkpoint-management): display persistent Resume card and handle Resume click per lane`
-- [ ] ☑ batch 3-A complete
+- [x] Execute ARC-1305
+  - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
+  - [x] Lint / tests pass
+  - [x] Write `task-completions/ARC-1305-COMPLETION-SUMMARY.md`
+  - [x] Commit: `feat(checkpoint-management): display persistent Resume card and handle Resume click per lane`
+- [x] ☑ batch 3-A complete
 
 ### 🟢 Wave 3 Gate
 
-- [ ] 🟢 WAVE 3 GATE — ARC-1305 closed and merged
+- [x] 🟢 WAVE 3 GATE — ARC-1305 closed and merged
 
 ---
 
