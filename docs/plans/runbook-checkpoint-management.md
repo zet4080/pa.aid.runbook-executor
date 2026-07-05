@@ -94,7 +94,7 @@
 - [x] 🔒 Claimed: build-agent / 2026-07-05 00:00
 - [x] Read all issues: ARC-1305
 - [x] Write all implementation plans
-- [ ] 🟡 BATCH PLAN CHECKPOINT
+- [x] 🟡 BATCH PLAN CHECKPOINT
 - [ ] Execute ARC-1305
   - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
   - [ ] Lint / tests pass
