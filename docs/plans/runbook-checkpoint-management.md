@@ -71,7 +71,7 @@
 ### ARC-1304 — Read PR comment threads and address as required action items 🔴 HIGH
 
 - [ ] **ARC-1304** — Read PR comment threads and address as required action items
-  - [ ] 🔒 Claimed: _(fill in: agent / YYYY-MM-DD HH:MM before starting)_
+  - [x] 🔒 Claimed: checkpoint-management / 2026-07-05 18:33
   - [ ] Read `issues/checkpoint-management/ARC-1304-inline-edit-artifacts.md`
   - [ ] Write `implementation_plans/checkpoint-management/ARC-1304-implementation-plan.md`
   - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
