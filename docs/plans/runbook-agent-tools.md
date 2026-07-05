@@ -208,11 +208,11 @@
   - [x] Lint / tests pass
   - [x] Write `task-completions/ARC-1357-COMPLETION-SUMMARY.md`
   - [x] Commit: `feat(agent-tools): implement get_branch_diff tool`
-- [ ] Execute ARC-1359 (`planning_commit`)
-  - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
-  - [ ] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1359-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(agent-tools): implement planning_commit tool`
+- [x] Execute ARC-1359 (`planning_commit`)
+  - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
+  - [x] Lint / tests pass
+  - [x] Write `task-completions/ARC-1359-COMPLETION-SUMMARY.md`
+  - [x] Commit: `feat(agent-tools): implement planning_commit tool`
 - [ ] Execute ARC-1361 (`preflight_check`)
   - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
   - [ ] Lint / tests pass
