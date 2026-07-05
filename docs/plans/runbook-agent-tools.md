@@ -163,7 +163,7 @@
   - [x] Execute plan
   - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
   - [x] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1358-COMPLETION-SUMMARY.md`
+  - [x] Write `task-completions/ARC-1358-COMPLETION-SUMMARY.md`
   - [ ] Commit: `feat(agent-tools): implement update_issue_status tool`
 
 ### 🔴 HIGH — ARC-1360: `archive_issue`
