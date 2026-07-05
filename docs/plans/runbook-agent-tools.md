@@ -143,7 +143,7 @@
 ### 🔴 HIGH — ARC-1355: `run_lint`
 
 - [ ] **ARC-1355** — Implement `run_lint` OpenCode tool
-  - [ ] 🔒 Claimed: _(fill in: agent-tools / YYYY-MM-DD HH:MM before starting)_
+  - [x] 🔒 Claimed: agent-tools / 2026-07-05 09:57
   - [ ] Read `issues/agent-tools/ARC-1355-tool-run-lint.md`
   - [ ] Write `implementation_plans/agent-tools/ARC-1355-implementation-plan.md`
   - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
