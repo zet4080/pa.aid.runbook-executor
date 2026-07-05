@@ -38,7 +38,7 @@
 
 ### 🔴 HIGH — ARC-1349: `runbook_claim_story`
 
-- [x] Confirm ARC-1348 complete
+- [x] Confirm `runbook_find_next_story` complete
 - [x] **ARC-1349** — Implement `runbook_claim_story` OpenCode tool
   - [x] 🔒 Claimed: agent-tools / 2026-07-02 14:52
   - [x] Read `issues/agent-tools/ARC-1349-tool-runbook-claim-story.md`
@@ -78,7 +78,7 @@
 
 ### 🔴 HIGH — ARC-1350: `runbook_check_step`
 
-- [x] Confirm ARC-1349 complete
+- [x] Confirm `runbook_claim_story` complete
 - [x] **ARC-1350** — Implement `runbook_check_step` OpenCode tool
   - [x] 🔒 Claimed: agent-tools / 2026-07-04 14:38
   - [x] Read `issues/agent-tools/ARC-1350-tool-runbook-check-step.md`
@@ -92,7 +92,7 @@
 
 ### 🔴 HIGH — ARC-1351: `runbook_check_story`
 
-- [x] Confirm ARC-1349 complete
+- [x] Confirm `runbook_claim_story` complete
 - [x] **ARC-1351** — Implement `runbook_check_story` OpenCode tool
   - [x] 🔒 Claimed: agent-tools / 2026-07-04 20:37
   - [x] Read `issues/agent-tools/ARC-1351-tool-runbook-check-story.md`
@@ -106,7 +106,7 @@
 
 ### Wave 1 gate
 
-- [x] ARC-1348, ARC-1349, ARC-1362, ARC-1363, ARC-1350, ARC-1351 all checked off
+- [x] All Wave 1 stories checked off
 - [x] All completion summaries written
 - [x] 🟢 WAVE GATE — Wave 1 closed; Wave 2 may begin
 
@@ -168,8 +168,8 @@
 
 ### 🔴 HIGH — ARC-1360: `archive_issue`
 
-- [ ] Confirm ARC-1351 complete
-- [ ] Confirm ARC-1358 complete
+- [ ] Confirm `runbook_check_story` tool complete
+- [ ] Confirm `update_issue_status` tool complete
 - [ ] **ARC-1360** — Implement `archive_issue` OpenCode tool
   - [ ] 🔒 Claimed: _(fill in: agent-tools / YYYY-MM-DD HH:MM before starting)_
   - [ ] Read `issues/agent-tools/ARC-1360-tool-archive-issue.md`
