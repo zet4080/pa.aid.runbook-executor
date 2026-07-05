@@ -158,7 +158,7 @@
 - [ ] **ARC-1358** — Implement `update_issue_status` OpenCode tool
   - [x] 🔒 Claimed: agent-tools / 2026-07-05 10:32
   - [x] Read `issues/agent-tools/ARC-1358-tool-update-issue-status.md`
-  - [ ] Write `implementation_plans/agent-tools/ARC-1358-implementation-plan.md`
+  - [x] Write `implementation_plans/agent-tools/ARC-1358-implementation-plan.md`
   - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
   - [ ] Execute plan
   - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
