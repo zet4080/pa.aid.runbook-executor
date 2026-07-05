@@ -168,10 +168,10 @@
 
 ### 🔴 HIGH — ARC-1360: `archive_issue`
 
-- [ ] Confirm `runbook_check_story` tool complete
-- [ ] Confirm `update_issue_status` tool complete
+- [x] Confirm `runbook_check_story` tool complete
+- [x] Confirm `update_issue_status` tool complete
 - [ ] **ARC-1360** — Implement `archive_issue` OpenCode tool
-  - [ ] 🔒 Claimed: _(fill in: agent-tools / YYYY-MM-DD HH:MM before starting)_
+  - [x] 🔒 Claimed: agent-tools / 2026-07-05 10:45
   - [ ] Read `issues/agent-tools/ARC-1360-tool-archive-issue.md`
   - [ ] Write `implementation_plans/agent-tools/ARC-1360-implementation-plan.md`
   - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
