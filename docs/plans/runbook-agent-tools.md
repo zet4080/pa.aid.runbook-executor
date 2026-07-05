@@ -147,7 +147,7 @@
   - [x] Read `issues/agent-tools/ARC-1355-tool-run-lint.md`
   - [x] Write `implementation_plans/agent-tools/ARC-1355-implementation-plan.md`
   - [x] 🔴 INDIVIDUAL PLAN CHECKPOINT
-  - [ ] Execute plan
+  - [x] Execute plan
   - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
   - [ ] Lint / tests pass
   - [ ] Write `task-completions/ARC-1355-COMPLETION-SUMMARY.md`
