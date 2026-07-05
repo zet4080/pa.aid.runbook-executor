@@ -99,7 +99,7 @@
   - [x] Write `implementation_plans/agent-tools/ARC-1351-implementation-plan.md`
   - [x] 🔴 INDIVIDUAL PLAN CHECKPOINT
   - [x] Execute plan
-  - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
+  - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
   - [ ] Lint / tests pass
   - [ ] Write `task-completions/ARC-1351-COMPLETION-SUMMARY.md`
   - [ ] Commit: `feat(agent-tools): implement runbook_check_story tool`
