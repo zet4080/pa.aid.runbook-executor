@@ -95,7 +95,7 @@
 - [x] Confirm ARC-1349 complete
 - [ ] **ARC-1351** — Implement `runbook_check_story` OpenCode tool
   - [x] 🔒 Claimed: agent-tools / 2026-07-04 20:37
-  - [ ] Read `issues/agent-tools/ARC-1351-tool-runbook-check-story.md`
+  - [x] Read `issues/agent-tools/ARC-1351-tool-runbook-check-story.md`
   - [ ] Write `implementation_plans/agent-tools/ARC-1351-implementation-plan.md`
   - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
   - [ ] Execute plan
