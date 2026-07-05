@@ -198,11 +198,11 @@
   - [x] Lint / tests pass
   - [x] Write `task-completions/ARC-1352-COMPLETION-SUMMARY.md`
   - [x] Commit: `feat(agent-tools): implement runbook_check_dependencies tool`
-- [ ] Execute ARC-1356 (`run_typecheck`)
-  - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
-  - [ ] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1356-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(agent-tools): implement run_typecheck tool`
+- [x] Execute ARC-1356 (`run_typecheck`)
+  - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
+  - [x] Lint / tests pass
+  - [x] Write `task-completions/ARC-1356-COMPLETION-SUMMARY.md`
+  - [x] Commit: `feat(agent-tools): implement run_typecheck tool`
 - [ ] Execute ARC-1357 (`get_branch_diff`)
   - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
   - [ ] Lint / tests pass
