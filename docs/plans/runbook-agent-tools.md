@@ -106,9 +106,9 @@
 
 ### Wave 1 gate
 
-- [ ] ARC-1348, ARC-1349, ARC-1362, ARC-1363, ARC-1350, ARC-1351 all checked off
-- [ ] All completion summaries written
-- [ ] 🟢 WAVE GATE — Wave 1 closed; Wave 2 may begin
+- [x] ARC-1348, ARC-1349, ARC-1362, ARC-1363, ARC-1350, ARC-1351 all checked off
+- [x] All completion summaries written
+- [x] 🟢 WAVE GATE — Wave 1 closed; Wave 2 may begin
 
 ## Wave 2 — Code Quality & Issue Tools
 
