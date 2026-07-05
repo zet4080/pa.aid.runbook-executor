@@ -124,7 +124,7 @@
   - [x] Execute plan
   - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
   - [x] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1353-COMPLETION-SUMMARY.md`
+  - [x] Write `task-completions/ARC-1353-COMPLETION-SUMMARY.md`
   - [ ] Commit: `feat(agent-tools): implement get_current_issue tool`
 
 ### 🔴 HIGH — ARC-1354: `run_tests`
