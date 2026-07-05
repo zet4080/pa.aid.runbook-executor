@@ -123,7 +123,7 @@
   - [x] 🔴 INDIVIDUAL PLAN CHECKPOINT
   - [x] Execute plan
   - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
-  - [ ] Lint / tests pass
+  - [x] Lint / tests pass
   - [ ] Write `task-completions/ARC-1353-COMPLETION-SUMMARY.md`
   - [ ] Commit: `feat(agent-tools): implement get_current_issue tool`
 
