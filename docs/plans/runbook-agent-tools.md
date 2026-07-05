@@ -203,11 +203,11 @@
   - [x] Lint / tests pass
   - [x] Write `task-completions/ARC-1356-COMPLETION-SUMMARY.md`
   - [x] Commit: `feat(agent-tools): implement run_typecheck tool`
-- [ ] Execute ARC-1357 (`get_branch_diff`)
-  - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
-  - [ ] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1357-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(agent-tools): implement get_branch_diff tool`
+- [x] Execute ARC-1357 (`get_branch_diff`)
+  - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
+  - [x] Lint / tests pass
+  - [x] Write `task-completions/ARC-1357-COMPLETION-SUMMARY.md`
+  - [x] Commit: `feat(agent-tools): implement get_branch_diff tool`
 - [ ] Execute ARC-1359 (`planning_commit`)
   - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
   - [ ] Lint / tests pass
