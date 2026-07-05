@@ -155,7 +155,7 @@
 
 ### 🔴 HIGH — ARC-1358: `update_issue_status`
 
-- [ ] **ARC-1358** — Implement `update_issue_status` OpenCode tool
+- [x] **ARC-1358** — Implement `update_issue_status` OpenCode tool
   - [x] 🔒 Claimed: agent-tools / 2026-07-05 10:32
   - [x] Read `issues/agent-tools/ARC-1358-tool-update-issue-status.md`
   - [x] Write `implementation_plans/agent-tools/ARC-1358-implementation-plan.md`
