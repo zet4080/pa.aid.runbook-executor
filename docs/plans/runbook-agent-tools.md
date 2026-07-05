@@ -218,11 +218,11 @@
   - [x] Lint / tests pass
   - [x] Write `task-completions/ARC-1361-COMPLETION-SUMMARY.md`
   - [x] Commit: `feat(agent-tools): implement preflight_check tool`
-- [ ] Execute ARC-1364 (`generate_issue_file`)
-  - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
-  - [ ] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1364-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(agent-tools): implement generate_issue_file tool`
+- [x] Execute ARC-1364 (`generate_issue_file`)
+  - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
+  - [x] Lint / tests pass
+  - [x] Write `task-completions/ARC-1364-COMPLETION-SUMMARY.md`
+  - [x] Commit: `feat(agent-tools): implement generate_issue_file tool`
 - [ ] ☑ batch complete
 
 ### Wave 2 gate
