@@ -183,7 +183,7 @@
 
 ### 🟡 Batch — Supporting tools (ARC-1352, ARC-1356, ARC-1357, ARC-1359, ARC-1361, ARC-1364)
 
-- [ ] 🔒 Claimed: _(fill in: agent-tools / YYYY-MM-DD HH:MM before starting)_
+- [x] 🔒 Claimed: agent-tools / 2026-07-05 11:15
 - [ ] Read all issues: ARC-1352, ARC-1356, ARC-1357, ARC-1359, ARC-1361, ARC-1364
 - [ ] Write all implementation plans:
   - [ ] `implementation_plans/agent-tools/ARC-1352-implementation-plan.md`
