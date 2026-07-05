@@ -164,7 +164,7 @@
   - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
   - [x] Lint / tests pass
   - [x] Write `task-completions/ARC-1358-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(agent-tools): implement update_issue_status tool`
+  - [x] Commit: `feat(agent-tools): implement update_issue_status tool`
 
 ### 🔴 HIGH — ARC-1360: `archive_issue`
 
@@ -184,7 +184,7 @@
 ### 🟡 Batch — Supporting tools (ARC-1352, ARC-1356, ARC-1357, ARC-1359, ARC-1361, ARC-1364)
 
 - [x] 🔒 Claimed: agent-tools / 2026-07-05 11:15
-- [ ] Read all issues: ARC-1352, ARC-1356, ARC-1357, ARC-1359, ARC-1361, ARC-1364
+- [x] Read all issues: ARC-1352, ARC-1356, ARC-1357, ARC-1359, ARC-1361, ARC-1364
 - [x] Write all implementation plans:
   - [x] `implementation_plans/agent-tools/ARC-1352-implementation-plan.md`
   - [x] `implementation_plans/agent-tools/ARC-1356-implementation-plan.md`
@@ -192,7 +192,7 @@
   - [x] `implementation_plans/agent-tools/ARC-1359-implementation-plan.md`
   - [x] `implementation_plans/agent-tools/ARC-1361-implementation-plan.md`
   - [x] `implementation_plans/agent-tools/ARC-1364-implementation-plan.md`
-- [ ] 🟡 BATCH PLAN CHECKPOINT
+- [x] 🟡 BATCH PLAN CHECKPOINT
 - [x] Execute ARC-1352 (`runbook_check_dependencies`)
   - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
   - [x] Lint / tests pass
@@ -213,7 +213,7 @@
   - [x] Lint / tests pass
   - [x] Write `task-completions/ARC-1359-COMPLETION-SUMMARY.md`
   - [x] Commit: `feat(agent-tools): implement planning_commit tool`
-- [ ] Execute ARC-1361 (`preflight_check`)
+- [x] Execute ARC-1361 (`preflight_check`)
   - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
   - [x] Lint / tests pass
   - [x] Write `task-completions/ARC-1361-COMPLETION-SUMMARY.md`
@@ -223,13 +223,13 @@
   - [x] Lint / tests pass
   - [x] Write `task-completions/ARC-1364-COMPLETION-SUMMARY.md`
   - [x] Commit: `feat(agent-tools): implement generate_issue_file tool`
-- [ ] ☑ batch complete
+- [x] ☑ batch complete
 
 ### Wave 2 gate
 
-- [ ] All Wave 2 stories checked off (ARC-1352, ARC-1353, ARC-1354, ARC-1355, ARC-1356, ARC-1357, ARC-1358, ARC-1359, ARC-1360, ARC-1361, ARC-1364)
-- [ ] All completion summaries written
-- [ ] 🟢 WAVE GATE — agent-tools lane complete; all 16 tools deployed to `~/.config/opencode/tools/`
+- [x] All Wave 2 stories checked off (ARC-1352, ARC-1353, ARC-1354, ARC-1355, ARC-1356, ARC-1357, ARC-1358, ARC-1359, ARC-1360, ARC-1361, ARC-1364)
+- [x] All completion summaries written
+- [x] 🟢 WAVE GATE — agent-tools lane complete; all 16 tools deployed to `~/.config/opencode/tools/`
 
 ## On-Hold Register
 
