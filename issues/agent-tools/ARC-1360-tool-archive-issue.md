@@ -2,7 +2,9 @@
 |-------|-------|
 | Type | Story |
 | Priority | High |
-| Status | To Do |
+| Status | Completed |
+| Completion | 100% |
+| Last Updated | 2026-07-05 |
 | Assignee | — |
 | Reporter | — |
 | Created | 2026-07-02 |
@@ -93,5 +95,5 @@ Agents frequently get paths wrong, forget to create subdirectories, skip the REA
 
 | Artifact | Path | Status |
 |----------|------|--------|
-| Implementation plan | `implementation_plans/agent-tools/ARC-1360-implementation-plan.md` | TBD |
-| Completion summary | `task-completions/ARC-1360-COMPLETION-SUMMARY.md` | TBD |
+| Implementation plan | `implementation_plans/agent-tools/ARC-1360-implementation-plan.md` | ✅ Done |
+| Completion summary | `task-completions/ARC-1360-COMPLETION-SUMMARY.md` | ✅ Done |

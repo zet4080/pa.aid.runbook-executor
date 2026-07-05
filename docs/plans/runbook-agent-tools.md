@@ -170,16 +170,16 @@
 
 - [x] Confirm `runbook_check_story` tool complete
 - [x] Confirm `update_issue_status` tool complete
-- [ ] **ARC-1360** — Implement `archive_issue` OpenCode tool
+- [x] **ARC-1360** — Implement `archive_issue` OpenCode tool
   - [x] 🔒 Claimed: agent-tools / 2026-07-05 10:45
-  - [ ] Read `issues/agent-tools/ARC-1360-tool-archive-issue.md`
+  - [x] Read `issues/agent-tools/ARC-1360-tool-archive-issue.md`
   - [x] Write `implementation_plans/agent-tools/ARC-1360-implementation-plan.md`
-  - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
-  - [ ] Execute plan
-  - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
-  - [ ] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1360-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(agent-tools): implement archive_issue tool`
+  - [x] 🔴 INDIVIDUAL PLAN CHECKPOINT
+  - [x] Execute plan
+  - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
+  - [x] Lint / tests pass
+  - [x] Write `task-completions/ARC-1360-COMPLETION-SUMMARY.md`
+  - [x] Commit: `feat(agent-tools): implement archive_issue tool`
 
 ### 🟡 Batch — Supporting tools (ARC-1352, ARC-1356, ARC-1357, ARC-1359, ARC-1361, ARC-1364)
 
