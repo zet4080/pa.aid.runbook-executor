@@ -116,7 +116,7 @@
 
 ### 🔴 HIGH — ARC-1353: `get_current_issue`
 
-- [ ] **ARC-1353** — Implement `get_current_issue` OpenCode tool
+- [x] **ARC-1353** — Implement `get_current_issue` OpenCode tool
   - [x] 🔒 Claimed: agent-tools / 2026-07-05 08:15
   - [x] Read `issues/agent-tools/ARC-1353-tool-get-current-issue.md`
   - [x] Write `implementation_plans/agent-tools/ARC-1353-implementation-plan.md`
