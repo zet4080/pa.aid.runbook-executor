@@ -35,7 +35,7 @@ Workflow per story:
 | queue-scheduling-policy | Queue & Scheduling Policy | ARC-1296 | 3 | 10h | after ARC-1303 merged |
 | failure-handling | Failure Handling & Escalation | ARC-1300 | 3 | 10h | after ARC-1288 merged |
 | session-history | Session History | ARC-1309 | 3 | 9h | after ARC-1287 merged |
-| agent-tools | OpenCode Agent Tools | ARC-1348-epic | 15 | 38h | immediately |
+| agent-tools | OpenCode Agent Tools | ARC-1348-epic | 16 | 40h | immediately |
 
 ```
 T=0       T=8       T=15      T=19      T=25      T=31      T=37
@@ -198,8 +198,8 @@ None. All three stories extend an established queue UI with incremental scope.
 | queue-scheduling-policy | 3 | 10h | 10h | 3 × 15 min = 0.75h |
 | failure-handling | 3 | 10h | 10h | 3 × 15 min = 0.75h |
 | session-history | 3 | 9h | 9h | 3 × 15 min = 0.75h |
-| agent-tools | 15 | 38h | 37h | 15 × 15 min = 3.75h |
-| **Total** | **41** | **38h** (parallel) | **129h** | **10.25h** |
+| agent-tools | 16 | 40h | 39h | 16 × 15 min = 4h |
+| **Total** | **42** | **38h** (parallel) | **131h** | **10.5h** |
 
 Agent-hours include 20% coordination overhead per lane.
 
@@ -207,7 +207,7 @@ Agent-hours include 20% coordination overhead per lane.
 
 ## Supervision Budget
 
-- 41 story checkpoints × 15 min = **10.25h supervisor time** across 38h wall-clock
+- 42 story checkpoints × 15 min = **10.5h supervisor time** across 38h wall-clock
 - ~18% supervision ratio (healthy; no wave gates)
 - No global sync gates — supervisor handles per-story reviews only
 
@@ -248,6 +248,7 @@ Agent-hours include 20% coordination overhead per lane.
 | ARC-1360 | Implement `archive_issue` OpenCode tool | 4h | ARC-1351, ARC-1358 | 🔴 HIGH |
 | ARC-1361 | Implement `preflight_check` OpenCode tool | 2h | — | 🟡 MEDIUM |
 | ARC-1362 | Implement `validate_runbook` OpenCode tool | 3h | — | 🔴 HIGH |
+| ARC-1364 | Implement `generate_issue_file` OpenCode tool | 2h | — | 🟡 MEDIUM |
 
 **🔴 HIGH stories (individual checkpoints):**
 - ARC-1348 (foundational — all runbook navigation tools depend on this parser)
@@ -265,7 +266,7 @@ Agent-hours include 20% coordination overhead per lane.
 
 ## On-Hold Items
 
-None. All 41 stories have named prerequisites and can begin once their start conditions are met.
+None. All 42 stories have named prerequisites and can begin once their start conditions are met.
 
 ---
 
