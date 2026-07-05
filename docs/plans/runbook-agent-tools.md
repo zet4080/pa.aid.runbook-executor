@@ -131,7 +131,7 @@
 
 - [ ] **ARC-1354** — Implement `run_tests` OpenCode tool
   - [x] 🔒 Claimed: agent-tools / 2026-07-05 09:36
-  - [ ] Read `issues/agent-tools/ARC-1354-tool-run-tests.md`
+  - [x] Read `issues/agent-tools/ARC-1354-tool-run-tests.md`
   - [ ] Write `implementation_plans/agent-tools/ARC-1354-implementation-plan.md`
   - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
   - [ ] Execute plan
