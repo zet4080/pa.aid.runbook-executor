@@ -92,8 +92,8 @@
 ### Batch 3-A: ARC-1305
 
 - [x] 🔒 Claimed: build-agent / 2026-07-05 00:00
-- [ ] Read all issues: ARC-1305
-- [ ] Write all implementation plans
+- [x] Read all issues: ARC-1305
+- [x] Write all implementation plans
 - [ ] 🟡 BATCH PLAN CHECKPOINT
 - [ ] Execute ARC-1305
   - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
