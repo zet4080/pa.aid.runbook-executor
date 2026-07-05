@@ -73,7 +73,7 @@
 - [ ] **ARC-1304** — Read PR comment threads and address as required action items
   - [x] 🔒 Claimed: checkpoint-management / 2026-07-05 18:33
   - [x] Read `issues/checkpoint-management/ARC-1304-inline-edit-artifacts.md`
-  - [ ] Write `implementation_plans/checkpoint-management/ARC-1304-implementation-plan.md`
+  - [x] Write `implementation_plans/checkpoint-management/ARC-1304-implementation-plan.md`
   - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
   - [ ] Execute plan
   - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
