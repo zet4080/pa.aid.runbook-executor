@@ -173,7 +173,7 @@
 - [ ] **ARC-1360** — Implement `archive_issue` OpenCode tool
   - [x] 🔒 Claimed: agent-tools / 2026-07-05 10:45
   - [ ] Read `issues/agent-tools/ARC-1360-tool-archive-issue.md`
-  - [ ] Write `implementation_plans/agent-tools/ARC-1360-implementation-plan.md`
+  - [x] Write `implementation_plans/agent-tools/ARC-1360-implementation-plan.md`
   - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
   - [ ] Execute plan
   - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
