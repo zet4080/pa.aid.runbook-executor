@@ -145,7 +145,7 @@
 - [ ] **ARC-1355** — Implement `run_lint` OpenCode tool
   - [x] 🔒 Claimed: agent-tools / 2026-07-05 09:57
   - [x] Read `issues/agent-tools/ARC-1355-tool-run-lint.md`
-  - [ ] Write `implementation_plans/agent-tools/ARC-1355-implementation-plan.md`
+  - [x] Write `implementation_plans/agent-tools/ARC-1355-implementation-plan.md`
   - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
   - [ ] Execute plan
   - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
