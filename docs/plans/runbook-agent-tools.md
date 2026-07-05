@@ -191,7 +191,7 @@
   - [ ] `implementation_plans/agent-tools/ARC-1357-implementation-plan.md`
   - [ ] `implementation_plans/agent-tools/ARC-1359-implementation-plan.md`
   - [ ] `implementation_plans/agent-tools/ARC-1361-implementation-plan.md`
-- [ ] `implementation_plans/agent-tools/ARC-1364-implementation-plan.md`
+  - [ ] `implementation_plans/agent-tools/ARC-1364-implementation-plan.md`
 - [ ] 🟡 BATCH PLAN CHECKPOINT
 - [ ] Execute ARC-1352 (`runbook_check_dependencies`)
   - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
