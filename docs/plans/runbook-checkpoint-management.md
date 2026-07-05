@@ -78,7 +78,7 @@
   - [x] Execute plan
   - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
   - [x] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1304-COMPLETION-SUMMARY.md`
+  - [x] Write `task-completions/ARC-1304-COMPLETION-SUMMARY.md`
   - [ ] Commit: `feat(checkpoint-management): read PR comment threads on Resume and address each as required action item`
 
 ### 🟢 Wave 2 Gate
