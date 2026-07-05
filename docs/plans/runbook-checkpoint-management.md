@@ -83,7 +83,7 @@
 
 ### 🟢 Wave 2 Gate
 
-- [ ] 🟢 WAVE 2 GATE — ARC-1302, ARC-1303, ARC-1304 all closed and merged
+- [x] 🟢 WAVE 2 GATE — ARC-1302, ARC-1303, ARC-1304 all closed and merged
 
 ---
 
