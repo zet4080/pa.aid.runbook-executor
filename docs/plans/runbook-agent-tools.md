@@ -101,7 +101,7 @@
   - [x] Execute plan
   - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
   - [x] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1351-COMPLETION-SUMMARY.md`
+  - [x] Write `task-completions/ARC-1351-COMPLETION-SUMMARY.md`
   - [ ] Commit: `feat(agent-tools): implement runbook_check_story tool`
 
 ### Wave 1 gate
