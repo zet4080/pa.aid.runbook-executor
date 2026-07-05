@@ -129,16 +129,16 @@
 
 ### 🔴 HIGH — ARC-1354: `run_tests`
 
-- [ ] **ARC-1354** — Implement `run_tests` OpenCode tool
+- [x] **ARC-1354** — Implement `run_tests` OpenCode tool
   - [x] 🔒 Claimed: agent-tools / 2026-07-05 09:36
   - [x] Read `issues/agent-tools/ARC-1354-tool-run-tests.md`
   - [x] Write `implementation_plans/agent-tools/ARC-1354-implementation-plan.md`
-  - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
-  - [ ] Execute plan
-  - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
-  - [ ] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1354-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(agent-tools): implement run_tests tool`
+  - [x] 🔴 INDIVIDUAL PLAN CHECKPOINT
+  - [x] Execute plan
+  - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
+  - [x] Lint / tests pass
+  - [x] Write `task-completions/ARC-1354-COMPLETION-SUMMARY.md`
+  - [x] Commit: `feat(agent-tools): implement run_tests tool`
 
 ### 🔴 HIGH — ARC-1355: `run_lint`
 
