@@ -159,7 +159,7 @@
   - [x] 🔒 Claimed: agent-tools / 2026-07-05 10:32
   - [x] Read `issues/agent-tools/ARC-1358-tool-update-issue-status.md`
   - [x] Write `implementation_plans/agent-tools/ARC-1358-implementation-plan.md`
-  - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
+  - [x] 🔴 INDIVIDUAL PLAN CHECKPOINT
   - [ ] Execute plan
   - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
   - [ ] Lint / tests pass
