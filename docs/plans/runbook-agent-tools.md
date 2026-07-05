@@ -193,11 +193,11 @@
   - [x] `implementation_plans/agent-tools/ARC-1361-implementation-plan.md`
   - [x] `implementation_plans/agent-tools/ARC-1364-implementation-plan.md`
 - [ ] 🟡 BATCH PLAN CHECKPOINT
-- [ ] Execute ARC-1352 (`runbook_check_dependencies`)
-  - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
-  - [ ] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1352-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(agent-tools): implement runbook_check_dependencies tool`
+- [x] Execute ARC-1352 (`runbook_check_dependencies`)
+  - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
+  - [x] Lint / tests pass
+  - [x] Write `task-completions/ARC-1352-COMPLETION-SUMMARY.md`
+  - [x] Commit: `feat(agent-tools): implement runbook_check_dependencies tool`
 - [ ] Execute ARC-1356 (`run_typecheck`)
   - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
   - [ ] Lint / tests pass
