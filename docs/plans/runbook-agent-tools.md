@@ -181,10 +181,10 @@
   - [x] Write `task-completions/ARC-1360-COMPLETION-SUMMARY.md`
   - [x] Commit: `feat(agent-tools): implement archive_issue tool`
 
-### 🟡 Batch — Supporting tools (ARC-1352, ARC-1356, ARC-1357, ARC-1359, ARC-1361, ARC-1364)
+### 🟡 Batch — Supporting tools (ARC-1352, ARC-1356, ARC-1357, ARC-1359, ARC-1361, ARC-1364, ARC-1366)
 
 - [x] 🔒 Claimed: agent-tools / 2026-07-05 11:15
-- [x] Read all issues: ARC-1352, ARC-1356, ARC-1357, ARC-1359, ARC-1361, ARC-1364
+- [x] Read all issues: ARC-1352, ARC-1356, ARC-1357, ARC-1359, ARC-1361, ARC-1364, ARC-1366
 - [x] Write all implementation plans:
   - [x] `implementation_plans/agent-tools/ARC-1352-implementation-plan.md`
   - [x] `implementation_plans/agent-tools/ARC-1356-implementation-plan.md`
@@ -192,6 +192,7 @@
   - [x] `implementation_plans/agent-tools/ARC-1359-implementation-plan.md`
   - [x] `implementation_plans/agent-tools/ARC-1361-implementation-plan.md`
   - [x] `implementation_plans/agent-tools/ARC-1364-implementation-plan.md`
+- [ ] `implementation_plans/agent-tools/ARC-1366-implementation-plan.md`
 - [x] 🟡 BATCH PLAN CHECKPOINT
 - [x] Execute ARC-1352 (`runbook_check_dependencies`)
   - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
@@ -223,13 +224,19 @@
   - [x] Lint / tests pass
   - [x] Write `task-completions/ARC-1364-COMPLETION-SUMMARY.md`
   - [x] Commit: `feat(agent-tools): implement generate_issue_file tool`
+
+- [ ] Execute ARC-1366 (`resume_checkpoint`)
+  - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
+  - [ ] Lint / tests pass
+  - [ ] Write `task-completions/ARC-1366-COMPLETION-SUMMARY.md`
+  - [ ] Commit: `feat(agent-tools): implement resume_checkpoint tool`
 - [x] ☑ batch complete
 
 ### Wave 2 gate
 
-- [x] All Wave 2 stories checked off (ARC-1352, ARC-1353, ARC-1354, ARC-1355, ARC-1356, ARC-1357, ARC-1358, ARC-1359, ARC-1360, ARC-1361, ARC-1364)
+- [ ] All Wave 2 stories checked off (ARC-1352, ARC-1353, ARC-1354, ARC-1355, ARC-1356, ARC-1357, ARC-1358, ARC-1359, ARC-1360, ARC-1361, ARC-1364, ARC-1366)
 - [x] All completion summaries written
-- [x] 🟢 WAVE GATE — agent-tools lane complete; all 16 tools deployed to `~/.config/opencode/tools/`
+- [ ] 🟢 WAVE GATE — agent-tools lane complete; all 17 tools deployed to `~/.config/opencode/tools/`
 
 ## On-Hold Register
 
@@ -241,5 +248,5 @@
 | Wave | HIGH checkpoints | Batch checkpoints | Wave gates | Total |
 |------|-----------------|-------------------|------------|-------|
 | Wave 1 | 6 (ARC-1348, ARC-1349, ARC-1362, ARC-1363, ARC-1350, ARC-1351) | 0 | 1 | 7 |
-| Wave 2 | 5 (ARC-1353, ARC-1354, ARC-1355, ARC-1358, ARC-1360) | 1 (ARC-1352, ARC-1356, ARC-1357, ARC-1359, ARC-1361, ARC-1364) | 1 | 7 |
+| Wave 2 | 5 (ARC-1353, ARC-1354, ARC-1355, ARC-1358, ARC-1360) | 1 (ARC-1352, ARC-1356, ARC-1357, ARC-1359, ARC-1361, ARC-1364, ARC-1366) | 1 | 7 |
 | **Total** | **11** | **1** | **2** | **14** |
