@@ -2,7 +2,7 @@
 
 **Repo:** pa.aid.runbook-executor
 **Generated:** 2026-06-27
-**Stories:** 42 across 8 epics
+**Stories:** 47 across 8 epics
 
 ---
 
@@ -30,8 +30,8 @@ Workflow per story:
 |------|---------|----------|---------|------------|-----------------|
 | core-infrastructure | Core Infrastructure | ARC-1284 | 4 | 18h | immediately |
 | session-setup | Session Setup & Runbook Selection | ARC-1289 | 4 | 12h | after ARC-1286 merged |
-| parallel-lane-execution | Parallel Lane Execution | ARC-1290 | 4 | 16h | after ARC-1288 merged |
-| checkpoint-management | Checkpoint Management | ARC-1295 | 6 | 20h | after ARC-1291 merged |
+| parallel-lane-execution | Parallel Lane Execution | ARC-1290 | 8 | 28h | after ARC-1288 merged |
+| checkpoint-management | Checkpoint Management | ARC-1295 | 7 | 24h | after ARC-1291 merged |
 | queue-scheduling-policy | Queue & Scheduling Policy | ARC-1296 | 3 | 10h | after ARC-1303 merged |
 | failure-handling | Failure Handling & Escalation | ARC-1300 | 3 | 10h | after ARC-1288 merged |
 | session-history | Session History | ARC-1309 | 3 | 9h | after ARC-1287 merged |
