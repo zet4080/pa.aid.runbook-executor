@@ -115,7 +115,7 @@
 - [ ] **ARC-1365** — Display agent last message on checkpoint Resume card
   - [x] 🔒 Claimed: checkpoint-management / 2026-07-06 06:35
   - [x] Read `issues/checkpoint-management/ARC-1365-agent-last-message-on-checkpoint.md`
-  - [ ] Write `implementation_plans/checkpoint-management/ARC-1365-implementation-plan.md`
+  - [x] Write `implementation_plans/checkpoint-management/ARC-1365-implementation-plan.md`
   - [ ] 🟡 INDIVIDUAL PLAN CHECKPOINT
   - [ ] Execute plan
   - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
