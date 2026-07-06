@@ -2,7 +2,7 @@
 
 **Repo:** pa.aid.runbook-executor
 **Generated:** 2026-06-27
-**Stories:** 41 across 8 epics
+**Stories:** 42 across 8 epics
 
 ---
 
@@ -31,7 +31,7 @@ Workflow per story:
 | core-infrastructure | Core Infrastructure | ARC-1284 | 4 | 18h | immediately |
 | session-setup | Session Setup & Runbook Selection | ARC-1289 | 4 | 12h | after ARC-1286 merged |
 | parallel-lane-execution | Parallel Lane Execution | ARC-1290 | 4 | 16h | after ARC-1288 merged |
-| checkpoint-management | Checkpoint Management | ARC-1295 | 5 | 17h | after ARC-1291 merged |
+| checkpoint-management | Checkpoint Management | ARC-1295 | 6 | 20h | after ARC-1291 merged |
 | queue-scheduling-policy | Queue & Scheduling Policy | ARC-1296 | 3 | 10h | after ARC-1303 merged |
 | failure-handling | Failure Handling & Escalation | ARC-1300 | 3 | 10h | after ARC-1288 merged |
 | session-history | Session History | ARC-1309 | 3 | 9h | after ARC-1287 merged |
@@ -125,6 +125,7 @@ Recommended execution order: ARC-1285 → ARC-1286 → ARC-1287 → ARC-1288 (un
 | ARC-1303 | Display checkpoint queue with automatic priority scoring | 3h | ARC-1301 | 🟡 MEDIUM |
 | ARC-1304 | Inline-edit checkpoint artifacts and persist handoff file to disk | 4h | ARC-1301 | 🔴 HIGH |
 | ARC-1305 | Approve or reject checkpoint inline with feedback | 2h | ARC-1303, ARC-1304 | 🟡 MEDIUM |
+| ARC-1365 | Display agent last message on checkpoint Resume card | 3h | ARC-1302, ARC-1305 | 🟡 MEDIUM |
 
 **Pre-check:** verify ARC-1291 (sequential step execution) is merged before starting this lane.
 
@@ -194,12 +195,12 @@ None. All three stories extend an established queue UI with incremental scope.
 | core-infrastructure | 4 | 18h | 18h | 4 × 15 min = 1h |
 | session-setup | 4 | 12h | 12h | 4 × 15 min = 1h |
 | parallel-lane-execution | 4 | 16h | 16h | 4 × 15 min = 1h |
-| checkpoint-management | 5 | 17h | 17h | 5 × 15 min = 1.25h |
+| checkpoint-management | 6 | 20h | 20h | 6 × 15 min = 1.5h |
 | queue-scheduling-policy | 3 | 10h | 10h | 3 × 15 min = 0.75h |
 | failure-handling | 3 | 10h | 10h | 3 × 15 min = 0.75h |
 | session-history | 3 | 9h | 9h | 3 × 15 min = 0.75h |
 | agent-tools | 16 | 40h | 39h | 16 × 15 min = 4h |
-| **Total** | **42** | **38h** (parallel) | **131h** | **10.5h** |
+| **Total** | **43** | **38h** (parallel) | **134h** | **10.75h** |
 
 Agent-hours include 20% coordination overhead per lane.
 
@@ -207,7 +208,7 @@ Agent-hours include 20% coordination overhead per lane.
 
 ## Supervision Budget
 
-- 42 story checkpoints × 15 min = **10.5h supervisor time** across 38h wall-clock
+- 43 story checkpoints × 15 min = **10.75h supervisor time** across 38h wall-clock
 - ~18% supervision ratio (healthy; no wave gates)
 - No global sync gates — supervisor handles per-story reviews only
 
@@ -266,7 +267,7 @@ Agent-hours include 20% coordination overhead per lane.
 
 ## On-Hold Items
 
-None. All 42 stories have named prerequisites and can begin once their start conditions are met.
+None. All 43 stories have named prerequisites and can begin once their start conditions are met.
 
 ---
 
