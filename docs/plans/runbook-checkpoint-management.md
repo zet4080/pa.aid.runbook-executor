@@ -116,7 +116,7 @@
   - [x] 🔒 Claimed: checkpoint-management / 2026-07-06 06:35
   - [x] Read `issues/checkpoint-management/ARC-1365-agent-last-message-on-checkpoint.md`
   - [x] Write `implementation_plans/checkpoint-management/ARC-1365-implementation-plan.md`
-  - [ ] 🟡 INDIVIDUAL PLAN CHECKPOINT
+  - [x] 🟡 INDIVIDUAL PLAN CHECKPOINT
   - [ ] Execute plan
   - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
   - [ ] Lint / tests pass
