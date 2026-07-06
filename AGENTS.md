@@ -26,14 +26,12 @@
 
 ## Branching Strategy (pa.aid.conductor.ts)
 
-All runbook executor feature work targets `pa.aid.conductor.ts`. The `main` branch stays clean until the full feature set is complete.
+All runbook executor feature work targets `pa.aid.conductor.ts`. Feature branches are created directly from `main`.
 
 | Rule | Detail |
 |------|--------|
-| Long-lived integration branch | `runbook-executor` — all feature work merges here |
-| Feature branches | Branch off `runbook-executor`; named exactly `<KEY>` (e.g. `ARC-1285`) |
-| Merge target | Feature branches merge back into `runbook-executor`, never directly to `main` |
-| Final merge | `runbook-executor` → `main` only when all epics are complete |
+| Feature branches | Branch off `main`; named exactly `<KEY>` (e.g. `ARC-1285`) |
+| Merge target | Feature branches merge back into `main` |
 
 **Branch creation command:**
 ```bash
