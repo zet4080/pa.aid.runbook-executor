@@ -117,7 +117,7 @@
   - [x] Read `issues/checkpoint-management/ARC-1365-agent-last-message-on-checkpoint.md`
   - [x] Write `implementation_plans/checkpoint-management/ARC-1365-implementation-plan.md`
   - [x] 🟡 INDIVIDUAL PLAN CHECKPOINT
-  - [ ] Execute plan
+  - [x] Execute plan
   - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
   - [ ] Lint / tests pass
   - [ ] Write `task-completions/ARC-1365-COMPLETION-SUMMARY.md`
