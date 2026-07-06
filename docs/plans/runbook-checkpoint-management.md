@@ -108,6 +108,27 @@
 
 ---
 
+## Wave 4 — Agent Last Message on Checkpoint Resume Card
+
+### ARC-1365 — Display agent last message on checkpoint Resume card 🟡 MEDIUM
+
+- [ ] **ARC-1365** — Display agent last message on checkpoint Resume card
+  - [ ] 🔒 Claimed:
+  - [ ] Read `issues/checkpoint-management/ARC-1365-agent-last-message-on-checkpoint.md`
+  - [ ] Write `implementation_plans/checkpoint-management/ARC-1365-implementation-plan.md`
+  - [ ] 🟡 INDIVIDUAL PLAN CHECKPOINT
+  - [ ] Execute plan
+  - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
+  - [ ] Lint / tests pass
+  - [ ] Write `task-completions/ARC-1365-COMPLETION-SUMMARY.md`
+  - [ ] Commit: `feat(checkpoint-management): display agent last message on checkpoint Resume card`
+
+### 🟢 Wave 4 Gate
+
+- [ ] 🟢 WAVE 4 GATE — ARC-1365 closed and merged
+
+---
+
 ## On-Hold Register
 
 | Story | Blocked by | Last checked | Action if unblocked |
@@ -124,4 +145,5 @@
 | Wave 1 | 1 | 0 | 1 | 2 |
 | Wave 2 | 1 | 1 | 1 | 3 |
 | Wave 3 | 0 | 1 | 1 | 2 |
-| **Total** | **2** | **2** | **3** | **7** |
+| Wave 4 | 0 | 1 | 1 | 2 |
+| **Total** | **2** | **3** | **4** | **9** |
