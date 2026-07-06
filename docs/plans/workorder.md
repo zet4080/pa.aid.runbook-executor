@@ -112,6 +112,22 @@ Recommended execution order: ARC-1285 → ARC-1286 → ARC-1287 → ARC-1288 (un
 - ARC-1292 (concurrency management; architectural scheduling decision)
 - ARC-1293 (real-time streaming UI; WebSocket/SSE architecture decision)
 
+**Wave 2 — Conductor Automation (ARC-1367, ARC-1368, ARC-1369, ARC-1370):**
+
+| Story | Summary | Est. | Intra-lane depends on | Risk |
+|-------|---------|------|----------------------|------|
+| ARC-1367 | Conductor: auto-claim story in runbook before dispatching agent | 3h | ARC-1349 (agent-tools) | 🔴 HIGH |
+| ARC-1368 | Conductor: auto-provision feature git worktree for HIGH stories | 3h | ARC-1367 | 🔴 HIGH |
+| ARC-1369 | Conductor: auto-commit implementation plans and completion summaries to planning repo | 3h | ARC-1359 (agent-tools) | 🔴 HIGH |
+| ARC-1370 | Conductor: auto-update issue status and archive story artifacts on completion | 5h | ARC-1358, ARC-1360, ARC-1369 | 🟡 MEDIUM |
+
+**Wave 2 start condition:** Wave 1 gate passed; ARC-1349 and ARC-1359 (agent-tools lane) merged.
+
+**🔴 HIGH stories (individual checkpoints):**
+- ARC-1367 (eliminates manual claim ceremony; must fire before worktree creation)
+- ARC-1368 (eliminates manual git worktree setup; injects worktree path into agent prompt)
+- ARC-1369 (eliminates manual planning_commit calls; post-step auto-commit hook)
+
 ---
 
 ## Lane: checkpoint-management
@@ -132,6 +148,17 @@ Recommended execution order: ARC-1285 → ARC-1286 → ARC-1287 → ARC-1288 (un
 **🔴 HIGH stories (individual checkpoints):**
 - ARC-1301 (checkpoint detection + lane pause; blocks queue-scheduling-policy lane via ARC-1303)
 - ARC-1304 (inline edit + crash-safe handoff file persistence; wide artifact surface)
+
+**Wave 5 — PR Approval Gate for Planning Artifacts (ARC-1371):**
+
+| Story | Summary | Est. | Intra-lane depends on | Risk |
+|-------|---------|------|----------------------|------|
+| ARC-1371 | Conductor: open PR for implementation plans and decision documents as approval gate | 4h | ARC-1366, ARC-1369 | 🔴 HIGH |
+
+**Wave 5 start condition:** Wave 4 gate passed; ARC-1366 (resume_checkpoint, agent-tools lane) and ARC-1369 (parallel-lane-execution Wave 2) both merged.
+
+**🔴 HIGH stories (individual checkpoints):**
+- ARC-1371 (changes approval workflow for plans and decisions; PR-merge as resume signal; Bitbucket API dependency)
 
 ---
 
@@ -194,13 +221,13 @@ None. All three stories extend an established queue UI with incremental scope.
 |------|---------|------------|------------------|-------------|
 | core-infrastructure | 4 | 18h | 18h | 4 × 15 min = 1h |
 | session-setup | 4 | 12h | 12h | 4 × 15 min = 1h |
-| parallel-lane-execution | 4 | 16h | 16h | 4 × 15 min = 1h |
-| checkpoint-management | 6 | 20h | 20h | 6 × 15 min = 1.5h |
+| parallel-lane-execution | 8 | 28h | 30h | 8 × 15 min = 2h |
+| checkpoint-management | 7 | 24h | 24h | 7 × 15 min = 1.75h |
 | queue-scheduling-policy | 3 | 10h | 10h | 3 × 15 min = 0.75h |
 | failure-handling | 3 | 10h | 10h | 3 × 15 min = 0.75h |
 | session-history | 3 | 9h | 9h | 3 × 15 min = 0.75h |
 | agent-tools | 16 | 40h | 39h | 16 × 15 min = 4h |
-| **Total** | **43** | **38h** (parallel) | **134h** | **10.75h** |
+| **Total** | **47** | **38h** (parallel) | **152h** | **11.75h** |
 
 Agent-hours include 20% coordination overhead per lane.
 
@@ -208,7 +235,7 @@ Agent-hours include 20% coordination overhead per lane.
 
 ## Supervision Budget
 
-- 43 story checkpoints × 15 min = **10.75h supervisor time** across 38h wall-clock
+- 47 story checkpoints × 15 min = **11.75h supervisor time** across 38h wall-clock
 - ~18% supervision ratio (healthy; no wave gates)
 - No global sync gates — supervisor handles per-story reviews only
 
@@ -225,6 +252,12 @@ Agent-hours include 20% coordination overhead per lane.
 | ARC-1291 | ARC-1301 (checkpoint-mgmt) | hard data | Checkpoint detection hooks into step execution flow |
 | ARC-1302 | ARC-1308 (failure-handling) | hard data | Exhausted-retry notification reuses browser notification logic |
 | ARC-1303 | ARC-1297 (queue-scheduling) | hard data | Queue panel UI builds on checkpoint priority scoring model |
+| ARC-1349 | ARC-1367 (parallel-lane-execution) | hard data | Auto-claim reuses runbook_claim_story markdown-writer pattern |
+| ARC-1358 | ARC-1370 (parallel-lane-execution) | hard data | Auto-archive reuses update_issue_status frontmatter logic |
+| ARC-1359 | ARC-1369 (parallel-lane-execution) | hard data | Auto-commit reuses planning_commit git pattern |
+| ARC-1360 | ARC-1370 (parallel-lane-execution) | hard data | Auto-archive reuses archive_issue file-move logic |
+| ARC-1366 | ARC-1371 (checkpoint-management) | hard data | PR-merge detection builds on resume_checkpoint mechanism |
+| ARC-1369 | ARC-1371 (checkpoint-management) | hard data | PR branch+commit infrastructure reused for plan/decision PRs |
 
 ---
 
@@ -267,7 +300,7 @@ Agent-hours include 20% coordination overhead per lane.
 
 ## On-Hold Items
 
-None. All 43 stories have named prerequisites and can begin once their start conditions are met.
+None. All 47 stories have named prerequisites and can begin once their start conditions are met.
 
 ---
 
