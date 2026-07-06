@@ -121,11 +121,11 @@
   - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
   - [x] Lint / tests pass
   - [x] Write `task-completions/ARC-1365-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(checkpoint-management): display agent last message on checkpoint Resume card`
+  - [x] Commit: `feat(checkpoint-management): display agent last message on checkpoint Resume card`
 
 ### 🟢 Wave 4 Gate
 
-- [ ] 🟢 WAVE 4 GATE — ARC-1365 closed and merged
+- [x] 🟢 WAVE 4 GATE — ARC-1365 closed and merged
 
 ---
 
