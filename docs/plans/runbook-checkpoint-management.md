@@ -113,7 +113,7 @@
 ### ARC-1365 — Display agent last message on checkpoint Resume card 🟡 MEDIUM
 
 - [ ] **ARC-1365** — Display agent last message on checkpoint Resume card
-  - [ ] 🔒 Claimed:
+  - [x] 🔒 Claimed: checkpoint-management / 2026-07-06 06:35
   - [ ] Read `issues/checkpoint-management/ARC-1365-agent-last-message-on-checkpoint.md`
   - [ ] Write `implementation_plans/checkpoint-management/ARC-1365-implementation-plan.md`
   - [ ] 🟡 INDIVIDUAL PLAN CHECKPOINT
