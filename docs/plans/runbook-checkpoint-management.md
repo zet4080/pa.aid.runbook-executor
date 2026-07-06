@@ -119,7 +119,7 @@
   - [x] 🟡 INDIVIDUAL PLAN CHECKPOINT
   - [x] Execute plan
   - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
-  - [ ] Lint / tests pass
+  - [x] Lint / tests pass
   - [ ] Write `task-completions/ARC-1365-COMPLETION-SUMMARY.md`
   - [ ] Commit: `feat(checkpoint-management): display agent last message on checkpoint Resume card`
 
