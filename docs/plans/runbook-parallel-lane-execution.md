@@ -133,7 +133,7 @@
   - [x] 🔒 Claimed: parallel-lane-execution / 2026-07-07 13:50
   - [x] Read `issues/parallel-lane-execution/ARC-1368-conductor-auto-provision-worktree.md`
   - [x] Write `implementation_plans/parallel-lane-execution/ARC-1368-implementation-plan.md`
-  - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
+  - [x] 🔴 INDIVIDUAL PLAN CHECKPOINT
   - [ ] Execute plan
   - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
   - [ ] Lint / tests pass
