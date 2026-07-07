@@ -116,7 +116,7 @@
 
 ### 🔴 ARC-1367 — Conductor: auto-claim story in runbook before dispatching agent
 
-- [ ] **ARC-1367** — Conductor: auto-claim story in runbook before dispatching agent Depends on ARC-1349 (runbook_claim_story) — Wave 1 must be done
+- [x] **ARC-1367** — Conductor: auto-claim story in runbook before dispatching agent Depends on ARC-1349 (runbook_claim_story) — Wave 1 must be done
   - [x] 🔒 Claimed: parallel-lane-execution / 2026-07-07 09:34
   - [x] Read `issues/parallel-lane-execution/ARC-1367-conductor-auto-claim-story.md`
   - [x] Write `implementation_plans/parallel-lane-execution/ARC-1367-implementation-plan.md`
