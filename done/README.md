@@ -8,3 +8,4 @@
 | ARC-1314 | Expand runbook detail on demand | 2026-06-29 | `done/issues/session-setup/ARC-1314-expand-runbook-detail.md` |
 | ARC-1315 | Select runbooks to include in session | 2026-06-29 | `done/issues/session-setup/ARC-1315-select-runbooks-for-session.md` |
 | ARC-1316 | Configure session parameters before start | 2026-06-29 | `done/issues/session-setup/ARC-1316-configure-session-parameters.md` |
+| ARC-1367 | Conductor: auto-claim story in runbook before dispatching agent | 2026-07-07 | `done/issues/parallel-lane-execution/ARC-1367-conductor-auto-claim-story.md` |
