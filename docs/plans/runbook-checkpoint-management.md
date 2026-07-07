@@ -154,17 +154,17 @@
 - [x] ☑ all complete
 
 ### Wave 4 gate
-- [ ] All active stories in this wave checked off
-- [ ] All PRs merged
-- [ ] All completion summaries written
-- [ ] 🟢 WAVE GATE — notify supervisor; dependent lanes: none
+- [x] All active stories in this wave checked off
+- [x] All PRs merged
+- [x] All completion summaries written
+- [x] 🟢 WAVE GATE — notify supervisor; dependent lanes: none
 
 ## Wave 5 — PR Approval Gate for Planning Artifacts
 
 > Gate: ARC-1371 closed and merged; planning artifact review is fully PR-based
 
-- [ ] Confirm Confirm Wave 4 gate passed
-- [ ] Confirm Confirm ARC-1366 (resume_checkpoint) merged
+- [x] Confirm Confirm Wave 4 gate passed
+- [x] Confirm Confirm ARC-1366 (resume_checkpoint) merged
 
 ### 🔴 ARC-1371 — Conductor: open PR for implementation plans and decision documents as approval gate
 
