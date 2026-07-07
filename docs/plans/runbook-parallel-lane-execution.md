@@ -103,21 +103,21 @@
 - [x] ☑ all complete
 
 ### Wave 1 gate
-- [ ] All active stories in this wave checked off
-- [ ] All PRs merged
-- [ ] All completion summaries written
-- [ ] 🟢 WAVE GATE — notify supervisor; dependent lanes: none
+- [x] All active stories in this wave checked off
+- [x] All PRs merged
+- [x] All completion summaries written
+- [x] 🟢 WAVE GATE — notify supervisor; dependent lanes: none
 
 ## Wave 2 — Conductor Automation — Reducing Agent Ceremony
 
 > Gate: all 4 automation stories closed; conductor handles claim, worktree, artifact commit, and archive without agent ceremony
 
-- [ ] Confirm Confirm Wave 1 gate passed
+- [x] Confirm Confirm Wave 1 gate passed
 
 ### 🔴 ARC-1367 — Conductor: auto-claim story in runbook before dispatching agent
 
 - [ ] **ARC-1367** — Conductor: auto-claim story in runbook before dispatching agent Depends on ARC-1349 (runbook_claim_story) — Wave 1 must be done
-  - [ ] 🔒 Claimed: _(fill in: lane / YYYY-MM-DD HH:MM before starting)_
+  - [x] 🔒 Claimed: parallel-lane-execution / 2026-07-07 09:34
   - [ ] Read `issues/parallel-lane-execution/ARC-1367-conductor-auto-claim-story.md`
   - [ ] Write `implementation_plans/parallel-lane-execution/ARC-1367-implementation-plan.md`
   - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
