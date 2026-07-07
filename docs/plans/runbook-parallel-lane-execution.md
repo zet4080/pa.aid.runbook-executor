@@ -149,10 +149,10 @@
   - [ ] `implementation_plans/parallel-lane-execution/ARC-1369-implementation-plan.md`
   - [ ] `implementation_plans/parallel-lane-execution/ARC-1370-implementation-plan.md`
 - [ ] 🔴 BATCH PLAN CHECKPOINT
-- [ ] Execute ARC-1369 — Conductor: auto-commit implementation plans and completion summaries to planning repo Depends on ARC-1359 (planning_commit) pattern
-  - [ ] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1369-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(parallel-lane-execution): conductor auto-commit planning artifacts after step success`
+- [x] Execute ARC-1369 — Conductor: auto-commit implementation plans and completion summaries to planning repo Depends on ARC-1359 (planning_commit) pattern
+  - [x] Lint / tests pass
+  - [x] Write `task-completions/ARC-1369-COMPLETION-SUMMARY.md`
+  - [x] Commit: `feat(parallel-lane-execution): conductor auto-commit planning artifacts after step success`
 - [ ] Execute ARC-1370 — Conductor: auto-update issue status and archive story artifacts on completion Depends on ARC-1358, ARC-1360, ARC-1369
   - [ ] Lint / tests pass
   - [ ] Write `task-completions/ARC-1370-COMPLETION-SUMMARY.md`
