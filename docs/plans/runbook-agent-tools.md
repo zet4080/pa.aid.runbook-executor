@@ -225,7 +225,7 @@
   - [x] Write `task-completions/ARC-1364-COMPLETION-SUMMARY.md`
   - [x] Commit: `feat(agent-tools): implement generate_issue_file tool`
 
-- [ ] Execute ARC-1366 (`resume_checkpoint`)
+- [x] Execute ARC-1366 (`resume_checkpoint`)
   - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
   - [x] Lint / tests pass
   - [x] Write `task-completions/ARC-1366-COMPLETION-SUMMARY.md`
