@@ -122,15 +122,15 @@
   - [x] Write `implementation_plans/parallel-lane-execution/ARC-1367-implementation-plan.md`
   - [x] 🔴 INDIVIDUAL PLAN CHECKPOINT
   - [x] Execute plan
-  - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
-  - [ ] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1367-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(parallel-lane-execution): conductor auto-claim story before agent dispatch`
+  - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
+  - [x] Lint / tests pass
+  - [x] Write `task-completions/ARC-1367-COMPLETION-SUMMARY.md`
+  - [x] Commit: `feat(parallel-lane-execution): conductor auto-claim story before agent dispatch`
 
 ### 🔴 ARC-1368 — Conductor: auto-provision feature git worktree for HIGH stories
 
 - [ ] **ARC-1368** — Conductor: auto-provision feature git worktree for HIGH stories Depends on ARC-1367 (auto-claim must fire first)
-  - [ ] 🔒 Claimed: _(fill in: lane / YYYY-MM-DD HH:MM before starting)_
+  - [x] 🔒 Claimed: parallel-lane-execution / 2026-07-07 13:50
   - [ ] Read `issues/parallel-lane-execution/ARC-1368-conductor-auto-provision-worktree.md`
   - [ ] Write `implementation_plans/parallel-lane-execution/ARC-1368-implementation-plan.md`
   - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
