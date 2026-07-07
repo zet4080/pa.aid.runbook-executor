@@ -135,14 +135,14 @@
   - [x] Write `implementation_plans/parallel-lane-execution/ARC-1368-implementation-plan.md`
   - [x] 🔴 INDIVIDUAL PLAN CHECKPOINT
   - [x] Execute plan
-  - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
-  - [ ] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1368-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(parallel-lane-execution): conductor auto-provision feature git worktree`
+  - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
+  - [x] Lint / tests pass
+  - [x] Write `task-completions/ARC-1368-COMPLETION-SUMMARY.md`
+  - [x] Commit: `feat(parallel-lane-execution): conductor auto-provision feature git worktree`
 
 ### 🔴 Batch — Batch 2-A
 
-- [ ] 🔒 Claimed: _(fill in: lane / YYYY-MM-DD HH:MM before starting)_
+- [x] 🔒 Claimed: parallel-lane-execution / 2026-07-07 00:00
 - [ ] Read all issues: ARC-1369, ARC-1370
   - Files: `issues/parallel-lane-execution/ARC-1369-conductor-auto-commit-planning-artifacts.md`, `issues/parallel-lane-execution/ARC-1370-conductor-auto-archive-on-completion.md`
 - [ ] Write all plans:
