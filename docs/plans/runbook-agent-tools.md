@@ -148,10 +148,10 @@
   - [x] Write `implementation_plans/agent-tools/ARC-1355-implementation-plan.md`
   - [x] 🔴 INDIVIDUAL PLAN CHECKPOINT
   - [x] Execute plan
-  - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
-  - [ ] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1355-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(agent-tools): implement run_lint tool`
+  - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
+  - [x] Lint / tests pass
+  - [x] Write `task-completions/ARC-1355-COMPLETION-SUMMARY.md`
+  - [x] Commit: `feat(agent-tools): implement run_lint tool`
 
 ### 🔴 HIGH — ARC-1358: `update_issue_status`
 
@@ -230,12 +230,12 @@
   - [ ] Lint / tests pass
   - [ ] Write `task-completions/ARC-1366-COMPLETION-SUMMARY.md`
   - [ ] Commit: `feat(agent-tools): implement resume_checkpoint tool`
-- [x] ☑ batch complete
+- [ ] ☑ batch complete
 
 ### Wave 2 gate
 
 - [ ] All Wave 2 stories checked off (ARC-1352, ARC-1353, ARC-1354, ARC-1355, ARC-1356, ARC-1357, ARC-1358, ARC-1359, ARC-1360, ARC-1361, ARC-1364, ARC-1366)
-- [x] All completion summaries written
+- [ ] All completion summaries written
 - [ ] 🟢 WAVE GATE — agent-tools lane complete; all 17 tools deployed to `~/.config/opencode/tools/`
 
 ## On-Hold Register
