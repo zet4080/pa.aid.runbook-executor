@@ -120,7 +120,7 @@
   - [x] 🔒 Claimed: parallel-lane-execution / 2026-07-07 09:34
   - [x] Read `issues/parallel-lane-execution/ARC-1367-conductor-auto-claim-story.md`
   - [x] Write `implementation_plans/parallel-lane-execution/ARC-1367-implementation-plan.md`
-  - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
+  - [x] 🔴 INDIVIDUAL PLAN CHECKPOINT
   - [ ] Execute plan
   - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
   - [ ] Lint / tests pass
