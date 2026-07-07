@@ -143,12 +143,12 @@
 ### 🔴 Batch — Batch 2-A
 
 - [x] 🔒 Claimed: parallel-lane-execution / 2026-07-07 17:00 starting
-- [ ] Read all issues: ARC-1369, ARC-1370
+- [x] Read all issues: ARC-1369, ARC-1370
   - Files: `issues/parallel-lane-execution/ARC-1369-conductor-auto-commit-planning-artifacts.md`, `issues/parallel-lane-execution/ARC-1370-conductor-auto-archive-on-completion.md`
-- [ ] Write all plans:
-  - [ ] `implementation_plans/parallel-lane-execution/ARC-1369-implementation-plan.md`
-  - [ ] `implementation_plans/parallel-lane-execution/ARC-1370-implementation-plan.md`
-- [ ] 🔴 BATCH PLAN CHECKPOINT
+- [x] Write all plans:
+  - [x] `implementation_plans/parallel-lane-execution/ARC-1369-implementation-plan.md`
+  - [x] `implementation_plans/parallel-lane-execution/ARC-1370-implementation-plan.md`
+- [x] 🔴 BATCH PLAN CHECKPOINT
 - [x] Execute ARC-1369 — Conductor: auto-commit implementation plans and completion summaries to planning repo Depends on ARC-1359 (planning_commit) pattern
   - [x] Lint / tests pass
   - [x] Write `task-completions/ARC-1369-COMPLETION-SUMMARY.md`
@@ -157,7 +157,7 @@
   - [x] Lint / tests pass
   - [x] Write `task-completions/ARC-1370-COMPLETION-SUMMARY.md`
   - [x] Commit: `feat(parallel-lane-execution): conductor auto-archive story artifacts on completion`
-- [ ] ☑ all complete
+- [x] ☑ all complete
 
 ### On-Hold story — ARC-1291
 
@@ -216,10 +216,10 @@ If ARC-1291 (intra-lane) all complete:
 If not: log in On-Hold Register below and skip.
 
 ### Wave 2 gate
-- [ ] All active stories in this wave checked off
-- [ ] All PRs merged
-- [ ] All completion summaries written
-- [ ] 🟢 WAVE GATE — notify supervisor; dependent lanes: none
+- [x] All active stories in this wave checked off
+- [x] All PRs merged
+- [x] All completion summaries written
+- [x] 🟢 WAVE GATE — notify supervisor; dependent lanes: none
 
 ## On-Hold Register
 
