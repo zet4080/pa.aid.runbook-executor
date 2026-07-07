@@ -156,7 +156,7 @@
 - [ ] Execute ARC-1370 — Conductor: auto-update issue status and archive story artifacts on completion Depends on ARC-1358, ARC-1360, ARC-1369
   - [x] Lint / tests pass
   - [x] Write `task-completions/ARC-1370-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(parallel-lane-execution): conductor auto-archive story artifacts on completion`
+  - [x] Commit: `feat(parallel-lane-execution): conductor auto-archive story artifacts on completion`
 - [ ] ☑ all complete
 
 ### On-Hold story — ARC-1291
