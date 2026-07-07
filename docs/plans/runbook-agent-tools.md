@@ -229,7 +229,7 @@
   - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
   - [x] Lint / tests pass
   - [x] Write `task-completions/ARC-1366-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(agent-tools): implement resume_checkpoint tool`
+  - [x] Commit: `feat(agent-tools): implement resume_checkpoint tool`
 - [ ] ☑ batch complete
 
 ### Wave 2 gate
