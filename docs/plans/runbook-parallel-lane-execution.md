@@ -131,7 +131,7 @@
 
 - [ ] **ARC-1368** — Conductor: auto-provision feature git worktree for HIGH stories Depends on ARC-1367 (auto-claim must fire first)
   - [x] 🔒 Claimed: parallel-lane-execution / 2026-07-07 13:50
-  - [ ] Read `issues/parallel-lane-execution/ARC-1368-conductor-auto-provision-worktree.md`
+  - [x] Read `issues/parallel-lane-execution/ARC-1368-conductor-auto-provision-worktree.md`
   - [ ] Write `implementation_plans/parallel-lane-execution/ARC-1368-implementation-plan.md`
   - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
   - [ ] Execute plan
