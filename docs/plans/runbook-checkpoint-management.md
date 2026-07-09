@@ -176,7 +176,7 @@
   - [x] Execute plan
   - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
   - [x] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1371-COMPLETION-SUMMARY.md`
+  - [x] Write `task-completions/ARC-1371-COMPLETION-SUMMARY.md`
   - [ ] Commit: `feat(checkpoint-management): PR approval gate for implementation plans and decision documents`
 
 ### On-Hold story — ARC-1301
