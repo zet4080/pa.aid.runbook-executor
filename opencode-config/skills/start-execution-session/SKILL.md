@@ -35,8 +35,23 @@ If any of these files are missing, stop and report:
 ### Which lane?
 
 If the user specified a lane at invocation, use it.
-If not, ask:
-> "Which lane (feature) are you working on? Available lanes: {list from workorder Feature Lane Overview table}"
+If not, write a decision document to request the selection:
+
+1. Write `decisions/{session-date}-lane-selection.md` using the `_template.md` schema:
+   - `key`: `lane-selection`
+   - `story`: `Select lane for this execution session`
+   - `status: pending`
+   - List each available lane from the workorder Feature Lane Overview table as an option in the body
+2. Commit and push the decision document:
+   ```bash
+   git add decisions/{session-date}-lane-selection.md
+   git commit -m "docs(session): add lane selection decision"
+   git push
+   ```
+3. 🔴 STOP at checkpoint. Surface:
+   > "Lane not specified. Decision document written: `decisions/{session-date}-lane-selection.md`. Set `status: answered` and `selected_approach: {lane-name}`, then re-trigger the session."
+
+On resume: read the answered document, extract `selected_approach`, use that as the lane. Do not ask interactively.
 
 ### Which wave?
 
@@ -47,9 +62,7 @@ In the workorder, find the lane's current wave:
 
 ### Which story?
 
-Open the lane's runbook: `docs/plans/runbook-{lane}.md`
-
-Find the **first unchecked AND unclaimed story checkbox** in the active wave. A story is claimed if it has a checked `- [x] 🔒 Claimed:` sub-item. Skip claimed stories — another agent or session owns them.
+Call `runbook_find_next_story(runbook_path="docs/plans/runbook-{lane}.md")` — this returns the first unchecked AND unclaimed story in the active wave, or null if none remain. A story is claimed if it has a checked `- [x] 🔒 Claimed:` sub-item. Skip claimed stories — another agent or session owns them.
 
 Report:
 > "Next story: **{KEY}** — {summary}
@@ -60,18 +73,7 @@ Report:
 
 **Before writing any plan or code**, mark the story or batch as claimed in the runbook:
 
-Update the existing unchecked `- [ ] 🔒 Claimed:` row; do not add a second Claimed row. Use the row's current indentation:
-```
-  - [x] 🔒 Claimed: {lane} / {YYYY-MM-DD HH:MM}
-```
-
-If the runbook has no existing `🔒 Claimed:` row for the story or batch, stop: the generated runbook is malformed. Repair or regenerate it before starting work.
-
-Commit immediately:
-```bash
-git add docs/plans/runbook-{lane}.md
-git commit -m "chore({lane}): claim {KEY}"
-```
+Call `runbook_claim_story(runbook_path="docs/plans/runbook-{lane}.md", story_key="{KEY}", lane="{lane}", repo_path="/path/to/planning/repo")` — this updates the claimed checkbox, stages, commits, and pushes the change.
 
 This prevents a parallel agent from picking the same story.
 
@@ -119,25 +121,27 @@ Follow the checkpoint model from HOW-THIS-WORKS.md:
 **If 🔴 HIGH story:**
 1. Read `issues/{lane}/{KEY}-*.md`
 2. Write `implementation_plans/{lane}/{KEY}-implementation-plan.md`
-3. 🔴 STOP — present plan to supervisor for review before proceeding
-4. On approval: execute plan
-5. Run `local-code-review` — fix all BLOCKER/ISSUE findings (max 3 iterations; escalate if not clean)
-6. Lint / tests pass
-7. Write `task-completions/{KEY}-COMPLETION-SUMMARY.md`
-8. Commit: `{type}({lane}): {description} ({KEY})`
-9. Check off story in runbook
+3. The conductor detects the new plan file via git status, opens a Bitbucket PR (branch `plan/{lane}/{KEY}`, PR titled `Plan review: {KEY} — {story title}`), and pauses the lane automatically (ARC-1371). No manual commit/push is needed — the agent's step is complete once the file is written to disk.
+4. 🔴 The lane is now paused — the supervisor reviews the plan on the PR and merges to approve
+5. On PR merge: the conductor detects it, resumes the lane, and re-dispatches the agent to execute the plan (now on `main`)
+6. Run `local-code-review` — fix all BLOCKER/ISSUE findings (max 3 iterations; escalate if not clean)
+7. Lint / tests pass
+8. Write `task-completions/{KEY}-COMPLETION-SUMMARY.md`
+9. Commit: `{type}({lane}): {description} ({KEY})`
+10. Check off story in runbook
 
 **If 🟡 MEDIUM or 🟢 LOW story (batch):**
 1. Identify all stories in the batch (from runbook)
 2. Read all issue files
 3. Write all implementation plans
-4. 🟡 STOP — present all plans to supervisor for review before proceeding
-5. On approval: execute each plan in sequence
-6. Run `local-code-review` after each plan — fix all BLOCKER/ISSUE findings (max 3 iterations; escalate if not clean)
-7. Lint / tests pass for each
-8. Write completion summary for each
-9. Commit each
-10. Check off all stories in runbook
+4. Each plan file triggers its own conductor-managed PR approval gate (ARC-1371) as it is written — no manual commit/push needed
+5. 🟡 Each plan pauses at its own checkpoint until its PR is merged by the supervisor
+6. On approval: execute each plan in sequence
+7. Run `local-code-review` after each plan — fix all BLOCKER/ISSUE findings (max 3 iterations; escalate if not clean)
+8. Lint / tests pass for each
+9. Write completion summary for each
+10. Commit each
+11. Check off all stories in runbook
 
 ---
 
@@ -174,19 +178,21 @@ Report current state before proceeding:
 
 ## Human Escalation Triggers
 
-Stop immediately and present to supervisor when ANY of these occur. Do not proceed without explicit human instruction.
+Stop immediately and write a decision document when ANY of these occur. Do not proceed without an answered decision document or explicit human instruction.
 
-| Trigger | What to report |
-|---------|---------------|
-| Scope change discovered during implementation | "Scope change found: {description}. Out of current issue scope. Proceed, defer, or open new issue?" |
-| Architectural decision required | "Architecture decision needed: {options with trade-offs}. Cannot proceed without direction." |
-| Security-sensitive change identified | "Security-sensitive change found: {description}. Requires human sign-off before proceeding." |
-| Product behavior change (unplanned) | "This change alters observable product behavior: {description}. Not in AC. Human approval required." |
-| Local review loop hit 3 iterations with unresolved BLOCKER/ISSUE | "local-code-review exhausted 3 iterations. Unresolved findings: {list}. Cannot auto-resolve." |
-| Agent disagreement between plan and review findings | "Plan specifies X but review flags X as BLOCKER/ISSUE. Conflict requires human resolution." |
-| Cross-lane dependency check fails | "Lane {name} Wave {N} gate is not closed. Cannot start dependent story." |
+| Trigger | Decision document action |
+|---------|--------------------------|
+| Scope change discovered during implementation | Write `decisions/{KEY}-scope-change.md`: describe the out-of-scope change, list options (proceed / defer / open new issue), include recommendation. Commit+push. 🔴 Stop at checkpoint. |
+| Architectural decision required | Write `decisions/{KEY}-architecture-decision.md`: describe the decision point, list 2–3 options with trade-offs, include recommendation. Commit+push. 🔴 Stop at checkpoint. |
+| Security-sensitive change identified | Write `decisions/{KEY}-security-review.md`: describe the sensitive change, list options (proceed with mitigations / defer / reject), note security implications. Commit+push. 🔴 Stop at checkpoint. |
+| Product behavior change (unplanned) | Write `decisions/{KEY}-behavior-change.md`: describe the observable behavior change, list options (accept / revert / open new issue), note AC impact. Commit+push. 🔴 Stop at checkpoint. |
+| Local review loop hit 3 iterations with unresolved BLOCKER/ISSUE | Stop at checkpoint. Report: "local-code-review exhausted 3 iterations. Unresolved findings: {list}. Cannot auto-resolve." No decision document needed — this is an operational block. |
+| Agent disagreement between plan and review findings | Stop at checkpoint. Report: "Plan specifies X but review flags X as BLOCKER/ISSUE. Conflict requires human resolution." No decision document needed — this is an operational block. |
+| Cross-lane dependency check fails | Stop at checkpoint. Report: "Lane {name} Wave {N} gate is not closed. Cannot start dependent story." No decision document needed — this is an operational block. |
 
-**Do not rationalize past these triggers.** If in doubt → escalate.
+On resume after an answered decision document: read the document, verify `status: answered`, extract `selected_approach`, and proceed accordingly.
+
+**Do not rationalize past these triggers.** If in doubt → write a decision document and stop.
 
 ---
 

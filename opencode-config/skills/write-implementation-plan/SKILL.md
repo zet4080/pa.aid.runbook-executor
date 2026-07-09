@@ -39,7 +39,7 @@ Three phases — in order, no skipping:
 **Always run this phase before writing anything.**
 
 1. Read `AGENTS.md` — architecture notes, key patterns, sibling repos, commit format
-2. Read the issue file in full — extract: goal, constraints, AC, scope, out-of-scope
+2. Call `get_current_issue(planning_repo_path)` — this resolves the issue ID from the current git branch, locates the issue file in the planning repo, and returns `{ issue_id, file_path, acceptance_criteria }`. Read the issue file referenced by `file_path` to extract: goal, constraints, AC, scope, out-of-scope.
 3. Explore relevant source — find files/modules the change will touch:
    - Search for existing implementations of similar patterns
    - Read files named or implied by the issue
@@ -63,11 +63,29 @@ Three phases — in order, no skipping:
 - The choice involves a trade-off the user should own
 
 **Process:**
-1. Propose 2-3 approaches with trade-offs
-2. Lead with your recommended option and explain why
-3. **STOP — wait for user approval before writing the plan**
 
-Approach format:
+The approach gate is asynchronous — the agent writes a decision document. The conductor opens a Bitbucket PR for it and pauses the lane at a 🔴 checkpoint automatically (ARC-1371); the supervisor answers by editing `status: answered` and `selected_approach: Option N` directly in the file within the PR (via the Bitbucket web editor on the PR branch, or by pushing an additional commit to it) and merging. The conductor detects the merge and resumes the lane, re-reading the merged file from `main` — no manual commit, push, or `status: answered` editing on `main` is needed from the agent or supervisor outside the PR flow.
+
+**Path A — No existing decision document (first run):**
+
+1. Check for `decisions/{KEY}-approach-decision.md` in the planning repo root. If the file is absent, proceed with Path A.
+2. Write `decisions/{KEY}-approach-decision.md` using the `_template.md` schema:
+   - Populate `key`, `story`, `status: pending`
+   - Leave `selected_approach`, `decided_by`, `decided_at` blank
+   - Fill in all options, pros/cons, and the recommendation in the document body
+   - **Do NOT overwrite an existing file** — always check for file existence before writing
+3. The agent's step is complete once the file is written. The conductor's `runLane` detects the new decision document via git status, opens a Bitbucket PR (branch `decision/{KEY}-{type}`, PR titled `Decision: {KEY} — {type}`), and pauses the lane automatically. No manual `git add`/`commit`/`push` is needed — the conductor's PR-approval-gate logic handles it.
+4. 🔴 The lane is now paused awaiting PR merge. Output: "Decision document written: `decisions/{KEY}-approach-decision.md`. The conductor has opened a PR for review — merge it (after setting `status: answered` and `selected_approach: Option N` in the file) to resume."
+
+**Path B — Decision document exists with `status: answered` (resume):**
+
+1. Check for `decisions/{KEY}-approach-decision.md`. If the file is present and contains the exact line `status: answered` (case-sensitive, no extra whitespace), proceed with Path B.
+2. Read the document. Extract the value of `selected_approach` from the frontmatter.
+3. Log: "Decision document found — proceeding with [selected_approach]"
+4. Continue to Phase 2 — **do not ask interactively**.
+
+Approach format (used when populating the Options section of the decision document body):
+
 ```
 Option 1 (recommended): {name}
   How: {1-2 sentences}
@@ -85,13 +103,15 @@ Option 3: {name}
 Recommendation: Option {N} because {reason}.
 ```
 
-**Do not write the plan until the user selects an approach.**
-
 ---
 
 ## Phase 2 — Write Plan
 
 Write `implementation_plans/{EPIC}/{TRACKER-ID}-implementation-plan.md`.
+
+**Note:** The conductor detects the new plan file via git status, opens a Bitbucket PR (branch `plan/{lane}/{KEY}`, PR titled `Plan review: {KEY} — {story title}`), and pauses the lane automatically after each step completes (ARC-1371). No manual git commit, push, or stop-and-wait phrasing is needed — the agent's step is complete once the plan file is written to disk. Execution resumes automatically once the supervisor merges the PR.
+
+**If a decision document was written for this story**, archive it after the plan PR is merged (the conductor performs this once execution resumes past the decision checkpoint — no agent action needed at plan-write time).
 
 ### Traceability Header (required)
 
@@ -182,6 +202,7 @@ If the testing section has mock setup or assertions → replace with scenario de
 ## Quality Checklist
 
 - [ ] Phase 0 complete — codebase explored, unknowns resolved
+
 - [ ] Phase 1 done or explicitly skipped with reason
 - [ ] Traceability header complete (including chosen approach)
 - [ ] Every AC from issue is addressed by a step
