@@ -1,38 +1,59 @@
 # ARC-1371 Implementation Plan: Conductor — Open PR for Implementation Plans and Decision Documents as Approval Gate
 
-**Date:** 2026-07-07
 **Issue:** `issues/checkpoint-management/ARC-1371-conductor-pr-approval-gate-for-plans-and-decisions.md`
+**Completion Summary:** `task-completions/ARC-1371-COMPLETION-SUMMARY.md` (TBD)
+**Approach:** single approach — pattern established (extend `checkpointGit.ts`, no new module)
 **Lane:** checkpoint-management
 **Epic:** ARC-1295 — ARC: Checkpoint Management
+**Owner:** build agent
+**Date:** 2026-07-09 (rewritten against merged ARC-1367–ARC-1370 code; originally written 2026-07-07)
 
-## Goal
+## Rewrite Note
 
-Extend the conductor so that when an agent writes an implementation plan or a decision document, the artifact is committed to a short-lived branch and a Bitbucket PR is opened automatically. The lane pauses at a 🔴 checkpoint; PR merge is the canonical approval signal that resumes the lane. This eliminates the manual `status: answered` editing pattern and gives supervisors inline Bitbucket comment capability on every planning artifact.
+This plan was originally written speculatively, before ARC-1367, ARC-1368, ARC-1369, and ARC-1370 merged into `main`. It has been rewritten from a fresh read of the actual merged code in `packages/server/src/git/checkpointGit.ts`, `packages/server/src/runner/laneRunner.ts`, `packages/server/src/routes/checkpoints.ts`, `packages/server/src/state/types.ts`, and `packages/server/src/index.ts` at commit `03efc9b` (post-ARC-1370 merge). Every function signature, call site, and control-flow reference below is verified against that code, not assumed.
 
-## Pre-conditions / Assumptions
+## Scope & Alignment
 
-| # | Pre-condition | How to verify |
-|---|---------------|---------------|
-| 1 | ARC-1366 is merged — `resume_checkpoint` endpoint exists and polls PR state for lane resume | `git log --oneline` in `pa.aid.conductor.ts`; check for ARC-1366 in commits |
-| 2 | ARC-1369 is merged — `commitPlanningArtifacts` function exists in `checkpointGit.ts` and is wired into `laneRunner.ts` | Check `checkpointGit.ts` exports; grep for `commitPlanningArtifacts` in `laneRunner.ts` |
-| 3 | `BITBUCKET_USERNAME` and `BITBUCKET_PASSWORD` env vars are set in the running server process | Confirmed pattern used by `createCheckpointBranchAndPR` |
-| 4 | The planning repo's git remote is a reachable Bitbucket URL | Auto-detected via `git remote get-url origin` — same as existing checkpoint PR logic |
-| 5 | `SessionConfig` can be extended with a `prPollIntervalMs` field without a version bump | Schema allows new optional fields |
+This plan extends `checkpointGit.ts` with plan/decision PR-opening and PR-merge-detection functions, and rewires the two `laneRunner.ts` call sites that currently commit planning artifacts and completion artifacts directly to `main` (`commitPlanningArtifacts`, wired at the successful-agent-step tail; `archiveStoryArtifacts`, wired at lane completion) so that **implementation plans and decision documents** go through a branch+PR approval gate instead. Completion summaries and story archival (ARC-1370's `archiveStoryArtifacts`) are explicitly out of scope per the issue and continue to commit straight to `main`.
 
-**Dependency note:** This plan is written against the expected post-ARC-1369 codebase. If ARC-1369 is not yet merged at execution time, step 2 may need to be adjusted to account for a different signature for planning-artifact commit logic. Verify before starting.
+Acceptance criteria mapping:
+
+| AC | Addressed by |
+|----|--------------|
+| AC1 — plan PR: branch `plan/{lane}/{KEY}`, PR titled `Plan review: {KEY} — {title}`, pause at 🔴 | Steps 2, 3, 6 |
+| AC2 — decision PR: branch `decision/{KEY}-{type}`, PR titled `Decision: {KEY} — {type}`, pause at 🔴 | Steps 2, 4, 6 |
+| AC3 — merge detected, lane resumes; decision merge reads `selected_approach` from `main` | Steps 5, 7 |
+| AC4 — plan PR merge → plan file now on `main`, agent executes it | Step 7 (poller triggers `runLane`, which re-parses the runbook and re-dispatches the agent step — the merged plan file is on disk for the agent to read) |
+| AC5 — decision PR merge → read `status`; `answered` continues, `pending` re-pauses with warning | Step 7 |
+| AC6 — PR creation failure → fallback commit to `main`, checkpoint raised, supervisor notified via queue | Steps 2, 3, 4 |
+| AC7 — `write-implementation-plan` / `start-execution-session` skills no longer instruct manual commit / `status: answered` editing | Steps 9, 10 |
+
+## Assumptions & Dependencies
+
+| # | Assumption | Verified against |
+|---|------------|-------------------|
+| 1 | `commitPlanningArtifacts(repoRoot: string, lane: string): void` exists in `checkpointGit.ts`, is synchronous (not async), and is called once — after `markStepCheckedInMarkdown` — in the success tail of the `type === 'agent'` branch of `runLane`, only when no pending CHECKPOINT/GATE sub-step was found | Read `checkpointGit.ts` lines ~357–399 and `laneRunner.ts` lines ~456–461 |
+| 2 | `archiveStoryArtifacts(repoRoot: string, storyKey: string, lane: string): void` exists in `packages/server/src/git/planningArchiver.ts` (its own module, not `checkpointGit.ts`), is synchronous, and is called once at the very end of `runLane` after `laneStatusMap.set(runbookPath, 'done')`, gated on deriving an `ARC-\d+` key from the completed steps | Read `planningArchiver.ts` lines ~150–243 and `laneRunner.ts` lines ~509–518 |
+| 3 | `createCheckpointBranchAndPR`, `listUnresolvedPRComments`, `replyToThread`, `resolveThread`, `fetchCommitSha` are the only currently-exported PR/git functions from `checkpointGit.ts`; the private helpers `parseRemoteUrl`, `getBitbucketCredentials`, `parsePrId`, `parsePrUrlRepo`, `createBitbucketPR` are unexported and reusable in-module only | Read `checkpointGit.ts` in full (428 lines) |
+| 4 | There is **no existing PR-merge-polling mechanism** anywhere in the codebase. ARC-1366 (`get_checkpoint_context` / `send_checkpoint_notification`) is an OpenCode *tool* pair for supervisor-instruction handoff at a checkpoint — it does not poll Bitbucket and has no `resume_checkpoint` endpoint or PR-state polling. The route `POST /api/checkpoints/:stepId/resume` (in `routes/checkpoints.ts`) is a manual, supervisor-triggered HTTP call; it addresses unresolved PR comments (ARC-1304 `listUnresolvedPRComments`/`addressPRComments`) before dequeuing and calling `runLane`, but never checks whether a PR is merged. **This plan must build the PR-merge poller from scratch** — there is nothing to "reuse" beyond the existing Bitbucket REST call pattern in `checkpointGit.ts`. | Read `routes/checkpoints.ts` in full (220 lines); searched for `resume_checkpoint`, `isPRMerged`, `MERGED`, poll* across `packages/server/src` — zero matches; read `issues/agent-tools/ARC-1366-tool-resume-checkpoint.md` in full |
+| 5 | `SessionConfig` (in `state/types.ts`) currently has exactly four fields: `maxConcurrentLanes`, `retryLimit`, `queuePolicy`, `escalationSequence`. No `prPollIntervalMs` or any PR-related field exists yet. `PATCH /api/state` already supports partial `config` merges via `routes/state.ts`, so adding a new optional field requires no route change. | Read `state/types.ts` lines 1–24 and `routes/state.ts` in full |
+| 6 | `CheckpointQueueEntry` (in `state/types.ts`) currently has: `stepId`, `runbookPath`, `checkpointLevel`, `hitAt`, `prUrl?`, `renotifyMessage?`, `lastAgentMessage?`. No `planningArtifact` discriminator exists yet. | Read `state/types.ts` lines 26–46 |
+| 7 | `laneFromRunbookPath`, `isNonExecutableSubStep`, `checkpointLevelFromSubStepLabel`, `isHighStory`, `extractLastAgentMessage` are private (unexported) functions local to `laneRunner.ts`. `laneStatusMap`, `laneActiveStep`, `pushedSubStepCheckpoints` are private module-level `Map`/`Set` state. | Read `laneRunner.ts` in full (519 lines) |
+| 8 | The agent step's **only** signal that a plan or decision file was written is the markdown runbook step label plus the fact that the agent, per skill instructions, writes the file to a fixed conventional path (`implementation_plans/{lane}/{KEY}-implementation-plan.md` or `decisions/{KEY}-approach-decision.md`). There is **no structured "artifact written" event type** in `runner/types.ts` (`OpenCodeEvent` is `StepStartEvent \| ToolUseEvent \| TextEvent \| StepFinishEvent \| ErrorEvent \| UnknownEvent` — no artifact-specific variant). Detection must be done via `git status --porcelain` on the conventional directories, exactly as `commitPlanningArtifacts` already does. | Read `runner/types.ts` in full; read `commitPlanningArtifacts` implementation |
+| 9 | ARC-1366 is a **planning-repo tool pair**, not an application-server feature. It has no bearing on `pa.aid.conductor.ts` server code and is not a dependency this plan needs to call into. The issue's "Dependencies" line referencing ARC-1366 is about *conceptual* precedent (checkpoint + supervisor instruction), not a shared function. | Read `issues/agent-tools/ARC-1366-tool-resume-checkpoint.md` in full |
+| 10 | Decision documents live in `decisions/{KEY}-approach-decision.md` in the planning repo (per `decisions/_template.md`), with frontmatter fields `key`, `story`, `status` (`pending`/`answered`), `selected_approach`, `decided_by`, `decided_at`. The `write-implementation-plan` skill's Phase 1 (`decisions/_template.md`) and `start-execution-session` skill both currently instruct manual commit-and-push of the decision file and manual `status: answered` editing by the human. | Read `decisions/_template.md`; read both skill files (`~/.config/opencode/skills/write-implementation-plan/SKILL.md`, `~/.config/opencode/skills/start-execution-session/SKILL.md`) |
+| 11 | `BITBUCKET_USERNAME`, `BITBUCKET_PASSWORD`, optionally `BITBUCKET_WORKSPACE`, `BITBUCKET_DEFAULT_BRANCH` env vars are loaded via `dotenv.config()` in `index.ts` from the monorepo root `.env` | Read `index.ts` lines 30–38; existing `getBitbucketCredentials()` pattern in `checkpointGit.ts` |
+| 12 | Branch must be created in the planning repo (`pa.aid.runbook-executor`), reached via `getState().repoRoot` — the same `repoRoot` value `commitPlanningArtifacts` and `archiveStoryArtifacts` already use — not `pa.aid.conductor.ts` (constraint from the issue) | Constraint restated from issue; `repoRoot` usage confirmed in `laneRunner.ts` |
 
 ## Architecture Decision
 
-**Decision:** Extend `checkpointGit.ts` with two new exported functions — `createPlanningArtifactBranchAndPR` (shared core) plus thin wrappers `createPlanPR` and `createDecisionPR`. Do **not** introduce a separate `planningArtifactGit.ts` module.
+**Decision:** Extend `checkpointGit.ts` with two new exported functions — `createPlanPR` (branch `plan/{lane}/{KEY}`) and `createDecisionPR` (branch `decision/{KEY}-{type}`) — following the exact structural pattern of the existing `createCheckpointBranchAndPR`: create/reuse branch → commit → push (skip if already on remote) → return to previous ref → fire-and-forget Bitbucket POST → return `{ branch, prUrl? }`. Do **not** introduce a separate `planningArtifactGit.ts` module — this satisfies the issue constraint "must reuse the existing `checkpointGit.ts` PR-creation logic" and keeps the private helpers (`getBitbucketCredentials`, `parseRemoteUrl`, `parsePrId`, `parsePrUrlRepo`) co-located and unexported.
 
-**Rationale:**
-- The issue constraint explicitly states: "Must reuse the existing `checkpointGit.ts` PR-creation logic — do not introduce a second Bitbucket API client."
-- The private helpers `createBitbucketPR`, `getBitbucketCredentials`, `parseRemoteUrl`, `parsePrId`, and `parsePrUrlRepo` are already defined in `checkpointGit.ts`; co-location avoids making them exported or duplicated.
-- The new functions follow the exact same pattern as `createCheckpointBranchAndPR`: branch creation → push → fire-and-forget Bitbucket API call → return `{ branch, prUrl? }`.
+**Decision:** No polling mechanism exists to reuse (see Assumption 4). A new exported function `isPRMerged(prUrl: string): Promise<boolean>` and a new `startPlanningPRPoller(opts): { stop: () => void }` are added to `checkpointGit.ts`, following the same private-helper-reuse pattern (`parsePrId`, `parsePrUrlRepo`, `getBitbucketCredentials`) as the existing `listUnresolvedPRComments`.
 
-**Decision:** PR merge detection reuses the existing `resume_checkpoint` polling mechanism introduced by ARC-1366. No new polling loop is added in this story; instead, `CheckpointQueueEntry.prUrl` is populated with the planning PR URL so the existing resume route polls it.
+**Decision:** `commitPlanningArtifacts` is **not removed**. It remains the auto-commit path for any planning-artifact directory changes that are *not* plans or decisions (defensive: if a future artifact type lands in `implementation_plans/` or `task-completions/` without going through the new PR path, it still gets committed). The new logic in `laneRunner.ts` intercepts **only** plan and decision files *before* `commitPlanningArtifacts` runs, diverting them to the PR path; anything else `commitPlanningArtifacts` picks up (e.g. `task-completions/`) is untouched, matching the issue's explicit "Out of Scope: completion summaries continue to be committed directly to main (ARC-1369)."
 
-**Decision:** Artifact commit to the planning branch happens inside the new `createPlanPR` / `createDecisionPR` functions (not in `laneRunner.ts`), keeping git operations centralized in `checkpointGit.ts`.
+**Decision:** `archiveStoryArtifacts` (ARC-1370) is untouched. It runs at lane completion regardless of this story — plan/decision PR merges happen mid-lane, well before `archiveStoryArtifacts` fires.
 
 ## Implementation Steps
 
@@ -40,730 +61,190 @@ Extend the conductor so that when an agent writes an implementation plan or a de
 
 **File:** `packages/server/src/state/types.ts`
 
-Add an optional field to `SessionConfig`:
+Add an optional field `prPollIntervalMs?: number` to the `SessionConfig` interface (alongside `maxConcurrentLanes`, `retryLimit`, `queuePolicy`, `escalationSequence`), documented as the polling interval in milliseconds for Bitbucket PR-merge checks. Add `prPollIntervalMs: 30000` to `DEFAULT_SESSION_CONFIG`. No changes to `routes/state.ts` are needed — its `PATCH /api/state` handler already merges any `body.config` fields into `current.config` verbatim.
 
-```typescript
-/**
- * Polling interval in milliseconds for checking Bitbucket PR merge status.
- * Used by the planning-artifact PR resume poller (ARC-1371).
- * Default: 30000 (30 seconds).
- */
-prPollIntervalMs?: number;
-```
+**Verification:** `DEFAULT_SESSION_CONFIG.prPollIntervalMs === 30000`; existing `reconcile.test.ts` fixtures that construct `SessionConfig` literals without the new field still typecheck (field is optional).
 
-Update `DEFAULT_SESSION_CONFIG`:
-
-```typescript
-prPollIntervalMs: 30000,
-```
-
-**Why here:** The issue constraint specifies the polling interval must be configurable. `SessionConfig` is the existing home for all tunable conductor parameters. The default of 30 s matches the issue constraint's stated default.
-
-### Step 2 — Add `CreatePlanningArtifactPROptions` and `CreatePlanningArtifactPRResult` interfaces to `checkpointGit.ts`
+### Step 2 — Add planning-artifact PR types to `checkpointGit.ts`
 
 **File:** `packages/server/src/git/checkpointGit.ts`
 
-Add near the top of the file, after the existing `CreateCheckpointBranchAndPRResult` interface:
+Add, near `CreateCheckpointBranchAndPRResult`:
+- `CreatePlanPROptions { repoRoot: string; lane: string; storyKey: string; storyTitle: string; artifactPath: string }`
+- `CreateDecisionPROptions { repoRoot: string; storyKey: string; decisionType: string; artifactPath: string }`
+- `CreatePlanningArtifactPRResult { branch: string; prUrl?: string }`
 
-```typescript
-// -----------------------------------------------------------------
-// ARC-1371: Planning artifact PR types
-// -----------------------------------------------------------------
-
-export interface CreatePlanPROptions {
-  /** Absolute path of the planning repo on disk */
-  repoRoot: string;
-  /** Lane identifier (e.g. "checkpoint-management") */
-  lane: string;
-  /** Story key (e.g. "ARC-1371") */
-  storyKey: string;
-  /** Story title — used in the PR title */
-  storyTitle: string;
-  /** Absolute path of the implementation plan file to commit */
-  artifactPath: string;
-}
-
-export interface CreateDecisionPROptions {
-  /** Absolute path of the planning repo on disk */
-  repoRoot: string;
-  /** Story key (e.g. "ARC-1371") */
-  storyKey: string;
-  /** Decision type suffix (e.g. "approach-decision") */
-  decisionType: string;
-  /** Absolute path of the decision document file to commit */
-  artifactPath: string;
-}
-
-export interface CreatePlanningArtifactPRResult {
-  /** Git branch that was created and pushed */
-  branch: string;
-  /** Bitbucket PR URL, or undefined if PR creation failed */
-  prUrl?: string;
-}
-```
+**Verification:** `npx tsc --noEmit` in `packages/server` reports no new errors.
 
 ### Step 3 — Implement `createPlanPR` in `checkpointGit.ts`
 
 **File:** `packages/server/src/git/checkpointGit.ts`
 
-Add the following exported function after `createCheckpointBranchAndPR`:
+Add `export async function createPlanPR(opts: CreatePlanPROptions): Promise<CreatePlanningArtifactPRResult>`, mirroring `createCheckpointBranchAndPR`'s git sequence but scoped to a single artifact file instead of the whole runbook-checkoff diff:
+1. Branch name: `` `plan/${lane}/${storyKey}` ``.
+2. Create or reuse the branch (same `rev-parse --verify` / `checkout -b` / `checkout` pattern as `createCheckpointBranchAndPR`).
+3. `git add` the single `artifactPath` (relative to `repoRoot`), commit with message `` `docs(${lane}): add ${storyKey} implementation plan for review` ``.
+4. Push only if not already on remote (same `ls-remote --heads` guard).
+5. Return to the previous ref (`git checkout -`, matching `createCheckpointBranchAndPR`'s pattern rather than a hardcoded `git checkout main` — this is safer if the caller was on a non-`main` ref, and avoids the detached-HEAD risk called out in the risk table).
+6. Attempt Bitbucket PR creation using the existing private helpers `getBitbucketCredentials`, `parseRemoteUrl` (via `git -C {repoRoot} remote get-url origin`), reading `BITBUCKET_WORKSPACE`/`BITBUCKET_DEFAULT_BRANCH` overrides exactly as `createBitbucketPR` does. PR title: `` `Plan review: ${storyKey} — ${storyTitle}` ``. PR description includes artifact path, lane, story key, and a one-line reviewer instruction. On any failure, catch, `console.error` with an `[ARC-1371]` prefix, and return `{ branch, prUrl: undefined }` — never throw.
+7. **Fallback commit to `main` on PR failure (AC6):** if the Bitbucket POST fails, the artifact is already committed on the new branch (step 3), not on `main`. To satisfy AC6's "artifact is committed directly to main as a fallback," add an explicit fallback path: after the PR-creation `catch` block, if `prUrl` is `undefined`, cherry-pick or re-apply the same commit onto `main` (`git checkout main && git cherry-pick {branch}` or simpler: re-run the add+commit sequence against `main` directly, since the working tree still has the file). Given the branch is disposable in this failure case, the simplest safe approach is: checkout `main`, `git add`/`git commit` the same artifact file with the same message, push. Document this explicitly in code comments so a future reader does not mistake the branch-commit for the fallback.
 
-```typescript
-/**
- * Creates a planning-repo branch for an implementation plan, commits the plan file,
- * pushes the branch, and opens a Bitbucket PR for supervisor review.
- *
- * Branch naming: `plan/{lane}/{storyKey}`  (e.g. `plan/checkpoint-management/ARC-1371`)
- * PR title: `Plan review: {storyKey} — {storyTitle}`
- * PR description: includes artifact path, lane, story key, and review instructions.
- *
- * Implementation plan commits happen on the new branch (not on main).
- * PR merge is the approval signal; the conductor resumes the lane via the existing
- * resume_checkpoint polling mechanism (ARC-1366).
- *
- * Fallback: if PR creation fails, the artifact is still committed to the branch and
- * the function returns `{ branch, prUrl: undefined }`. The caller raises the checkpoint
- * without a PR URL, notifying the supervisor via the checkpoint queue.
- */
-export async function createPlanPR(
-  opts: CreatePlanPROptions,
-): Promise<CreatePlanningArtifactPRResult> {
-  const { repoRoot, lane, storyKey, storyTitle, artifactPath } = opts;
-  const branch = `plan/${lane}/${storyKey}`;
-
-  const execOpts = {
-    encoding: 'utf8' as const,
-    stdio: 'pipe' as const,
-    timeout: 10000,
-    cwd: repoRoot,
-  };
-
-  // Ensure we are on main before branching
-  execSync('git checkout main', execOpts);
-
-  // Create or reuse branch
-  let branchExistsLocally = false;
-  try {
-    execSync(`git rev-parse --verify ${branch}`, execOpts);
-    branchExistsLocally = true;
-  } catch {
-    // branch does not exist locally — will create it below
-  }
-
-  if (branchExistsLocally) {
-    execSync(`git checkout ${branch}`, execOpts);
-  } else {
-    execSync(`git checkout -b ${branch}`, execOpts);
-  }
-
-  // Stage and commit the plan artifact on the branch
-  const relPath = artifactPath.startsWith(repoRoot)
-   ? artifactPath.slice(repoRoot.length + 1)
-    : artifactPath;
-  execSync(`git add -- "${relPath}"`, execOpts);
-  execSync(
-    `git commit -m "docs(${lane}): add ${storyKey} implementation plan for review"`,
-    execOpts,
-  );
-
-  // Push branch (only if not already on remote)
-  const remoteRef = execSync(`git ls-remote --heads origin ${branch}`, execOpts).trim();
-  if (remoteRef === '') {
-    execSync(`git push origin ${branch}`, execOpts);
-  } else {
-    execSync(`git push origin ${branch}`, execOpts);
-  }
-
-  // Return to main
-  execSync('git checkout main', execOpts);
-
-  // Attempt PR creation — non-blocking on failure
-  let prUrl: string | undefined;
-  try {
-    const { credentials } = getBitbucketCredentials();
-    const remoteUrl = execSync(`git -C ${repoRoot} remote get-url origin`, {
-      encoding: 'utf8',
-      stdio: 'pipe',
-      timeout: 10000,
-    }).trim();
-    const { workspace: detectedWorkspace, repoSlug } = parseRemoteUrl(remoteUrl);
-    const workspace = process.env.BITBUCKET_WORKSPACE?? detectedWorkspace;
-    const defaultBranch = process.env.BITBUCKET_DEFAULT_BRANCH?? 'main';
-
-    const url = `https://api.bitbucket.org/2.0/repositories/${workspace}/${repoSlug}/pullrequests`;
-    const body = JSON.stringify({
-      title: `Plan review: ${storyKey} — ${storyTitle}`,
-      description: [
-        `Implementation plan for ${storyKey} ready for supervisor review.`,
-        ``,
-        `**Artifact:** \`${relPath}\
-`,
-        `**Lane:** ${lane}`,
-        `**Story:** ${storyKey}`,
-        ``,
-        `Review the plan file in this PR. Merging this PR approves the plan and unblocks lane execution.`,
-      ].join('\n'),
-      source: { branch: { name: branch } },
-      destination: { branch: { name: defaultBranch } },
-      close_source_branch: true,
-    });
-
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Basic ${credentials}` },
-      body,
-    });
-
-    if (!response.ok) {
-      const text = await response.text().catch(() => '');
-      throw new Error(`Bitbucket API returned ${response.status}: ${text}`);
-    }
-
-    const data = (await response.json()) as { links?: { html?: { href?: string } } };
-    prUrl = data.links?.html?.href;
-    if (!prUrl) throw new Error('Bitbucket PR created but response contained no PR URL');
-  } catch (err) {
-    console.error(`[ARC-1371] Plan PR creation failed for branch ${branch}: ${String(err)}`);
-  }
-
-  return { branch, prUrl };
-}
-```
+**Verification:** unit test asserts branch naming, PR title/body content via the mocked `fetch` call, and that on `fetch` failure the artifact ends up committed on `main` (assert `execSync` was called with `git checkout main` and a `git commit` after the PR attempt failed).
 
 ### Step 4 — Implement `createDecisionPR` in `checkpointGit.ts`
 
 **File:** `packages/server/src/git/checkpointGit.ts`
 
-Add immediately after `createPlanPR`:
+Add `export async function createDecisionPR(opts: CreateDecisionPROptions): Promise<CreatePlanningArtifactPRResult>`, structurally identical to `createPlanPR` (Step 3) but:
+- Branch name: `` `decision/${storyKey}-${decisionType}` ``.
+- Commit message: `` `docs: add ${storyKey} ${decisionType} decision document for review` ``.
+- PR title: `` `Decision: ${storyKey} — ${decisionType}` ``.
+- PR description instructs the supervisor to edit `status: answered` and `selected_approach: Option N` in the file (in the PR's diff or by pushing an additional commit to the PR branch) before merging.
+- Same fallback-to-`main` behavior as Step 3 on PR-creation failure.
 
-```typescript
-/**
- * Creates a planning-repo branch for a decision document, commits the file,
- * pushes the branch, and opens a Bitbucket PR for supervisor review.
- *
- * Branch naming: `decision/{storyKey}-{decisionType}`
- * PR title: `Decision: {storyKey} — {decisionType}`
- * PR description: includes artifact path, story key, decision type, and
- *   instruction to set `status: answered` and `selected_approach` before merging.
- *
- * Same fallback and return contract as createPlanPR.
- */
-export async function createDecisionPR(
-  opts: CreateDecisionPROptions,
-): Promise<CreatePlanningArtifactPRResult> {
-  const { repoRoot, storyKey, decisionType, artifactPath } = opts;
-  const branch = `decision/${storyKey}-${decisionType}`;
+**Verification:** unit test asserts branch naming (`decision/ARC-1371-approach-decision`), PR title, and fallback-to-main path.
 
-  const execOpts = {
-    encoding: 'utf8' as const,
-    stdio: 'pipe' as const,
-    timeout: 10000,
-    cwd: repoRoot,
-  };
-
-  execSync('git checkout main', execOpts);
-
-  let branchExistsLocally = false;
-  try {
-    execSync(`git rev-parse --verify ${branch}`, execOpts);
-    branchExistsLocally = true;
-  } catch { /* create below */ }
-
-  if (branchExistsLocally) {
-    execSync(`git checkout ${branch}`, execOpts);
-  } else {
-    execSync(`git checkout -b ${branch}`, execOpts);
-  }
-
-  const relPath = artifactPath.startsWith(repoRoot)
-   ? artifactPath.slice(repoRoot.length + 1)
-    : artifactPath;
-  execSync(`git add -- "${relPath}"`, execOpts);
-  execSync(
-    `git commit -m "docs: add ${storyKey} ${decisionType} decision document for review"`,
-    execOpts,
-  );
-
-  const remoteRef = execSync(`git ls-remote --heads origin ${branch}`, execOpts).trim();
-  if (remoteRef === '') {
-    execSync(`git push origin ${branch}`, execOpts);
-  } else {
-    execSync(`git push origin ${branch}`, execOpts);
-  }
-
-  execSync('git checkout main', execOpts);
-
-  let prUrl: string | undefined;
-  try {
-    const { credentials } = getBitbucketCredentials();
-    const remoteUrl = execSync(`git -C ${repoRoot} remote get-url origin`, {
-      encoding: 'utf8',
-      stdio: 'pipe',
-      timeout: 10000,
-    }).trim();
-    const { workspace: detectedWorkspace, repoSlug } = parseRemoteUrl(remoteUrl);
-    const workspace = process.env.BITBUCKET_WORKSPACE?? detectedWorkspace;
-    const defaultBranch = process.env.BITBUCKET_DEFAULT_BRANCH?? 'main';
-
-    const url = `https://api.bitbucket.org/2.0/repositories/${workspace}/${repoSlug}/pullrequests`;
-    const body = JSON.stringify({
-      title: `Decision: ${storyKey} — ${decisionType}`,
-      description: [
-        `Decision document for ${storyKey} awaiting supervisor input.`,
-        ``,
-        `**Artifact:** \`${relPath}\
-`,
-        `**Story:** ${storyKey}`,
-        `**Type:** ${decisionType}`,
-        ``,
-        `To approve: edit the file in this PR to set \`status: answered\` and \`selected_approach: Option N\`, then merge.`,
-        `The conductor will read the merged file from \`main\` to extract \`selected_approach\`.`,
-      ].join('\n'),
-      source: { branch: { name: branch } },
-      destination: { branch: { name: defaultBranch } },
-      close_source_branch: true,
-    });
-
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Basic ${credentials}` },
-      body,
-    });
-
-    if (!response.ok) {
-      const text = await response.text().catch(() => '');
-      throw new Error(`Bitbucket API returned ${response.status}: ${text}`);
-    }
-
-    const data = (await response.json()) as { links?: { html?: { href?: string } } };
-    prUrl = data.links?.html?.href;
-    if (!prUrl) throw new Error('Bitbucket PR created but response contained no PR URL');
-  } catch (err) {
-    console.error(`[ARC-1371] Decision PR creation failed for branch ${branch}: ${String(err)}`);
-  }
-
-  return { branch, prUrl };
-}
-```
-
-### Step 5 — Add `isPRMerged` polling helper to `checkpointGit.ts`
+### Step 5 — Add `isPRMerged` and `startPlanningPRPoller` to `checkpointGit.ts`
 
 **File:** `packages/server/src/git/checkpointGit.ts`
 
-Add after `createDecisionPR`. This function is used by the lane poller in step 6.
+Since no polling mechanism exists anywhere in the codebase (Assumption 4), add both from scratch:
 
-```typescript
-/**
- * Checks whether a Bitbucket PR has been merged.
- * Fetches the PR state from the Bitbucket Cloud REST API.
- * Returns `true` if `state === "MERGED"`, `false` otherwise.
- * Throws on HTTP or network errors — callers must catch.
- */
-export async function isPRMerged(prUrl: string): Promise<boolean> {
-  const { credentials } = getBitbucketCredentials();
-  const prId = parsePrId(prUrl);
-  const { workspace, repoSlug } = parsePrUrlRepo(prUrl);
+- `export async function isPRMerged(prUrl: string): Promise<boolean>` — reuses the private `parsePrId` and `parsePrUrlRepo` helpers (already used by `listUnresolvedPRComments`/`replyToThread`/`resolveThread`) and `getBitbucketCredentials`. Issues a `GET` to `https://api.bitbucket.org/2.0/repositories/{workspace}/{repoSlug}/pullrequests/{prId}`, returns `true` iff the response body's `state === 'MERGED'`. Throws on non-2xx or network error — caller must catch.
+- `export function startPlanningPRPoller(opts: { prUrl: string; intervalMs: number; onMerged: () => void }): { stop: () => void }` — a `setTimeout`-based loop (not `setInterval`, to avoid overlapping in-flight checks) that calls `isPRMerged` every `intervalMs`, invokes `onMerged` exactly once and stops on the first `true`, logs and continues on individual poll errors, and exposes a `stop()` closure to cancel.
 
-  const url = `https://api.bitbucket.org/2.0/repositories/${workspace}/${repoSlug}/pullrequests/${prId}`;
+**Verification:** unit tests — `isPRMerged` returns true/false correctly per mocked `fetch` response and throws on non-2xx; `startPlanningPRPoller` calls `onMerged` once when merged, never calls it after `stop()`, and survives one thrown poll error before succeeding on a later tick (use `vi.useFakeTimers()` and advance timers, consistent with existing test patterns in `checkpointGit.test.ts`).
 
-  const response = await fetch(url, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Basic ${credentials}`,
-    },
-  });
-
-  if (!response.ok) {
-    const text = await response.text().catch(() => '');
-    throw new Error(`Bitbucket API returned ${response.status}: ${text}`);
-  }
-
-  const data = (await response.json()) as { state?: string };
-  return data.state === 'MERGED';
-}
-```
-
-### Step 6 — Add `startPlanningPRPoller` to `checkpointGit.ts`
-
-**File:** `packages/server/src/git/checkpointGit.ts`
-
-Add after `isPRMerged`. This drives the PR-merge detection loop without adding a new polling mechanism elsewhere:
-
-```typescript
-/**
- * Starts a polling loop that checks a planning-artifact PR for merge every
- * `intervalMs` milliseconds. When the PR is merged, `onMerged` is called once
- * and the polling stops.
- *
- * Returns a `stop` function that cancels polling (used in tests or if the lane
- * is externally resumed/cancelled before the PR merges).
- *
- * Error handling: individual poll failures are logged and skipped — the loop
- * continues until stopped or the PR is merged.
- */
-export function startPlanningPRPoller(opts: {
-  prUrl: string;
-  intervalMs: number;
-  onMerged: () => void;
-}): { stop: () => void } {
-  const { prUrl, intervalMs, onMerged } = opts;
-  let active = true;
-
-  const tick = async () => {
-    if (!active) return;
-    try {
-      const merged = await isPRMerged(prUrl);
-      if (merged && active) {
-        active = false;
-        onMerged();
-        return;
-      }
-    } catch (err) {
-      console.error(`[ARC-1371] isPRMerged poll failed for ${prUrl}: ${String(err)}`);
-    }
-    if (active) {
-      setTimeout(() => { void tick(); }, intervalMs);
-    }
-  };
-
-  setTimeout(() => { void tick(); }, intervalMs);
-
-  return { stop: () => { active = false; } };
-}
-```
-
-### Step 7 — Wire `createPlanPR` / `createDecisionPR` into `laneRunner.ts`
+### Step 6 — Wire plan/decision-artifact detection and PR triggering into `laneRunner.ts`
 
 **File:** `packages/server/src/runner/laneRunner.ts`
 
-**Context:** ARC-1369 added `commitPlanningArtifacts` logic. That function currently commits plan/decision files directly to `main`. ARC-1371 replaces that direct-to-main commit path with a branch + PR path for plans and decisions.
+**Current control flow being modified** (verified in the actual file): inside the `for (const step of steps)` loop, `type === 'agent'` branch, after `executeStep` succeeds and the `pendingGate` (CHECKPOINT/GATE sub-step) check finds no pending gate, the code calls `markStepCheckedInMarkdown(runbookPath, step.id)` and then unconditionally `commitPlanningArtifacts(stepState.repoRoot, laneFromRunbookPath(runbookPath))` before falling through to the next loop iteration.
 
-**7a. Update imports** — add to the existing `checkpointGit` import line:
+**New logic**, inserted immediately before the existing `commitPlanningArtifacts` call (i.e. still inside the "no pending gate" branch, after `markStepCheckedInMarkdown`):
 
-```typescript
-import {
-  createCheckpointBranchAndPR,
-  createPlanPR,
-  createDecisionPR,
-  startPlanningPRPoller,
-} from '../git/checkpointGit.js';
-```
+1. Run `git status --porcelain -- implementation_plans/ decisions/` against `stepState.repoRoot` (mirroring the exact `git status --porcelain` pattern `commitPlanningArtifacts` already uses, but scoped to `implementation_plans/` and `decisions/` instead of `implementation_plans/` + `task-completions/`).
+2. If the status output contains any line under `implementation_plans/`, treat it as a plan artifact: derive `storyKey` from the changed filename (matches the `{KEY}-implementation-plan.md` convention) and `lane` from `laneFromRunbookPath(runbookPath)`; derive `storyTitle` from the step's `label` (strip any leading `ARC-\d+ — ` prefix or ARC key match already extracted by `buildPromptFromStep`'s `arcKeyMatch` logic — reuse that same regex).
+3. If the status output contains any line under `decisions/` matching `{KEY}-approach-decision.md`, treat it as a decision artifact: derive `storyKey` and `decisionType` (`approach-decision`, the only decision type this codebase's `_template.md` currently produces) from the filename.
+4. For each detected artifact, call a new local async helper `triggerPlanningArtifactPR(...)` (Step 7) instead of proceeding to `commitPlanningArtifacts` for that file. If **any** plan or decision artifact was detected and dispatched, `return` from `runLane` immediately after `triggerPlanningArtifactPR` resolves (the lane is now paused; do not fall through to `commitPlanningArtifacts` or the next loop iteration).
+5. If no plan/decision artifact is detected, fall through unchanged to the existing `commitPlanningArtifacts(stepState.repoRoot, laneFromRunbookPath(runbookPath))` call — this preserves the existing behavior for completion summaries and any other `task-completions/`/`implementation_plans/` changes that are not plan/decision files (though in practice a step either writes a plan or doesn't; this fallthrough mainly protects the completion-summary and archived-plan-move scenarios already covered by ARC-1369/ARC-1370).
 
-**7b. Add a `planningPRPollers` registry** — track active pollers for cleanup:
+**Why detect via `git status` rather than a new event type:** confirmed in Assumption 8 — `OpenCodeEvent` has no artifact-write signal, and `commitPlanningArtifacts` already establishes the git-status-scan pattern as this codebase's convention for artifact detection.
 
-```typescript
-/**
- * Active planning PR pollers keyed by PR URL.
- * Stopped when a lane resumes or is done.
- */
-const planningPRPollers = new Map<string, { stop: () => void }>();
-```
+**Verification:** unit test in `laneRunner.test.ts` mocks `execSync`-backed git status (via the same `checkpointGit.js` module mock already used for `commitPlanningArtifacts`) to report a changed `implementation_plans/checkpoint-management/ARC-9999-implementation-plan.md` file, and asserts `triggerPlanningArtifactPR` (mocked) is called with `artifactType: 'plan'` and that `commitPlanningArtifacts` is NOT called for that step; a second test asserts the decision-file path.
 
-**7c. Add `triggerPlanningArtifactPR` helper function** in `laneRunner.ts`:
-
-This function replaces the direct `commitPlanningArtifacts` call for plan and decision artifacts. It:
-1. Calls `createPlanPR` or `createDecisionPR` (determined by `artifactType` parameter).
-2. Pushes a `CheckpointQueueEntry` with `checkpointLevel: 'high'` and the `prUrl`.
-3. Starts a `planningPRPoller` that calls `resumeLaneFromPlanningPR` on merge.
-4. Sets lane status to `'paused'`.
-
-```typescript
-type PlanningArtifactType = 'plan' | 'decision';
-
-interface TriggerPlanningArtifactPROpts {
-  runbookPath: string;
-  artifactType: PlanningArtifactType;
-  lane: string;
-  storyKey: string;
-  storyTitle: string;
-  decisionType?: string;   // required when artifactType === 'decision'
-  artifactPath: string;
-  repoRoot: string;
-  intervalMs: number;
-}
-
-async function triggerPlanningArtifactPR(opts: TriggerPlanningArtifactPROpts): Promise<void> {
-  const {
-    runbookPath, artifactType, lane, storyKey, storyTitle,
-    decisionType, artifactPath, repoRoot, intervalMs,
-  } = opts;
-
-  let result: { branch: string; prUrl?: string };
-
-  if (artifactType === 'plan') {
-    result = await createPlanPR({ repoRoot, lane, storyKey, storyTitle, artifactPath });
-  } else {
-    result = await createDecisionPR({
-      repoRoot, storyKey, decisionType: decisionType!, artifactPath,
-    });
-  }
-
-  const compositeId = `${storyKey}__plan_pr`;
-  const current = getState();
-  const entry: CheckpointQueueEntry = {
-    stepId: compositeId,
-    runbookPath,
-    checkpointLevel: 'high',
-    hitAt: new Date().toISOString(),
-    prUrl: result.prUrl,
-  };
-  const updated = {...current, checkpointQueue: [...current.checkpointQueue, entry] };
-  setState(updated);
-  writeSidecar(current.repoRoot, updated);
-
-  laneStatusMap.set(runbookPath, 'paused');
-
-  if (result.prUrl) {
-    const poller = startPlanningPRPoller({
-      prUrl: result.prUrl,
-      intervalMs,
-      onMerged: () => {
-        planningPRPollers.delete(result.prUrl!);
-        resumeLaneFromPlanningPR(compositeId, runbookPath, artifactType, storyKey);
-      },
-    });
-    planningPRPollers.set(result.prUrl, poller);
-  } else {
-    // Fallback: no prUrl — checkpoint is raised but lane stays paused until
-    // supervisor manually calls POST /api/checkpoints/:stepId/resume
-    console.warn(
-      `[ARC-1371] Planning artifact PR creation failed for ${storyKey}. ` +
-      `Lane ${lane} paused — supervisor must resume manually via checkpoint queue.`,
-    );
-  }
-}
-```
-
-**7d. Add `resumeLaneFromPlanningPR` helper** in `laneRunner.ts`:
-
-```typescript
-/**
- * Called by the planning PR poller when a plan or decision PR is merged.
- * Removes the checkpoint entry from the queue, reads the merged artifact from
- * main if this is a decision PR (to extract selected_approach), persists state,
- * and re-runs the lane from disk.
- */
-function resumeLaneFromPlanningPR(
-  compositeId: string,
-  runbookPath: string,
-  artifactType: PlanningArtifactType,
-  storyKey: string,
-): void {
-  const current = getState();
-  const updatedQueue = current.checkpointQueue.filter((e) => e.stepId!== compositeId);
-  const updated = {...current, checkpointQueue: updatedQueue };
-  setState(updated);
-  writeSidecar(current.repoRoot, updated);
-
-  if (artifactType === 'decision') {
-    // Decision documents: the merged file on main now contains status/selected_approach.
-    // The next agent invocation will read it from disk — no special extraction needed here;
-    // the agent prompt (built by buildPromptFromStep) will include the file path.
-    console.info(`[ARC-1371] Decision PR merged for ${storyKey} — lane resuming, agent will read merged file from main.`);
-  }
-
-  try {
-    const { parseRunbook } = require('../runbook/parser.js');
-    const parsed = parseRunbook(runbookPath);
-    const steps = parsed.waves.flatMap((wave: { steps: RunbookStep[] }) => wave.steps);
-    void runLane(runbookPath, steps).catch((err: unknown) => {
-      console.error(`[ARC-1371] runLane failed on planning PR resume for ${runbookPath}: ${String(err)}`);
-    });
-  } catch (parseErr: unknown) {
-    console.warn(`[ARC-1371] parseRunbook failed on planning PR resume for ${runbookPath}: ${String(parseErr)}`);
-  }
-}
-```
-
-> **Note on `require` vs `import`:** `resumeLaneFromPlanningPR` is called from a closure (the `onMerged` callback) at runtime, not at module load time. Use the already-imported `parseRunbook` from the existing static import at the top of `laneRunner.ts`. If `parseRunbook` is not yet imported, add it to the existing parser import. Do not use `require`.
-
-**Correction for 7d:** Replace the `require` call with the static import. The parser is already imported by `laneRunner.ts` (via `buildPromptFromStep` context) or must be added:
-
-```typescript
-// Add to imports at top of laneRunner.ts:
-import { parseRunbook } from '../runbook/parser.js';
-```
-
-Then in `resumeLaneFromPlanningPR`, call `parseRunbook(runbookPath)` directly.
-
-### Step 8 — Hook `triggerPlanningArtifactPR` into the agent-step post-execution path
+### Step 7 — Implement `triggerPlanningArtifactPR` and `resumeLaneFromPlanningPR` in `laneRunner.ts`
 
 **File:** `packages/server/src/runner/laneRunner.ts`
 
-ARC-1369 wired a `commitPlanningArtifacts` call somewhere in the agent step success path (after `executeStep` resolves and before the CHECKPOINT/GATE sub-step check). Locate that call site.
+**7a. Imports** — extend the existing `checkpointGit.js` import (currently `{ createCheckpointBranchAndPR, commitPlanningArtifacts }`) to add `createPlanPR, createDecisionPR, startPlanningPRPoller`.
 
-**Replace** the ARC-1369 direct-commit logic for plans and decisions with a call to `triggerPlanningArtifactPR`. The replacement logic should:
-1. After `executeStep` succeeds, scan the agent's output events for any newly written plan or decision file paths (ARC-1369 will have established a convention for this — look for a `planning_artifact_written` event type or similar signal in the step result).
-2. For each such file, call `triggerPlanningArtifactPR(...)` with the appropriate `artifactType`.
-3. If `triggerPlanningArtifactPR` was called, `return` immediately (the lane is now paused; the poller will resume it).
+**7b. Module-level poller registry** — add `const planningPRPollers = new Map<string, { stop: () => void }>()`, following the existing pattern of `laneStatusMap`/`laneActiveStep`/`pushedSubStepCheckpoints` as private module state; reset it in `_resetLaneStateForTesting()` alongside the other three.
 
-**If ARC-1369 established a different signal mechanism**, adapt accordingly. The core contract is:
-- Plans → `createPlanPR` → branch `plan/{lane}/{KEY}` → PR titled `Plan review: {KEY} — {title}`
-- Decisions → `createDecisionPR` → branch `decision/{KEY}-{type}` → PR titled `Decision: {KEY} — {type}`
+**7c. `triggerPlanningArtifactPR`** — signature: `async function triggerPlanningArtifactPR(opts: { runbookPath: string; artifactType: 'plan' | 'decision'; lane: string; storyKey: string; storyTitle?: string; decisionType?: string; artifactPath: string; repoRoot: string }): Promise<void>`. Behavior:
+1. Calls `createPlanPR` or `createDecisionPR` based on `artifactType`.
+2. Constructs a `CheckpointQueueEntry` with `checkpointLevel: 'high'`, `hitAt`, `prUrl: result.prUrl`, and the new `planningArtifact: { artifactType, storyKey, branch: result.branch }` field (Step 8), pushes it into `getState().checkpointQueue`, persists via `setState`/`writeSidecar`, exactly matching the existing push pattern used for sub-step and top-level checkpoints elsewhere in `runLane`.
+3. Sets `laneStatusMap.set(runbookPath, 'paused')`.
+4. If `result.prUrl` is defined, starts a poller via `startPlanningPRPoller({ prUrl, intervalMs: getState().config.prPollIntervalMs ?? 30000, onMerged: () => { planningPRPollers.delete(result.prUrl!); resumeLaneFromPlanningPR(...) } })` and stores it in `planningPRPollers`.
+5. If `result.prUrl` is undefined (PR creation failed and the artifact was committed to `main` as a fallback per Step 3/4), log a warning; the checkpoint entry stays in the queue with no `prUrl`, and per the existing `routes/checkpoints.ts` resume route, a supervisor can resume it manually via `POST /api/checkpoints/:stepId/resume` (that route's no-`prUrl` branch already dequeues and calls `runLane` — no route change needed for this fallback case).
 
-The `intervalMs` comes from `getState().config.prPollIntervalMs?? 30000`.
+**7d. `resumeLaneFromPlanningPR`** — signature: `export function resumeLaneFromPlanningPR(compositeId: string, runbookPath: string, artifactType: 'plan' | 'decision', storyKey: string): void` (exported, not module-private, so `index.ts` startup recovery in Step 8 can call it). Behavior:
+1. Dequeue the matching `checkpointQueue` entry by `stepId === compositeId`, persist via `setState`/`writeSidecar` — same filter-by-stepId pattern already used in `routes/checkpoints.ts`'s `resumeLane` helper (not `runLane` itself) to avoid stale-index bugs.
+2. If `artifactType === 'decision'`: no special extraction is done here — the merged decision file is on `main` at this point; the next agent invocation (triggered by `runLane` re-dispatching the same step, since `step.checked` is still `false` for a plan/decision-writing step that hasn't reached its `markStepCheckedInMarkdown` call) will re-read the file from disk via its prompt, which already references `decisions/{KEY}-approach-decision.md` by convention. Log an info message noting the merge.
 
-### Step 9 — Update `CheckpointQueueEntry` in `types.ts` (if needed)
+   **Correction to AC5's re-pause requirement:** AC5 requires that if `status` is still `pending` after merge (supervisor merged without answering), the conductor re-pauses and logs a warning rather than proceeding. Implement this by reading the merged file (`readFileSync` on the resolved `decisions/{KEY}-approach-decision.md` path under `repoRoot`) and checking for the literal line `status: answered`. If absent, re-push a `CheckpointQueueEntry` with the same `planningArtifact` metadata (no new PR — the existing merged PR already serves as the review surface) and `laneStatusMap.set(runbookPath, 'paused')`, then `return` without calling `runLane`. If present, proceed to step 3 below.
+3. Otherwise (plan artifact, or decision confirmed answered): re-parse the runbook via the existing `parseRunbook` import — this must be a **static top-level import** (`import { parseRunbook } from '../runbook/parser.js'`) added to `laneRunner.ts`'s import block, not a `require()` call, since `laneRunner.ts` is a pure ESM module and no other function in this file uses `require`. Then call `void runLane(runbookPath, steps).catch(...)`, matching the exact resume pattern already used in `routes/checkpoints.ts`'s `resumeLane` helper.
+
+**Verification:** unit tests mock `createPlanPR`/`createDecisionPR`/`startPlanningPRPoller` and assert: lane pauses and checkpoint entry is pushed with `planningArtifact` set; poller is started with the configured `intervalMs`; fallback (`prUrl` undefined) path pauses without starting a poller; `resumeLaneFromPlanningPR` dequeues the entry and calls `runLane`; decision resume with `status: pending` re-pauses without calling `runLane`.
+
+### Step 8 — Add `planningArtifact` discriminator to `CheckpointQueueEntry`
 
 **File:** `packages/server/src/state/types.ts`
 
-Check if `CheckpointQueueEntry` needs a new discriminator field to distinguish planning-PR checkpoints from execution checkpoints. The existing `prUrl` field is reused. Add an optional `planningArtifact` field for UI display:
+Add an optional field to `CheckpointQueueEntry` (alongside `prUrl?`, `renotifyMessage?`, `lastAgentMessage?`):
 
 ```typescript
-/**
- * Present on checkpoint entries created by planning-artifact PR opening (ARC-1371).
- * Used by the UI to display a more informative message in the ResumeCard.
- */
-planningArtifact?: {
-  artifactType: 'plan' | 'decision';
-  storyKey: string;
-  branch: string;
-};
+planningArtifact?: { artifactType: 'plan' | 'decision'; storyKey: string; branch: string };
 ```
 
-Update the `triggerPlanningArtifactPR` helper in step 7c to populate this field when creating the `CheckpointQueueEntry`.
+This is purely additive — existing entries without the field remain valid, and no other reader of `CheckpointQueueEntry` needs to change (the UI's `ResumeCard`/`CheckpointQueuePanel` components read `prUrl`, `renotifyMessage`, `lastAgentMessage` today and can be extended in a follow-up UI story if display polish is wanted; this plan's issue does not require a UI change).
 
-### Step 10 — Update `resume` route to handle planning PR checkpoints
+**Verification:** `npx tsc --noEmit` passes; existing `CheckpointQueueEntry` literals in tests that omit the field still typecheck.
+
+### Step 9 — Guard the resume route against manual resume of planning-PR checkpoints
 
 **File:** `packages/server/src/routes/checkpoints.ts`
 
-The existing `POST /api/checkpoints/:stepId/resume` route already handles `prUrl`-based entries by calling `listUnresolvedPRComments`. For planning PR checkpoints, the comment-address loop is not appropriate — the artifact should be reviewed inline on Bitbucket, not addressed by the agent.
+The current `POST /api/checkpoints/:stepId/resume` handler (verified: lines 123–186) branches on `entry.prUrl` truthy/falsy to decide whether to run the ARC-1304 comment-address flow before dequeuing. For a planning-artifact checkpoint (`entry.planningArtifact` set) **with** a `prUrl`, that comment-address flow is not the intended resume path — PR merge (via the Step 5/7 poller) is. Add a guard as the **first check** inside the try block, immediately after resolving `entry` (before the existing `if (entry.prUrl)` branch): if `entry.planningArtifact !== undefined && entry.prUrl !== undefined`, respond `409` with `{ error: '...merge the PR to resume automatically...', prUrl: entry.prUrl }` and `return` without touching the queue. If `entry.planningArtifact` is set but `entry.prUrl` is undefined (the AC6 fallback-to-`main` case), fall through to the existing no-`prUrl` branch unchanged — that path already dequeues and calls `runLane`, which is the correct manual-resume behavior for the fallback case.
 
-**Add a guard** at the top of the resume route handler:
+**Verification:** unit test in `checkpoints.test.ts` — entry with both `planningArtifact` and `prUrl` set returns 409 with `prUrl` in the body and does not call `runLane`; entry with `planningArtifact` set but no `prUrl` resumes normally (existing no-`prUrl` path).
 
-```typescript
-// ARC-1371: Planning-artifact PR checkpoints are resolved by PR merge via the
-// startPlanningPRPoller, not by manual resume. Reject manual resume attempts
-// with a clear error message.
-if (entry.planningArtifact!== undefined && entry.prUrl!== undefined) {
-  res.status(409).json({
-    error: `This checkpoint is waiting for a planning PR to be merged on Bitbucket. ` +
-           `Merge PR at ${entry.prUrl} to resume the lane automatically.`,
-    prUrl: entry.prUrl,
-  });
-  return;
-}
-```
+### Step 10 — Startup recovery for in-flight planning-PR pollers
 
-If the poller is not running (e.g. server was restarted after PR was created), the route should additionally restart the poller:
+**File:** `packages/server/src/index.ts`
 
-```typescript
-// ARC-1371: Re-start the poller if server was restarted and the entry still has a prUrl
-// (the poller lives only in memory and is lost on restart).
-if (entry.planningArtifact!== undefined && entry.prUrl!== undefined) {
-  // (handled above — fall through is unreachable; this comment is for dead-code clarity)
-}
-```
+Pollers live only in `laneRunner.ts`'s in-memory `planningPRPollers` map (Step 7b) and are lost on server restart. The current startup sequence (verified: lines 30–111) already loads `initialState` via `loadOrCreateState`, then reconstructs `laneStatusMap` from `initialState.checkpointQueue` via `restoreLaneStatus`. Add, immediately after that existing `if (initialState.sessionStartedAt) { ... }` block: iterate `initialState.checkpointQueue`, and for each entry where `entry.planningArtifact !== undefined && entry.prUrl !== undefined`, call `startPlanningPRPoller({ prUrl: entry.prUrl, intervalMs: initialState.config.prPollIntervalMs ?? 30000, onMerged: () => resumeLaneFromPlanningPR(entry.stepId, entry.runbookPath, entry.planningArtifact!.artifactType, entry.planningArtifact!.storyKey) })`. This requires importing `startPlanningPRPoller` from `../git/checkpointGit.js` and `resumeLaneFromPlanningPR` from `../runner/laneRunner.js` (already exported per Step 7d) into `index.ts`, alongside the existing `restoreLaneStatus` import.
 
-**Server restart recovery:** Add a startup hook (in `index.ts` or equivalent startup code) that scans the initial `checkpointQueue` for entries with `planningArtifact` set and `prUrl` present, and restarts pollers for them. The `onMerged` callback calls `resumeLaneFromPlanningPR` just as during normal operation.
-
-**File:** `packages/server/src/index.ts` (or startup module)
-
-```typescript
-// ARC-1371: On startup, restart any planning PR pollers for entries that were
-// in-flight when the server last shut down.
-const initialState = getState();
-for (const entry of initialState.checkpointQueue) {
-  if (entry.planningArtifact && entry.prUrl) {
-    const intervalMs = initialState.config.prPollIntervalMs?? 30000;
-    startPlanningPRPoller({
-      prUrl: entry.prUrl,
-      intervalMs,
-      onMerged: () => {
-        resumeLaneFromPlanningPR(
-          entry.stepId,
-          entry.runbookPath,
-          entry.planningArtifact!.artifactType,
-          entry.planningArtifact!.storyKey,
-        );
-      },
-    });
-  }
-}
-```
-
-> **Note:** `resumeLaneFromPlanningPR` must be exported from `laneRunner.ts` (or a new `planningPRResume.ts` module) for the startup code to call it. Make it an exported function.
+**Verification:** integration-style test (or manual smoke test) — seed a sidecar file with a `checkpointQueue` entry containing `planningArtifact` and `prUrl`, start the server, mock `isPRMerged` to resolve `true`, confirm `resumeLaneFromPlanningPR` fires and the lane transitions out of `paused`.
 
 ### Step 11 — Update `write-implementation-plan` skill
 
-**File:** `/home/zimmermann/.config/opencode/skills/write-implementation-plan/SKILL.md`
+**File:** `~/.config/opencode/skills/write-implementation-plan/SKILL.md` (and mirrored copy at `opencode-config/skills/write-implementation-plan/SKILL.md` in this planning repo, if present — verify at execution time and update both if the mirror exists)
 
-Remove the instructions that tell the agent to:
-- Commit the implementation plan file manually with `git add... && git commit && git push`
-- Stop and wait for supervisor approval of the plan document
+Remove the instruction (already partially updated by a prior story — verify current wording at execution time) that implies the agent commits the plan file manually. Replace with: the conductor's `runLane` now detects the new plan file via git status, opens a PR, and pauses the lane automatically (Steps 3, 6, 7 of this plan) — the agent's step is complete once the file is written to `implementation_plans/{lane}/{KEY}-implementation-plan.md`; no manual `git add`/`commit`/`push` and no manual stop-and-wait phrasing is needed, since the pause now happens inside `runLane` itself, not via agent-authored instructions.
 
-Replace with instructions that tell the agent:
-- Write the plan file to `implementation_plans/{lane}/{KEY}-implementation-plan.md`
-- The conductor automatically opens a PR for the plan and pauses the lane — the agent does not commit the file manually
-- The agent's step is complete when the file is written; the conductor handles the rest
+**Verification:** read the file after edit and confirm no remaining instruction tells the agent to manually commit/push the plan file or the decision document.
 
 ### Step 12 — Update `start-execution-session` skill
 
-**File:** `/home/zimmermann/.config/opencode/skills/start-execution-session/SKILL.md`
+**File:** `~/.config/opencode/skills/start-execution-session/SKILL.md` (and mirrored copy at `opencode-config/skills/start-execution-session/SKILL.md` in this planning repo, if present)
 
-Remove references to:
-- Manually editing `status: answered` in decision documents
-- Manually committing decision documents
+Remove instructions telling the agent to commit the decision document manually or to poll/wait for `status: answered` to be edited directly on `main`. Replace with: the conductor opens a PR for the decision document automatically (Step 4, 6, 7); the supervisor edits `status: answered` and `selected_approach: Option N` in the file within the PR (either via the Bitbucket web editor on the PR branch, or by pushing a commit to the PR branch) and merges; the conductor detects the merge (Step 5 poller) and resumes the lane, re-reading the merged file from `main` (Step 7d).
 
-Replace with:
-- Decision documents are written by the agent, committed to a branch, and submitted as a Bitbucket PR automatically by the conductor
-- Supervisors answer decisions by editing the file in the PR and merging; the conductor reads the merged file
-- Agents do not need to poll or check decision document status manually
+**Verification:** read the file after edit and confirm no remaining instruction tells the human/agent to edit `status: answered` directly on `main` outside a PR, or to manually push the decision file.
 
-## Test Plan
+## Testing & Validation
 
-### Unit tests — `packages/server/src/git/checkpointGit.test.ts`
+### Unit — `packages/server/src/git/checkpointGit.test.ts`
 
-| Test | Description | Assertion |
-|------|-------------|----------|
-| `createPlanPR — success path` | Valid opts, fetch returns PR URL | Returns `{ branch: 'plan/checkpoint-management/ARC-1371', prUrl: 'https://...' }` |
-| `createPlanPR — branch naming` | storyKey `ARC-1371`, lane `checkpoint-management` | Branch is exactly `plan/checkpoint-management/ARC-1371` |
-| `createPlanPR — PR title` | storyTitle `Conductor: open PR...` | Fetch body contains `Plan review: ARC-1371 — Conductor: open PR...` |
-| `createPlanPR — fallback on Bitbucket failure` | fetch returns 500 | Returns `{ branch, prUrl: undefined }`; does not throw |
-| `createPlanPR — artifact committed on branch` | execSync calls inspected | `git add` and `git commit` are called after `git checkout -b` |
-| `createDecisionPR — branch naming` | storyKey `ARC-1371`, decisionType `approach-decision` | Branch is `decision/ARC-1371-approach-decision` |
-| `createDecisionPR — PR title` | inputs as above | Fetch body contains `Decision: ARC-1371 — approach-decision` |
-| `createDecisionPR — fallback on Bitbucket failure` | fetch returns network error | Returns `{ branch, prUrl: undefined }` |
-| `isPRMerged — returns true when state is MERGED` | fetch returns `{ state: 'MERGED' }` | Returns `true` |
-| `isPRMerged — returns false when state is OPEN` | fetch returns `{ state: 'OPEN' }` | Returns `false` |
-| `isPRMerged — throws on non-2xx` | fetch returns 403 | Throws with `403` in message |
-| `startPlanningPRPoller — calls onMerged when merged` | isPRMerged resolves `true` after 1 tick | `onMerged` called exactly once |
-| `startPlanningPRPoller — stop cancels polling` | stop() called before tick | `onMerged` never called after stop |
-| `startPlanningPRPoller — continues on poll error` | isPRMerged throws once then returns true | `onMerged` still called on successful tick |
+- `createPlanPR` — branch naming (`plan/{lane}/{storyKey}`), PR title/body content, commit-on-branch before push, fallback-to-`main` commit when `fetch` fails.
+- `createDecisionPR` — branch naming (`decision/{storyKey}-{decisionType}`), PR title/body content, fallback-to-`main` commit.
+- `isPRMerged` — `true` when `state === 'MERGED'`, `false` for `OPEN`/other, throws on non-2xx.
+- `startPlanningPRPoller` — calls `onMerged` once on first `true` tick; `stop()` prevents further calls; survives a thrown poll error and succeeds on a later tick (fake timers).
 
-### Unit tests — `packages/server/src/__tests__/laneRunner.test.ts`
+### Unit — `packages/server/src/__tests__/laneRunner.test.ts`
 
-| Test | Description | Assertion |
-|------|-------------|----------|
-| `triggerPlanningArtifactPR — pauses lane and pushes checkpoint` | Mock `createPlanPR` to return prUrl | `laneStatusMap` is `'paused'`; checkpoint queue contains entry with `planningArtifact` |
-| `triggerPlanningArtifactPR — starts poller when prUrl present` | Mock `startPlanningPRPoller` | Poller started with correct `intervalMs` and `prUrl` |
-| `triggerPlanningArtifactPR — fallback path (no prUrl)` | Mock `createPlanPR` returns no prUrl | Lane still paused; checkpoint pushed; no poller started; warning logged |
-| `resumeLaneFromPlanningPR — dequeues entry and runs lane` | Call directly | `checkpointQueue` no longer contains the entry; `runLane` called |
+- Plan-artifact detection after successful agent step triggers `triggerPlanningArtifactPR` with `artifactType: 'plan'`, not `commitPlanningArtifacts`.
+- Decision-artifact detection triggers `artifactType: 'decision'`.
+- No plan/decision artifact present → existing `commitPlanningArtifacts` call is unchanged (regression guard).
+- `triggerPlanningArtifactPR` pauses the lane, pushes a `CheckpointQueueEntry` with `planningArtifact` set, and starts a poller when `prUrl` is present.
+- `triggerPlanningArtifactPR` fallback path (no `prUrl`) pauses without starting a poller and logs a warning.
+- `resumeLaneFromPlanningPR` dequeues by `stepId` and calls `runLane`.
+- `resumeLaneFromPlanningPR` for a decision artifact with `status: pending` in the merged file re-pauses without calling `runLane`.
 
-### Unit tests — `packages/server/src/__tests__/checkpoints.test.ts`
+### Unit — `packages/server/src/__tests__/checkpoints.test.ts`
 
-| Test | Description | Assertion |
-|------|-------------|----------|
-| `POST /checkpoints/:stepId/resume — planning PR checkpoint returns 409` | Entry has `planningArtifact` and `prUrl` | Response is 409 with `prUrl` in body |
+- `POST /checkpoints/:stepId/resume` for an entry with both `planningArtifact` and `prUrl` returns 409 with `prUrl` in the body.
+- Same route for an entry with `planningArtifact` set but no `prUrl` resumes normally (existing fallback path, unchanged).
 
 ### Integration smoke test
 
-1. Start the server pointing at a test planning repo with a decision document branch already pushed.
-2. Verify `GET /api/state` shows the checkpoint entry with `planningArtifact` and `prUrl` set.
-3. Simulate PR merge by mocking `isPRMerged` to return `true`.
-4. Verify lane transitions from `'paused'` to `'running'`.
+1. Start the server against a test planning repo with a pushed decision-document branch and an open PR recorded in `checkpointQueue` (`planningArtifact` + `prUrl` set).
+2. `GET /api/state` shows the entry with `planningArtifact` populated.
+3. Mock `isPRMerged` to resolve `true`.
+4. Confirm the lane's status (via `GET /api/state`'s `laneState`) transitions from `paused` to `running`/`done` once the poller fires.
 
-## Rollback / Risk Notes
+## Risks & Open Questions
 
 | Risk | Likelihood | Mitigation |
 |------|-----------|------------|
-| ARC-1369 commit logic differs from what this plan assumes | Medium | Step 8 notes explicitly flag the dependency; read ARC-1369 implementation before executing step 8 |
-| `git checkout main` at start of `createPlanPR`/`createDecisionPR` fails if repo is in detached HEAD state | Low | Add a `git status` guard; fall back to `git checkout -` |
-| Poller is lost on server restart before PR merges | Medium | Step 10 startup recovery handles this; verify in integration test |
-| Planning PR from a prior run already exists (branch exists on remote) | Low | The `git push origin` call will fail with "already exists"; catch this error and skip push; poller still functions if the PR URL can be retrieved from the Bitbucket API by branch name |
-| `planningArtifact` field absent on checkpoints persisted by previous server versions | Low | Field is optional; absent entries fall through to existing resume logic cleanly |
-| Skills updated (step 11–12) break agents that expect old manual-commit instructions | Medium | Update both skills atomically; test with a dry-run agent session before marking complete |
+| Git-status-based artifact detection (Step 6) misclassifies a file — e.g. an unrelated file lands in `implementation_plans/` or `decisions/` during the same step — as a plan/decision artifact | Low | Filename pattern match (`{KEY}-implementation-plan.md`, `{KEY}-approach-decision.md`) is strict; log and skip files that don't match either pattern rather than guessing |
+| `git checkout -` (return-to-previous-ref) in `createPlanPR`/`createDecisionPR` fails if the repo was already in a detached HEAD or mid-rebase state | Low | Existing `createCheckpointBranchAndPR` already uses `git checkout -` successfully in production; no new risk introduced beyond what's already accepted for checkpoint PRs |
+| Fallback-to-`main` commit (Step 3/4, AC6) races with a concurrent `commitPlanningArtifacts` call from a different lane's step completing at nearly the same time, since both mutate `main` via `execSync` synchronously | Medium | Node.js is single-threaded for synchronous `execSync` calls — no two `runLane` invocations can interleave `execSync` calls mid-sequence; the existing `commitPlanningArtifacts`/`archiveStoryArtifacts` already rely on this same single-thread guarantee, so no new risk class is introduced, but this should be called out in code review since it's easy to misjudge as unsafe |
+| Poller (`setTimeout` loop) accumulates unbounded if a PR is opened but the server is restarted many times without the PR ever merging — each restart's Step 10 recovery starts a new poller for the same `prUrl` without checking whether one is already conceptually "in flight" from a crashed prior process | Low | This is safe in practice because `planningPRPollers` is an in-memory `Map` that does not survive restart — only one poller per `prUrl` can exist within a single process lifetime; document this explicitly so a future multi-process deployment doesn't silently double-poll |
+| Decision-document `status: pending` re-pause (Step 7d) creates a duplicate `CheckpointQueueEntry` if `compositeId`/`stepId` reuse collides with an entry already re-added by a different resume attempt | Low | Reuse the same `stepId` as the original entry (not a new composite) so a second re-push simply replaces/matches the same key; add a defensive check (find-and-replace by `stepId`, not blind push) when re-pausing |
+| `planningArtifact` field absent on checkpoint entries persisted by server versions running before this story | Low | Field is optional; all new guard checks (`entry.planningArtifact !== undefined`) treat absence as "not a planning-artifact checkpoint," falling through cleanly to existing resume logic |
+| Two skill files may exist in two locations (`~/.config/opencode/skills/...` and this planning repo's `opencode-config/skills/...` mirror) and Step 11/12 could update one but miss the other, leaving stale instructions in whichever copy agents actually load at runtime | Medium | Step 11/12 explicitly instruct checking both locations at execution time; confirm which path OpenCode actually loads from before editing (per `agent-tools-technical-context.md`, tools/skills are loaded from `~/.config/opencode/`, so that copy is authoritative — the planning-repo mirror, if present, is likely a tracked backup and should be kept in sync but is not itself loaded by the agent) |
 
 ## Commit Message Template
 
@@ -772,10 +253,11 @@ feat(checkpoint-management): open Bitbucket PR for planning artifacts as approva
 
 - Add createPlanPR, createDecisionPR, isPRMerged, startPlanningPRPoller to checkpointGit.ts
 - Add triggerPlanningArtifactPR and resumeLaneFromPlanningPR to laneRunner.ts
+- Detect plan/decision artifacts via git status before falling through to commitPlanningArtifacts
 - Add planningArtifact discriminator field to CheckpointQueueEntry
 - Add prPollIntervalMs to SessionConfig (default 30 s)
 - Guard POST /checkpoints/:stepId/resume from manual resume of planning PR checkpoints
-- Add startup recovery for in-flight planning PR pollers
+- Add startup recovery for in-flight planning PR pollers in index.ts
 - Update write-implementation-plan and start-execution-session skills to remove
   manual commit and status:answered instructions
 ```
