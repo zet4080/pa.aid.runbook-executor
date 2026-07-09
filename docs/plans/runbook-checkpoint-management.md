@@ -171,7 +171,7 @@
 - [ ] **ARC-1371** — Conductor: open PR for implementation plans and decision documents as approval gate Depends on ARC-1366 (resume_checkpoint) for PR-merge detection; depends on ARC-1369 (auto-commit artifacts) for branch+commit infrastructure
   - [x] 🔒 Claimed: checkpoint-management / 2026-07-07 19:41
   - [ ] Read `issues/checkpoint-management/ARC-1371-conductor-pr-approval-gate-for-plans-and-decisions.md`
-  - [ ] Write `implementation_plans/checkpoint-management/ARC-1371-implementation-plan.md`
+  - [x] Write `implementation_plans/checkpoint-management/ARC-1371-implementation-plan.md`
   - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
   - [ ] Execute plan
   - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
