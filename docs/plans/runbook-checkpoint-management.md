@@ -174,7 +174,7 @@
   - [x] Write `implementation_plans/checkpoint-management/ARC-1371-implementation-plan.md`
   - [x] 🔴 INDIVIDUAL PLAN CHECKPOINT
   - [x] Execute plan
-  - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
+  - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
   - [ ] Lint / tests pass
   - [ ] Write `task-completions/ARC-1371-COMPLETION-SUMMARY.md`
   - [ ] Commit: `feat(checkpoint-management): PR approval gate for implementation plans and decision documents`
