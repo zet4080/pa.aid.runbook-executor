@@ -58,16 +58,16 @@
   - [x] Commit: `feat(story-lifecycle): add canonical StoryLifecycleState enum and per-story state field`
 
 ### Wave 1 gate
-- [ ] All active stories in this wave checked off
-- [ ] All PRs merged
-- [ ] All completion summaries written
-- [ ] 🟢 WAVE GATE — notify supervisor; dependent lanes: none
+- [x] All active stories in this wave checked off
+- [x] All PRs merged
+- [x] All completion summaries written
+- [x] 🟢 WAVE GATE — notify supervisor; dependent lanes: none
 
 ## Wave 2 — Sub-Machine Extraction and Silent-Failure Fixes
 
 ### 🟡 Batch — Batch 2-A
 
-- [ ] 🔒 Claimed: _(fill in: lane / YYYY-MM-DD HH:MM before starting)_
+- [x] 🔒 Claimed: story-lifecycle / 2026-07-12 14:00
 - [ ] Read all issues: ARC-1375, ARC-1377, ARC-1379, ARC-1380
   - Files: `issues/story-lifecycle/ARC-1375-extract-generic-pr-review-loop-sub-machine.md`, `issues/story-lifecycle/ARC-1377-track-agent-self-review-state.md`, `issues/story-lifecycle/ARC-1379-fix-worktree-provisioning-silent-failure.md`, `issues/story-lifecycle/ARC-1380-fix-archive-guard-silent-failure.md`
 - [ ] Write all plans:
