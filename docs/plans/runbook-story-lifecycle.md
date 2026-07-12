@@ -47,7 +47,7 @@
 ### 🔴 ARC-1374 — Add canonical StoryLifecycleState enum and per-story state field
 
 - [ ] **ARC-1374** — Add canonical StoryLifecycleState enum and per-story state field
-  - [ ] 🔒 Claimed: _(fill in: lane / YYYY-MM-DD HH:MM before starting)_
+  - [x] 🔒 Claimed: story-lifecycle / 2026-07-12 12:27
   - [ ] Read `issues/story-lifecycle/ARC-1374-add-canonical-story-lifecycle-state-enum.md`
   - [ ] Write `implementation_plans/story-lifecycle/ARC-1374-implementation-plan.md`
   - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
