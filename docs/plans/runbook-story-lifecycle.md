@@ -51,7 +51,7 @@
   - [x] Read `issues/story-lifecycle/ARC-1374-add-canonical-story-lifecycle-state-enum.md`
   - [x] Write `implementation_plans/story-lifecycle/ARC-1374-implementation-plan.md`
   - [x] 🔴 INDIVIDUAL PLAN CHECKPOINT
-  - [ ] Execute plan
+  - [x] Execute plan
   - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
   - [ ] Lint / tests pass
   - [ ] Write `task-completions/ARC-1374-COMPLETION-SUMMARY.md`
