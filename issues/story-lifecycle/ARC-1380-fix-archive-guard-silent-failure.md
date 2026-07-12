@@ -2,7 +2,9 @@
 |-------|-------|
 | Type | Story |
 | Priority | High |
-| Status | To Do |
+| Status | Completed |
+| Completion | 100% |
+| Last Updated | 2026-07-12 |
 | Assignee | — |
 | Reporter | — |
 | Created | 2026-07-12 |
@@ -40,5 +42,5 @@ Given the story is in awaiting_escalation_checkpoint due to an archive-guard fai
 
 | Artifact | Path | Status |
 |----------|------|--------|
-| Implementation plan | `implementation_plans/agent-tools/ARC-1380-implementation-plan.md` | TBD |
-| Completion summary | `task-completions/ARC-1380-COMPLETION-SUMMARY.md` | TBD |
+| Implementation plan | `implementation_plans/story-lifecycle/ARC-1380-implementation-plan.md` | Complete |
+| Completion summary | `task-completions/ARC-1380-COMPLETION-SUMMARY.md` | Complete |
