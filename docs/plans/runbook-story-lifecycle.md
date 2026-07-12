@@ -86,7 +86,7 @@
   - [ ] Commit: `feat(story-lifecycle): ARC-1377 implementation`
 - [ ] Execute ARC-1379 — Fix worktree-provisioning silent failure
   - [x] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1379-COMPLETION-SUMMARY.md`
+  - [x] Write `task-completions/ARC-1379-COMPLETION-SUMMARY.md`
   - [ ] Commit: `feat(story-lifecycle): ARC-1379 implementation`
 - [ ] Execute ARC-1380 — Fix archive-guard silent failure
   - [ ] Lint / tests pass
