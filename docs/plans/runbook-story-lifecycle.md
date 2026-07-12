@@ -54,7 +54,7 @@
   - [x] Execute plan
   - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
   - [x] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1374-COMPLETION-SUMMARY.md`
+  - [x] Write `task-completions/ARC-1374-COMPLETION-SUMMARY.md`
   - [ ] Commit: `feat(story-lifecycle): add canonical StoryLifecycleState enum and per-story state field`
 
 ### Wave 1 gate
