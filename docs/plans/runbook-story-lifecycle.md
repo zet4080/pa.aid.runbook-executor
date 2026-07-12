@@ -53,7 +53,7 @@
   - [x] 🔴 INDIVIDUAL PLAN CHECKPOINT
   - [x] Execute plan
   - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
-  - [ ] Lint / tests pass
+  - [x] Lint / tests pass
   - [ ] Write `task-completions/ARC-1374-COMPLETION-SUMMARY.md`
   - [ ] Commit: `feat(story-lifecycle): add canonical StoryLifecycleState enum and per-story state field`
 
