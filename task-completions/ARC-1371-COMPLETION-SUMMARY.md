@@ -5,7 +5,7 @@
 **Epic:** ARC-1295 — ARC: Checkpoint Management
 **Repo:** `pa.aid.conductor.ts`
 **Branch:** `ARC-1371` (off `main` at `03efc9b`, includes merged ARC-1367–ARC-1370)
-**Pull Request:** https://bitbucket.org/proalpha/pa.aid.conductor.ts/pull-requests/8 (open, not yet merged)
+**Pull Request:** https://bitbucket.org/proalpha/pa.aid.conductor.ts/pull-requests/8 (merged to `main`)
 **Completed:** 2026-07-09
 **Duration:** 1 session
 **Cost:** —
@@ -62,5 +62,5 @@ Changes are additive: new exported functions in `checkpointGit.ts`, new optional
 
 ## Next Steps
 
-- PR #8 (https://bitbucket.org/proalpha/pa.aid.conductor.ts/pull-requests/8) is open against `main` and awaiting supervisor/human review and merge.
-- Once merged: archive this issue (`archive_issue`) and update runbook to check off the final "Archive issue" step — not done yet, per workflow (archival only happens after PR merge).
+- PR #8 (https://bitbucket.org/proalpha/pa.aid.conductor.ts/pull-requests/8) was merged to `main`. The story is fully complete.
+- Archival proceeding: issue, implementation plan, and this completion summary are being moved to `done/` and the runbook's final "Archive issue" step checked off.
