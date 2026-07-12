@@ -161,7 +161,7 @@
 
 ## Wave 5 — PR Approval Gate for Planning Artifacts
 
-> Gate: ARC-1371 closed and merged; planning artifact review is fully PR-based
+> Gate: ARC-1371 closed and merged; planning artifact review is fully PR-based ARC-1372 depends on ARC-1371 + ARC-1304 (both already merged).
 
 - [x] Confirm Confirm Wave 4 gate passed
 - [x] Confirm Confirm ARC-1366 (resume_checkpoint) merged
@@ -178,6 +178,19 @@
   - [x] Lint / tests pass
   - [x] Write `task-completions/ARC-1371-COMPLETION-SUMMARY.md`
   - [x] Commit: `feat(checkpoint-management): PR approval gate for implementation plans and decision documents`
+
+### 🔴 ARC-1372 — Unify planning-artifact checkpoint gate with PR comment-resolution loop
+
+- [ ] **ARC-1372** — Unify planning-artifact checkpoint gate with PR comment-resolution loop Depends on ARC-1371 (planning-artifact PR creation and pause mechanism this issue unifies); depends on ARC-1304 (comment-resolution loop this issue reuses)
+  - [ ] 🔒 Claimed: _(fill in: lane / YYYY-MM-DD HH:MM before starting)_
+  - [ ] Read `issues/checkpoint-management/ARC-1372-unify-planning-artifact-gate-with-comment-loop.md`
+  - [ ] Write `implementation_plans/checkpoint-management/ARC-1372-implementation-plan.md`
+  - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
+  - [ ] Execute plan
+  - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
+  - [ ] Lint / tests pass
+  - [ ] Write `task-completions/ARC-1372-COMPLETION-SUMMARY.md`
+  - [ ] Commit: `feat(checkpoint-management): unify planning-artifact gate with comment loop`
 
 ### On-Hold story — ARC-1301
 
@@ -228,4 +241,4 @@ If not: log in On-Hold Register below and skip.
 | 2 | 1 | 1 | 1 | 3 |
 | 3 | 0 | 1 | 1 | 2 |
 | 4 | 0 | 1 | 1 | 2 |
-| 5 | 1 | 2 | 1 | 4 |
+| 5 | 2 | 2 | 1 | 5 |
