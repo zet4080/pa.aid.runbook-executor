@@ -72,7 +72,7 @@
   - Files: `issues/story-lifecycle/ARC-1375-extract-generic-pr-review-loop-sub-machine.md`, `issues/story-lifecycle/ARC-1377-track-agent-self-review-state.md`, `issues/story-lifecycle/ARC-1379-fix-worktree-provisioning-silent-failure.md`, `issues/story-lifecycle/ARC-1380-fix-archive-guard-silent-failure.md`
 - [ ] Write all plans:
   - [x] `implementation_plans/story-lifecycle/ARC-1375-implementation-plan.md`
-  - [ ] `implementation_plans/story-lifecycle/ARC-1377-implementation-plan.md`
+  - [x] `implementation_plans/story-lifecycle/ARC-1377-implementation-plan.md`
   - [ ] `implementation_plans/story-lifecycle/ARC-1379-implementation-plan.md`
   - [ ] `implementation_plans/story-lifecycle/ARC-1380-implementation-plan.md`
 - [ ] 🟡 BATCH PLAN CHECKPOINT
@@ -80,15 +80,15 @@
   - [x] Lint / tests pass
   - [x] Write `task-completions/ARC-1375-COMPLETION-SUMMARY.md`
   - [x] Commit: `feat(story-lifecycle): ARC-1375 implementation`
-- [ ] Execute ARC-1377 — Track agent self-review state explicitly
-  - [ ] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1377-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(story-lifecycle): ARC-1377 implementation`
+- [x] Execute ARC-1377 — Track agent self-review state explicitly
+  - [x] Lint / tests pass
+  - [x] Write `task-completions/ARC-1377-COMPLETION-SUMMARY.md`
+  - [x] Commit: `feat(story-lifecycle): ARC-1377 implementation`
 - [x] Execute ARC-1379 — Fix worktree-provisioning silent failure
   - [x] Lint / tests pass
   - [x] Write `task-completions/ARC-1379-COMPLETION-SUMMARY.md`
   - [x] Commit: `feat(story-lifecycle): ARC-1379 implementation`
-- [ ] Execute ARC-1380 — Fix archive-guard silent failure
+- [x] Execute ARC-1380 — Fix archive-guard silent failure
   - [x] Lint / tests pass
   - [x] Write `task-completions/ARC-1380-COMPLETION-SUMMARY.md`
   - [x] Commit: `feat(story-lifecycle): ARC-1380 implementation`
