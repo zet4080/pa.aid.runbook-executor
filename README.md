@@ -88,6 +88,7 @@ T=0       T=8       T=15      T=19      T=25      T=31      T=37
 | ARC: Queue & Scheduling Policy | ARC-1296 | 3 | Not started |
 | ARC: Failure Handling & Escalation | ARC-1300 | 3 | Not started |
 | ARC: Session History | ARC-1309 | 3 | Not started |
+| ARC: Story Lifecycle State Machine | ARC-1373 | 10 | Not started |
 
 ---
 

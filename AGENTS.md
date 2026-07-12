@@ -60,6 +60,7 @@ git -C /repos/pa.aid.conductor.ts worktree add /repos/<KEY> -b <KEY> main
 | ARC-1296 | ARC: Queue & Scheduling Policy | `issues/queue-scheduling-policy/` |
 | ARC-1300 | ARC: Failure Handling & Escalation | `issues/failure-handling/` |
 | ARC-1309 | ARC: Session History | `issues/session-history/` |
+| ARC-1373 | ARC: Story Lifecycle State Machine | `issues/story-lifecycle/` |
 
 ## Commit Message Format
 

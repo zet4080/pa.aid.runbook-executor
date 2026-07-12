@@ -2,7 +2,9 @@
 |-------|-------|
 | Type | Story |
 | Priority | High |
-| Status | To Do |
+| Status | Superseded — see ARC-1373 epic (implemented via ARC-1376) |
+| Completion | 0% |
+| Last Updated | 2026-07-12 |
 | Assignee | — |
 | Reporter | — |
 | Created | 2026-07-11 |
