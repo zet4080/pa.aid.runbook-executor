@@ -90,7 +90,7 @@
   - [x] Commit: `feat(story-lifecycle): ARC-1379 implementation`
 - [ ] Execute ARC-1380 — Fix archive-guard silent failure
   - [x] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1380-COMPLETION-SUMMARY.md`
+  - [x] Write `task-completions/ARC-1380-COMPLETION-SUMMARY.md`
   - [ ] Commit: `feat(story-lifecycle): ARC-1380 implementation`
 - [ ] ☑ all complete
 
