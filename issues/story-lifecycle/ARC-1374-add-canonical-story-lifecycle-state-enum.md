@@ -2,7 +2,9 @@
 |-------|-------|
 | Type | Story |
 | Priority | High |
-| Status | To Do |
+| Status | In Review |
+| Completion | 90% |
+| Last Updated | 2026-07-12 |
 | Assignee | — |
 | Reporter | — |
 | Created | 2026-07-12 |
