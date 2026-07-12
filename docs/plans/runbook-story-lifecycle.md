@@ -91,7 +91,7 @@
 - [ ] Execute ARC-1380 — Fix archive-guard silent failure
   - [x] Lint / tests pass
   - [x] Write `task-completions/ARC-1380-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(story-lifecycle): ARC-1380 implementation`
+  - [x] Commit: `feat(story-lifecycle): ARC-1380 implementation`
 - [ ] ☑ all complete
 
 ### Wave 2 gate
