@@ -50,7 +50,7 @@
   - [x] 🔒 Claimed: story-lifecycle / 2026-07-12 12:27
   - [x] Read `issues/story-lifecycle/ARC-1374-add-canonical-story-lifecycle-state-enum.md`
   - [x] Write `implementation_plans/story-lifecycle/ARC-1374-implementation-plan.md`
-  - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
+  - [x] 🔴 INDIVIDUAL PLAN CHECKPOINT
   - [ ] Execute plan
   - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
   - [ ] Lint / tests pass
