@@ -71,15 +71,15 @@
 - [x] Read all issues: ARC-1375, ARC-1377, ARC-1379, ARC-1380
   - Files: `issues/story-lifecycle/ARC-1375-extract-generic-pr-review-loop-sub-machine.md`, `issues/story-lifecycle/ARC-1377-track-agent-self-review-state.md`, `issues/story-lifecycle/ARC-1379-fix-worktree-provisioning-silent-failure.md`, `issues/story-lifecycle/ARC-1380-fix-archive-guard-silent-failure.md`
 - [ ] Write all plans:
-  - [ ] `implementation_plans/story-lifecycle/ARC-1375-implementation-plan.md`
+  - [x] `implementation_plans/story-lifecycle/ARC-1375-implementation-plan.md`
   - [ ] `implementation_plans/story-lifecycle/ARC-1377-implementation-plan.md`
   - [ ] `implementation_plans/story-lifecycle/ARC-1379-implementation-plan.md`
   - [ ] `implementation_plans/story-lifecycle/ARC-1380-implementation-plan.md`
 - [ ] 🟡 BATCH PLAN CHECKPOINT
-- [ ] Execute ARC-1375 — Extract generic PR-review-loop sub-machine parametrized by artifact kind
-  - [ ] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1375-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(story-lifecycle): ARC-1375 implementation`
+- [x] Execute ARC-1375 — Extract generic PR-review-loop sub-machine parametrized by artifact kind
+  - [x] Lint / tests pass
+  - [x] Write `task-completions/ARC-1375-COMPLETION-SUMMARY.md`
+  - [x] Commit: `feat(story-lifecycle): ARC-1375 implementation`
 - [ ] Execute ARC-1377 — Track agent self-review state explicitly
   - [ ] Lint / tests pass
   - [ ] Write `task-completions/ARC-1377-COMPLETION-SUMMARY.md`
