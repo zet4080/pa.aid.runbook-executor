@@ -109,7 +109,7 @@
 - [ ] **ARC-1376** — Migrate planning-artifact gate onto shared sub-machine (supersedes ARC-1372) Depends on ARC-1375 (shared sub-machine mechanism)
   - [x] 🔒 Claimed: story-lifecycle / 2026-07-13 15:50
   - [ ] Read `issues/story-lifecycle/ARC-1376-migrate-planning-artifact-gate-onto-shared-sub-machine.md`
-  - [ ] Write `implementation_plans/story-lifecycle/ARC-1376-implementation-plan.md`
+  - [x] Write `implementation_plans/story-lifecycle/ARC-1376-implementation-plan.md`
   - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
   - [ ] Execute plan
   - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
