@@ -73,9 +73,9 @@
 - [ ] Write all plans:
   - [x] `implementation_plans/story-lifecycle/ARC-1375-implementation-plan.md`
   - [x] `implementation_plans/story-lifecycle/ARC-1377-implementation-plan.md`
-  - [ ] `implementation_plans/story-lifecycle/ARC-1379-implementation-plan.md`
+  - [x] `implementation_plans/story-lifecycle/ARC-1379-implementation-plan.md`
   - [x] `implementation_plans/story-lifecycle/ARC-1380-implementation-plan.md`
-- [ ] 🟡 BATCH PLAN CHECKPOINT
+- [x] 🟡 BATCH PLAN CHECKPOINT
 - [x] Execute ARC-1375 — Extract generic PR-review-loop sub-machine parametrized by artifact kind
   - [x] Lint / tests pass
   - [x] Write `task-completions/ARC-1375-COMPLETION-SUMMARY.md`
@@ -92,13 +92,13 @@
   - [x] Lint / tests pass
   - [x] Write `task-completions/ARC-1380-COMPLETION-SUMMARY.md`
   - [x] Commit: `feat(story-lifecycle): ARC-1380 implementation`
-- [ ] ☑ all complete
+- [x] ☑ all complete
 
 ### Wave 2 gate
-- [ ] All active stories in this wave checked off
-- [ ] All PRs merged
-- [ ] All completion summaries written
-- [ ] 🟢 WAVE GATE — notify supervisor; dependent lanes: none
+- [x] All active stories in this wave checked off
+- [x] All PRs merged
+- [x] All completion summaries written
+- [x] 🟢 WAVE GATE — notify supervisor; dependent lanes: none
 
 ## Wave 3 — Gate Migration and New Review Gate
 
