@@ -2,7 +2,9 @@
 |-------|-------|
 | Type | Story |
 | Priority | High |
-| Status | To Do |
+| Status | Completed |
+| Completion | 100% |
+| Last Updated | 2026-07-14 |
 | Assignee | — |
 | Reporter | — |
 | Created | 2026-07-12 |
@@ -49,5 +51,5 @@ Given decision documents previously used a status:pending/answered markdown fiel
 
 | Artifact | Path | Status |
 |----------|------|--------|
-| Implementation plan | `implementation_plans/agent-tools/ARC-1376-implementation-plan.md` | TBD |
-| Completion summary | `task-completions/ARC-1376-COMPLETION-SUMMARY.md` | TBD |
+| Implementation plan | `implementation_plans/story-lifecycle/ARC-1376-implementation-plan.md` | Done |
+| Completion summary | `task-completions/ARC-1376-COMPLETION-SUMMARY.md` | Done |
