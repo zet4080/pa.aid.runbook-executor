@@ -124,7 +124,7 @@
   - [x] Read `issues/story-lifecycle/ARC-1378-add-implementation-review-gate.md`
   - [x] Write `implementation_plans/story-lifecycle/ARC-1378-implementation-plan.md`
   - [x] 🔴 INDIVIDUAL PLAN CHECKPOINT
-  - [ ] Execute plan
+  - [x] Execute plan
   - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
   - [ ] Lint / tests pass
   - [ ] Write `task-completions/ARC-1378-COMPLETION-SUMMARY.md`
