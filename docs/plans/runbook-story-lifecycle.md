@@ -110,7 +110,7 @@
   - [x] 🔒 Claimed: story-lifecycle / 2026-07-13 15:50
   - [x] Read `issues/story-lifecycle/ARC-1376-migrate-planning-artifact-gate-onto-shared-sub-machine.md`
   - [x] Write `implementation_plans/story-lifecycle/ARC-1376-implementation-plan.md`
-  - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
+  - [x] 🔴 INDIVIDUAL PLAN CHECKPOINT
   - [ ] Execute plan
   - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
   - [ ] Lint / tests pass
