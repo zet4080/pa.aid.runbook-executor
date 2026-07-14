@@ -13,3 +13,4 @@
 | ARC-1377 | ARC-1377: Track agent self-review (local-code-review) state explicitly in conductor state | 2026-07-12 | `done/issues/story-lifecycle/ARC-1377-track-agent-self-review-state.md` |
 | ARC-1379 | ARC-1379: Fix worktree-provisioning silent failure — route to escalation checkpoint | 2026-07-12 | `done/issues/story-lifecycle/ARC-1379-fix-worktree-provisioning-silent-failure.md` |
 | ARC-1380 | ARC-1380: Fix archive-guard silent failure — route to escalation checkpoint | 2026-07-12 | `done/issues/story-lifecycle/ARC-1380-fix-archive-guard-silent-failure.md` |
+| ARC-1376 | ARC-1376: Migrate planning-artifact gate onto shared PR-review sub-machine (supersedes ARC-1372) | 2026-07-14 | `done/issues/story-lifecycle/ARC-1376-migrate-planning-artifact-gate-onto-shared-sub-machine.md` |
