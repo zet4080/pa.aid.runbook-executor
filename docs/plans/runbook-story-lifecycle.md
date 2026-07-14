@@ -115,7 +115,7 @@
   - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
   - [x] Lint / tests pass
   - [x] Write `task-completions/ARC-1376-COMPLETION-SUMMARY.md`
-  - [ ] Commit: `feat(story-lifecycle): migrate planning-artifact gate onto shared PR-review sub-machine`
+  - [x] Commit: `feat(story-lifecycle): migrate planning-artifact gate onto shared PR-review sub-machine`
 
 ### 🔴 ARC-1378 — Add new human implementation-review gate after self-review passes
 
