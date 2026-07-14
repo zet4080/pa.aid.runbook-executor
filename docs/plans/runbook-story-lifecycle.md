@@ -127,7 +127,7 @@
   - [x] Execute plan
   - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
   - [x] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1378-COMPLETION-SUMMARY.md`
+  - [x] Write `task-completions/ARC-1378-COMPLETION-SUMMARY.md`
   - [ ] Commit: `feat(story-lifecycle): add human implementation-review gate`
 
 ### Wave 3 gate
