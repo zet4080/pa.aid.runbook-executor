@@ -119,7 +119,7 @@
 
 ### 🔴 ARC-1378 — Add new human implementation-review gate after self-review passes
 
-- [ ] **ARC-1378** — Add new human implementation-review gate after self-review passes Depends on ARC-1375 (shared sub-machine) and ARC-1377 (self-review state tracking)
+- [x] **ARC-1378** — Add new human implementation-review gate after self-review passes Depends on ARC-1375 (shared sub-machine) and ARC-1377 (self-review state tracking)
   - [x] 🔒 Claimed: story-lifecycle / 2026-07-14 09:26
   - [x] Read `issues/story-lifecycle/ARC-1378-add-implementation-review-gate.md`
   - [x] Write `implementation_plans/story-lifecycle/ARC-1378-implementation-plan.md`
