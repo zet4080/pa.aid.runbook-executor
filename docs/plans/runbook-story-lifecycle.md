@@ -125,7 +125,7 @@
   - [x] Write `implementation_plans/story-lifecycle/ARC-1378-implementation-plan.md`
   - [x] 🔴 INDIVIDUAL PLAN CHECKPOINT
   - [x] Execute plan
-  - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
+  - [x] Run `local-code-review` — all BLOCKER/ISSUE resolved
   - [ ] Lint / tests pass
   - [ ] Write `task-completions/ARC-1378-COMPLETION-SUMMARY.md`
   - [ ] Commit: `feat(story-lifecycle): add human implementation-review gate`
