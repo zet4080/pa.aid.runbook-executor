@@ -141,12 +141,12 @@
 ### 🟡 Batch — Batch 4-A
 
 - [x] 🔒 Claimed: story-lifecycle / 2026-07-15 10:15
-- [ ] Read all issues: ARC-1381, ARC-1382, ARC-1383
+- [x] Read all issues: ARC-1381, ARC-1382, ARC-1383
   - Files: `issues/story-lifecycle/ARC-1381-derive-legacy-status-enums-as-rollups.md`, `issues/story-lifecycle/ARC-1382-add-implementation-review-checkpoint-to-template.md`, `issues/story-lifecycle/ARC-1383-end-to-end-lifecycle-regression-tests.md`
-- [ ] Write all plans:
-  - [ ] `implementation_plans/story-lifecycle/ARC-1381-implementation-plan.md`
-  - [ ] `implementation_plans/story-lifecycle/ARC-1382-implementation-plan.md`
-  - [ ] `implementation_plans/story-lifecycle/ARC-1383-implementation-plan.md`
+- [x] Write all plans:
+  - [x] `implementation_plans/story-lifecycle/ARC-1381-implementation-plan.md`
+  - [x] `implementation_plans/story-lifecycle/ARC-1382-implementation-plan.md`
+  - [x] `implementation_plans/story-lifecycle/ARC-1383-implementation-plan.md`
 - [ ] 🟡 BATCH PLAN CHECKPOINT
 - [ ] Execute ARC-1381 — Derive legacy status enums as computed rollups from canonical state Depends on ARC-1374, ARC-1376, ARC-1378
   - [ ] Lint / tests pass
