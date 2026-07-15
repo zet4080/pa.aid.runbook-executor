@@ -157,10 +157,10 @@
   - [x] Write `task-completions/ARC-1382-COMPLETION-SUMMARY.md`
   - [x] Commit: `feat(story-lifecycle): ARC-1382 implementation`
 - [x] Execute ARC-1383 — End-to-end lifecycle regression tests Depends on all prior stories in this epic (ARC-1374 through ARC-1382)
-  - [ ] Lint / tests pass
+  - [x] Lint / tests pass
   - [x] Write `task-completions/ARC-1383-COMPLETION-SUMMARY.md`
   - [x] Commit: `feat(story-lifecycle): ARC-1383 implementation`
-- [ ] ☑ all complete
+- [x] ☑ all complete
 
 ### Wave 4 gate
 - [ ] All active stories in this wave checked off
