@@ -16,3 +16,4 @@
 | ARC-1376 | ARC-1376: Migrate planning-artifact gate onto shared PR-review sub-machine (supersedes ARC-1372) | 2026-07-14 | `done/issues/story-lifecycle/ARC-1376-migrate-planning-artifact-gate-onto-shared-sub-machine.md` |
 | ARC-1378 | ARC-1378: Add new human implementation-review gate after self-review passes | 2026-07-14 | `done/issues/story-lifecycle/ARC-1378-add-implementation-review-gate.md` |
 | ARC-1374 | ARC-1374: Add canonical StoryLifecycleState enum and per-story state field | 2026-07-15 | `done/issues/story-lifecycle/ARC-1374-add-canonical-story-lifecycle-state-enum.md` |
+| ARC-1381 | ARC-1381: Derive legacy status enums as computed rollups from canonical state | 2026-07-15 | `done/issues/story-lifecycle/ARC-1381-derive-legacy-status-enums-as-rollups.md` |
