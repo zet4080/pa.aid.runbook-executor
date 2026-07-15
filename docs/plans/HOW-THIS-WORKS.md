@@ -44,7 +44,8 @@ This repo contains requirements, issues, implementation plans, completion summar
 
 | Symbol | Tier | Trigger | Who acts |
 |--------|------|---------|----------|
-| 🔴 | HIGH individual | Before executing any HIGH-risk story | Coding agent presents plan; human supervisor approves before code is written |
+| 🔴 | HIGH individual plan | Before executing any HIGH-risk story | Coding agent presents plan; human supervisor approves before code is written |
+| 🔴 | HIGH implementation review | After self-review passes, before archiving | Coding agent presents implementation; human supervisor approves before completion summary |
 | 🟡 | MEDIUM/LOW batch | Before executing a batch of MEDIUM/LOW stories | Coding agent presents all plans in batch; human supervisor approves before any story in batch executes |
 | 🟢 | Wave gate | After all stories in a wave are checked off | Human supervisor verifies wave gate checklist; signals dependent lanes |
 
@@ -68,11 +69,13 @@ This repo contains requirements, issues, implementation plans, completion summar
 4. Read all issue files in batch
 5. Write all implementation plans for batch
 6. 🟡 BATCH PLAN CHECKPOINT — present all plans to human supervisor; wait for approval
-7. Execute stories in order: implement → local-code-review → lint/tests → completion summary → commit
+7. Execute stories in order: implement → local-code-review → lint/tests → 🔴 implementation review checkpoint (per-story) → completion summary → commit
 8. Check off each story checkbox in runbook
 9. Check wave gate; if all stories in wave complete, run wave gate checklist and notify supervisor
 
-### 9-step HIGH individual workflow
+**Note:** Implementation-review checkpoints occur per-story within a batch (after each story's self-review passes), but may be reviewed together in one pass by the supervisor.
+
+### 10-step HIGH individual workflow
 
 1. Load `start-execution-session` skill — identify lane, wave, next HIGH story
 2. Confirm cross-lane pre-checks are satisfied
@@ -81,8 +84,9 @@ This repo contains requirements, issues, implementation plans, completion summar
 5. Write implementation plan
 6. 🔴 INDIVIDUAL PLAN CHECKPOINT — present plan to human supervisor; wait for approval; do not write any code before approval
 7. Execute plan: implement → local-code-review (iterate max 3 times for BLOCKER/ISSUE) → lint/tests pass
-8. Write completion summary; commit
-9. Check off story checkbox in runbook; check wave gate
+8. 🔴 IMPLEMENTATION REVIEW CHECKPOINT — present implementation to human supervisor; wait for approval before archiving
+9. Write completion summary; commit
+10. Check off story checkbox in runbook; check wave gate
 
 ---
 

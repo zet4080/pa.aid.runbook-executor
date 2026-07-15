@@ -93,12 +93,13 @@ Every generated runbook uses this template. Do not omit any block.
 1. 🔒 Fill generated claim row in runbook + commit
 2. Read issue file
 3. Write implementation plan
-4. 🔴 CHECKPOINT — human reviews plan
+4. 🔴 INDIVIDUAL PLAN CHECKPOINT — human reviews plan before execution
 5. Execute plan
-6. Run `local-code-review` — all BLOCKER/ISSUE resolved
-7. Lint / tests pass
-8. Write completion summary
-9. Commit + ☑
+6. Run `local-code-review` — agent self-review with automated lint/tests/type-check
+7. 🔴 IMPLEMENTATION REVIEW CHECKPOINT — human reviews implementation before archiving
+8. Lint / tests pass (final verification after addressing review comments)
+9. Write completion summary
+10. Commit + ☑
 ```
 
 **MEDIUM/LOW batch workflow (9 steps):**
@@ -130,6 +131,7 @@ Every generated runbook uses this template. Do not omit any block.
   - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
   - [ ] Execute plan
   - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
+  - [ ] 🔴 IMPLEMENTATION REVIEW CHECKPOINT
   - [ ] Lint / tests pass
   - [ ] Write `task-completions/{KEY}-COMPLETION-SUMMARY.md`
   - [ ] Commit: `feat({feature}): {short description}`
