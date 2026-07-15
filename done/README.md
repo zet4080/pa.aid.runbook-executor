@@ -18,3 +18,4 @@
 | ARC-1374 | ARC-1374: Add canonical StoryLifecycleState enum and per-story state field | 2026-07-15 | `done/issues/story-lifecycle/ARC-1374-add-canonical-story-lifecycle-state-enum.md` |
 | ARC-1381 | ARC-1381: Derive legacy status enums as computed rollups from canonical state | 2026-07-15 | `done/issues/story-lifecycle/ARC-1381-derive-legacy-status-enums-as-rollups.md` |
 | ARC-1382 | ARC-1382: Add implementation-review checkpoint recognition to runbook template/docs/parser | 2026-07-15 | `done/issues/story-lifecycle/ARC-1382-add-implementation-review-checkpoint-to-template.md` |
+| ARC-1383 | ARC-1383: End-to-end lifecycle regression tests | 2026-07-15 | `done/issues/story-lifecycle/ARC-1383-end-to-end-lifecycle-regression-tests.md` |
