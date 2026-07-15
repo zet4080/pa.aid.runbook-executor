@@ -15,3 +15,4 @@
 | ARC-1380 | ARC-1380: Fix archive-guard silent failure — route to escalation checkpoint | 2026-07-12 | `done/issues/story-lifecycle/ARC-1380-fix-archive-guard-silent-failure.md` |
 | ARC-1376 | ARC-1376: Migrate planning-artifact gate onto shared PR-review sub-machine (supersedes ARC-1372) | 2026-07-14 | `done/issues/story-lifecycle/ARC-1376-migrate-planning-artifact-gate-onto-shared-sub-machine.md` |
 | ARC-1378 | ARC-1378: Add new human implementation-review gate after self-review passes | 2026-07-14 | `done/issues/story-lifecycle/ARC-1378-add-implementation-review-gate.md` |
+| ARC-1374 | ARC-1374: Add canonical StoryLifecycleState enum and per-story state field | 2026-07-15 | `done/issues/story-lifecycle/ARC-1374-add-canonical-story-lifecycle-state-enum.md` |
