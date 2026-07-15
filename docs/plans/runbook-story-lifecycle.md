@@ -158,7 +158,7 @@
   - [x] Commit: `feat(story-lifecycle): ARC-1382 implementation`
 - [ ] Execute ARC-1383 — End-to-end lifecycle regression tests Depends on all prior stories in this epic (ARC-1374 through ARC-1382)
   - [ ] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1383-COMPLETION-SUMMARY.md`
+  - [x] Write `task-completions/ARC-1383-COMPLETION-SUMMARY.md`
   - [ ] Commit: `feat(story-lifecycle): ARC-1383 implementation`
 - [ ] ☑ all complete
 
