@@ -163,10 +163,10 @@
 - [x] ☑ all complete
 
 ### Wave 4 gate
-- [ ] All active stories in this wave checked off
-- [ ] All PRs merged
-- [ ] All completion summaries written
-- [ ] 🟢 WAVE GATE — notify supervisor; dependent lanes: none
+- [x] All active stories in this wave checked off
+- [x] All PRs merged
+- [x] All completion summaries written
+- [x] 🟢 WAVE GATE — notify supervisor; dependent lanes: none
 
 ## On-Hold Register
 
