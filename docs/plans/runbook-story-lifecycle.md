@@ -147,7 +147,7 @@
   - [x] `implementation_plans/story-lifecycle/ARC-1381-implementation-plan.md`
   - [x] `implementation_plans/story-lifecycle/ARC-1382-implementation-plan.md`
   - [x] `implementation_plans/story-lifecycle/ARC-1383-implementation-plan.md`
-- [ ] 🟡 BATCH PLAN CHECKPOINT
+- [x] 🟡 BATCH PLAN CHECKPOINT
 - [ ] Execute ARC-1381 — Derive legacy status enums as computed rollups from canonical state Depends on ARC-1374, ARC-1376, ARC-1378
   - [ ] Lint / tests pass
   - [ ] Write `task-completions/ARC-1381-COMPLETION-SUMMARY.md`
