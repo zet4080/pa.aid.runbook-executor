@@ -154,7 +154,7 @@
   - [x] Commit: `feat(story-lifecycle): ARC-1381 implementation`
 - [ ] Execute ARC-1382 — Add implementation-review checkpoint recognition to runbook template/docs/parser Depends on ARC-1378
   - [ ] Lint / tests pass
-  - [ ] Write `task-completions/ARC-1382-COMPLETION-SUMMARY.md`
+  - [x] Write `task-completions/ARC-1382-COMPLETION-SUMMARY.md`
   - [ ] Commit: `feat(story-lifecycle): ARC-1382 implementation`
 - [ ] Execute ARC-1383 — End-to-end lifecycle regression tests Depends on all prior stories in this epic (ARC-1374 through ARC-1382)
   - [ ] Lint / tests pass
