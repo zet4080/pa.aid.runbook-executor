@@ -140,7 +140,7 @@
 
 ### 🟡 Batch — Batch 4-A
 
-- [ ] 🔒 Claimed: _(fill in: lane / YYYY-MM-DD HH:MM before starting)_
+- [x] 🔒 Claimed: story-lifecycle / 2026-07-15 10:15
 - [ ] Read all issues: ARC-1381, ARC-1382, ARC-1383
   - Files: `issues/story-lifecycle/ARC-1381-derive-legacy-status-enums-as-rollups.md`, `issues/story-lifecycle/ARC-1382-add-implementation-review-checkpoint-to-template.md`, `issues/story-lifecycle/ARC-1383-end-to-end-lifecycle-regression-tests.md`
 - [ ] Write all plans:
