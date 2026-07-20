@@ -128,13 +128,16 @@ Every generated runbook uses this template. Do not omit any block.
   - [ ] 🔒 Claimed: _(fill in: lane / YYYY-MM-DD HH:MM before starting)_
   - [ ] Read `issues/{feature}/{KEY}-{title}.md`
   - [ ] Write `implementation_plans/{feature}/{KEY}-implementation-plan.md`
+  - [ ] Commit plan: `docs({feature}): {KEY} implementation plan`
+  - [ ] Push and open PR (implementation plan)
   - [ ] 🔴 INDIVIDUAL PLAN CHECKPOINT
   - [ ] Execute plan
   - [ ] Run `local-code-review` — all BLOCKER/ISSUE resolved
-  - [ ] 🔴 IMPLEMENTATION REVIEW CHECKPOINT
   - [ ] Lint / tests pass
   - [ ] Write `task-completions/{KEY}-COMPLETION-SUMMARY.md`
   - [ ] Commit: `feat({feature}): {short description}`
+  - [ ] Push and open PR(s) — one per affected repository if the story spans multiple repos
+  - [ ] 🔴 IMPLEMENTATION REVIEW CHECKPOINT
 
 ### 🟡/🟢 Batch — {group description}
 
